@@ -1,0 +1,13 @@
+{
+  "name": "lexguard",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*",
+    "evals"
+  ],
+  "engines": {
+    "node": ">=22.12.0 <23"
+  }
+}
