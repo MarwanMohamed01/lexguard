@@ -52,3 +52,26 @@ They change, so re-check before relying on them.
 - D1 and Durable Objects: 100,000 row writes per day.
 - Workers AI: 10,000 Neurons per day, so evals run locally on Ollama.
 - Vectorize: 5M stored vector dimensions (about 6,500 vectors at 768 dims).
+
+## D6. `legacy-peer-deps=true` in `.npmrc` (npm 10.9.9 workaround)
+
+- **Problem:** `npm install vitest` crashes with `Cannot read properties of null
+  (reading 'edgesOut')` in npm's resolver. Reproduced in an empty folder with
+  vitest 4.1.0, 4.1.11 and 4.1.12, so it is npm 10.9.9 vs vitest's peer graph,
+  not our workspace.
+- **Decision:** set `legacy-peer-deps=true` in the project `.npmrc`. It only
+  changes this repo, not your global npm.
+- **Cost:** npm no longer installs peers automatically or flags peer conflicts.
+  We install peers explicitly and check with `npm ls --all` (clean on 2026-11-06).
+- **Alternative not taken:** upgrading npm globally (changes the whole machine).
+  Revisit if a newer npm is wanted.
+
+## D7. Known `npm audit` findings (dev tooling only)
+
+- 15 findings (9 moderate, 6 high) in dev dependencies: wrangler/miniflare,
+  undici, sharp, zod (transitive), eslint, typescript-eslint, minimatch.
+- npm's suggested fixes are all downgrades (pool-workers 0.12.21, eslint 9.39.5,
+  typescript-eslint 8.36.0), which would break the version alignment in D4.
+  `npm audit fix --force` is therefore not used.
+- None of these tools run inside the deployed Worker. Review each advisory
+  properly in M7 (supply chain) and decide upgrade, ignore with reason, or replace.
