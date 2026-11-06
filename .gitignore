@@ -1,0 +1,28 @@
+# dependencies
+node_modules/
+
+# Cloudflare / Wrangler local state
+.wrangler/
+.dev.vars
+.dev.vars.*
+!.dev.vars.example
+
+# secrets and env files (never commit)
+.env
+.env.*
+!.env.example
+
+# build and test output
+dist/
+coverage/
+
+# Evalite local results
+evals/.evalite/
+node_modules/.evalite/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.log
