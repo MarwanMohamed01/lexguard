@@ -1,0 +1,9 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  // Worker name: becomes lexguard.<your-subdomain>.workers.dev on deploy.
+  "name": "lexguard",
+  "main": "src/index.ts",
+  // Pins runtime behaviour to this date so Cloudflare updates never change our Worker silently.
+  "compatibility_date": "2026-11-01",
+  // Bindings (D1, Vectorize, Queues, Workflows, AI...) are added here in later milestones.
+}
