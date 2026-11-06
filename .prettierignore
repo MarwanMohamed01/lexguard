@@ -1,0 +1,9 @@
+node_modules/
+package-lock.json
+.wrangler/
+dist/
+coverage/
+evals/.evalite/
+**/worker-configuration.d.ts
+# The original spec is kept exactly as written.
+PROJECT.md

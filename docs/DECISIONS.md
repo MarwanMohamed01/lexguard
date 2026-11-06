@@ -38,12 +38,13 @@ They change, so re-check before relying on them.
 
 ## D4. Version pins
 
-| Tool | Pin | Reason |
-|---|---|---|
-| Node | 22.x | Per PROJECT.md. Installed: 22.23.4 |
-| TypeScript | 6.0.3 | typescript-eslint supports `>=4.8.4 <6.1.0`, so TS 7 (latest) is not yet supported |
-| Vitest | 4.x | `@cloudflare/vitest-pool-workers` and Evalite both require `^4`; Vitest 5 is not compatible |
-| Package manager | npm workspaces | Already installed, fewer moving parts than pnpm |
+| Tool            | Pin            | Reason                                                                                |
+| --------------- | -------------- | ------------------------------------------------------------------------------------- |
+| Node            | 22.x           | Per PROJECT.md. Installed: 22.23.4                                                    |
+| TypeScript      | 6.0.3          | typescript-eslint supports `>=4.8.4 <6.1.0`, so TS 7 (latest) is not yet supported    |
+| Vitest          | 4.1.12         | Evalite requires `^4`; `@cloudflare/vitest-plugin` accepts `^4.1.0 \|\| ^5.0.0`       |
+| Wrangler        | 4.158.0        | Same version `@cloudflare/vitest-plugin` 1.6.0 bundles, so only one copy is installed |
+| Package manager | npm workspaces | Already installed, fewer moving parts than pnpm                                       |
 
 ## D5. Free-tier budgets that shape the design
 
@@ -56,7 +57,7 @@ They change, so re-check before relying on them.
 ## D6. `legacy-peer-deps=true` in `.npmrc` (npm 10.9.9 workaround)
 
 - **Problem:** `npm install vitest` crashes with `Cannot read properties of null
-  (reading 'edgesOut')` in npm's resolver. Reproduced in an empty folder with
+(reading 'edgesOut')` in npm's resolver. Reproduced in an empty folder with
   vitest 4.1.0, 4.1.11 and 4.1.12, so it is npm 10.9.9 vs vitest's peer graph,
   not our workspace.
 - **Decision:** set `legacy-peer-deps=true` in the project `.npmrc`. It only
@@ -75,3 +76,13 @@ They change, so re-check before relying on them.
   `npm audit fix --force` is therefore not used.
 - None of these tools run inside the deployed Worker. Review each advisory
   properly in M7 (supply chain) and decide upgrade, ignore with reason, or replace.
+
+## D8. Workers test integration: `@cloudflare/vitest-plugin`
+
+- `@cloudflare/vitest-pool-workers` is deprecated (renamed, no more updates).
+  We use its replacement `@cloudflare/vitest-plugin` 1.6.0 with the
+  `cloudflareTest()` Vite plugin, per the official docs.
+- `@cloudflare/workers-types` is not installed: `wrangler types` generates both
+  our `Env` type and the runtime types into `apps/worker/worker-configuration.d.ts`.
+  That file is committed. Re-run `npm run types -w @lexguard/worker` after any
+  change to `wrangler.jsonc`.
