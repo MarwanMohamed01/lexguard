@@ -104,5 +104,5 @@ explain it._
 
 ### Still to do in M0
 
-- [ ] Deploy hello-world (`wrangler login`, then `npm run deploy -w @lexguard/worker`)
+- [x] Deployed hello-world on 2026-11-08 at https://lexguard.marwan-dev.workers.dev (`/` → JSON, `/health` → ok, other paths → 404). Bundle: 0.41 KiB, startup 1 ms.
 - [ ] Create the public GitHub repo and see CI run (when I decide)
