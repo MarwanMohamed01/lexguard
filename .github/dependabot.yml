@@ -9,6 +9,15 @@ updates:
     groups:
       minor-and-patch:
         update-types: [minor, patch]
+    # Upgrades blocked by other tools (see docs/DECISIONS.md D4 and D9).
+    # Remove a rule once the blocking tool supports the new version.
+    ignore:
+      # typescript-eslint 8.x supports TypeScript ">=4.8.4 <6.1.0".
+      - dependency-name: typescript
+        versions: [">=6.1.0"]
+      # Evalite 0.19 depends on @vitest/runner ^4.
+      - dependency-name: vitest
+        update-types: [version-update:semver-major]
 
   # Keeps the SHA-pinned GitHub Actions in ci.yml up to date.
   - package-ecosystem: github-actions
