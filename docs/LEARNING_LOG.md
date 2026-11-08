@@ -101,7 +101,7 @@ explain it._
 
 - npm and tooling: 3/3 · Worker basics: 3/4 (missed `compatibility_date`)
 - CI: 3/3 · Threat model: 3/4 (missed "quarantined reader beats bigger model")
-- Deploy: 0/3 (login token location, bundling to JS, bindings) — revisit before M1
+- Deploy: 0/3 → after recap 3/4. Remaining gap: API keys never go in `wrangler.jsonc` (it is committed and public); use `wrangler secret put` / `.dev.vars`
 
 ### Still to do in M0
 
