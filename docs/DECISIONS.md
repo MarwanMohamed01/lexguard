@@ -86,3 +86,13 @@ They change, so re-check before relying on them.
   our `Env` type and the runtime types into `apps/worker/worker-configuration.d.ts`.
   That file is committed. Re-run `npm run types -w @lexguard/worker` after any
   change to `wrangler.jsonc`.
+
+## D9. Dependabot ignores blocked upgrades
+
+- Dependabot opened PRs for TypeScript 7.0.2 and Vitest 5.1.0 on day one; CI
+  failed on both, confirming the constraints in D4.
+- Decision: close those PRs and add `ignore` rules in `.github/dependabot.yml`
+  for TypeScript `>=6.1.0` and Vitest major versions. All other updates still
+  arrive normally.
+- Revisit when typescript-eslint supports TS 7 (TypeScript rule) or when we move
+  to an Evalite version built on Vitest 5 (Vitest rule). Check during M9 at the latest.
