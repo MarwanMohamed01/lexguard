@@ -106,4 +106,5 @@ explain it._
 ### Still to do in M0
 
 - [x] Deployed hello-world on 2026-11-08 at https://lexguard.marwan-dev.workers.dev (`/` → JSON, `/health` → ok, other paths → 404). Bundle: 0.41 KiB, startup 1 ms.
-- [ ] Create the public GitHub repo and see CI run (when I decide)
+- [x] Public repo https://github.com/MarwanMohamed01/lexguard created and pushed on 2026-11-08. CI green on Linux. Lesson: the first push failed gitleaks with exit code 1 (tool error, not a leak) because the push range started at the root commit, which has no parent; a manual full-history run passed.
+- [x] Dependabot immediately proposed TypeScript 7 and Vitest 5; CI failed on both, as expected. The safety net works.
