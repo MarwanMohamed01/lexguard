@@ -16,7 +16,8 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "check": "npm run typecheck && npm run lint && npm run format:check && npm run test"
+    "check": "npm run check:hidden && npm run typecheck && npm run lint && npm run format:check && npm run test",
+    "check:hidden": "node scripts/check-hidden-chars.mjs"
   },
   "devDependencies": {
     "@cloudflare/vitest-plugin": "1.6.0",
