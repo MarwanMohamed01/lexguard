@@ -1,0 +1,8 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    // Evals run on your machine and in CI under Node, never inside a Worker.
+    "types": ["node"]
+  },
+  "include": ["pii"]
+}

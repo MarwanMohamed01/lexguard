@@ -1,0 +1,92 @@
+{
+  "datasetVersion": "pii-v1",
+  "cases": 33,
+  "supported": {
+    "tp": 25,
+    "fp": 2,
+    "fn": 2,
+    "precision": 0.9259259259259259,
+    "recall": 0.9259259259259259,
+    "f1": 0.9259259259259259
+  },
+  "byType": {
+    "EMAIL": {
+      "tp": 6,
+      "fp": 0,
+      "fn": 1,
+      "precision": 1,
+      "recall": 0.8571428571428571,
+      "f1": 0.923076923076923
+    },
+    "IBAN": {
+      "tp": 8,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1
+    },
+    "CARD": {
+      "tp": 4,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1
+    },
+    "PHONE": {
+      "tp": 7,
+      "fp": 2,
+      "fn": 1,
+      "precision": 0.7777777777777778,
+      "recall": 0.875,
+      "f1": 0.823529411764706
+    }
+  },
+  "names": {
+    "labelled": 3,
+    "caught": 0
+  },
+  "failures": [
+    {
+      "id": "email-obfuscated",
+      "missed": [
+        {
+          "type": "EMAIL",
+          "value": "privacy (at) fabrikam (dot) com"
+        }
+      ],
+      "falseAlarms": []
+    },
+    {
+      "id": "phone-us-national",
+      "missed": [
+        {
+          "type": "PHONE",
+          "value": "(415) 555-0199"
+        }
+      ],
+      "falseAlarms": []
+    },
+    {
+      "id": "neg-company-number",
+      "missed": [],
+      "falseAlarms": [
+        {
+          "type": "PHONE",
+          "value": "01234567"
+        }
+      ]
+    },
+    {
+      "id": "neg-registration-id",
+      "missed": [],
+      "falseAlarms": [
+        {
+          "type": "PHONE",
+          "value": "0123456789"
+        }
+      ]
+    }
+  ]
+}
