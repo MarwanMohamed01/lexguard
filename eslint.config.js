@@ -28,8 +28,16 @@ export default defineConfig(
     extends: [tseslint.configs.disableTypeChecked],
   },
   {
-    // Repo scripts run in Node.
-    files: ["scripts/**/*.mjs"],
-    languageOptions: { globals: { process: "readonly", console: "readonly" } },
+    // Repo and eval scripts run in Node.
+    files: ["scripts/**/*.mjs", "evals/**/*.mjs"],
+    languageOptions: {
+      globals: {
+        process: "readonly",
+        console: "readonly",
+        URL: "readonly",
+        fetch: "readonly",
+        Buffer: "readonly",
+      },
+    },
   },
 );

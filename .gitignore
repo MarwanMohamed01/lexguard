@@ -26,3 +26,6 @@ Thumbs.db
 .vscode/
 .idea/
 *.log
+
+# Downloaded eval datasets (fetched by evals/*/fetch.mjs, never committed)
+evals/data/

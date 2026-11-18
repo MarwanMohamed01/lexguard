@@ -1,0 +1,243 @@
+{
+  "dataset": "gretelai/gretel-pii-masking-en-v1 (test split)",
+  "revision": "e06eb1499ca8d54470f085021cd8e54f9efac7fd",
+  "coverage": {
+    "labelledEntities": 21378,
+    "supportedEntities": 2616,
+    "share": 0.12236879034521471
+  },
+  "all": {
+    "rows": 5000,
+    "strict": {
+      "tp": 1891,
+      "fp": 87,
+      "fn": 725,
+      "precision": 0.9560161779575329,
+      "recall": 0.7228593272171254,
+      "f1": 0.8232477144101003
+    },
+    "overlap": {
+      "tp": 1957,
+      "fp": 22,
+      "fn": 659,
+      "precision": 0.9888832743810005,
+      "recall": 0.7480886850152905,
+      "f1": 0.8517954298150163
+    },
+    "byType": {
+      "EMAIL": {
+        "strict": {
+          "tp": 1048,
+          "fp": 21,
+          "fn": 1,
+          "precision": 0.980355472404116,
+          "recall": 0.9990467111534795,
+          "f1": 0.9896128423040604
+        },
+        "overlap": {
+          "tp": 1049,
+          "fp": 20,
+          "fn": 0,
+          "precision": 0.9812909260991581,
+          "recall": 1,
+          "f1": 0.9905571293673276
+        }
+      },
+      "PHONE": {
+        "strict": {
+          "tp": 412,
+          "fp": 65,
+          "fn": 492,
+          "precision": 0.8637316561844863,
+          "recall": 0.4557522123893805,
+          "f1": 0.5966690803765388
+        },
+        "overlap": {
+          "tp": 461,
+          "fp": 2,
+          "fn": 443,
+          "precision": 0.9956803455723542,
+          "recall": 0.5099557522123894,
+          "f1": 0.6744696415508412
+        }
+      },
+      "CARD": {
+        "strict": {
+          "tp": 431,
+          "fp": 1,
+          "fn": 232,
+          "precision": 0.9976851851851852,
+          "recall": 0.6500754147812972,
+          "f1": 0.7872146118721461
+        },
+        "overlap": {
+          "tp": 447,
+          "fp": 0,
+          "fn": 216,
+          "precision": 1,
+          "recall": 0.6742081447963801,
+          "f1": 0.8054054054054054
+        }
+      }
+    },
+    "redactedOtherPii": 133
+  },
+  "contracts": {
+    "rows": 403,
+    "strict": {
+      "tp": 195,
+      "fp": 9,
+      "fn": 65,
+      "precision": 0.9558823529411765,
+      "recall": 0.75,
+      "f1": 0.8405172413793103
+    },
+    "overlap": {
+      "tp": 200,
+      "fp": 4,
+      "fn": 60,
+      "precision": 0.9803921568627451,
+      "recall": 0.7692307692307693,
+      "f1": 0.8620689655172413
+    },
+    "byType": {
+      "EMAIL": {
+        "strict": {
+          "tp": 111,
+          "fp": 3,
+          "fn": 0,
+          "precision": 0.9736842105263158,
+          "recall": 1,
+          "f1": 0.9866666666666666
+        },
+        "overlap": {
+          "tp": 111,
+          "fp": 3,
+          "fn": 0,
+          "precision": 0.9736842105263158,
+          "recall": 1,
+          "f1": 0.9866666666666666
+        }
+      },
+      "PHONE": {
+        "strict": {
+          "tp": 25,
+          "fp": 6,
+          "fn": 36,
+          "precision": 0.8064516129032258,
+          "recall": 0.4098360655737705,
+          "f1": 0.5434782608695652
+        },
+        "overlap": {
+          "tp": 28,
+          "fp": 1,
+          "fn": 33,
+          "precision": 0.9655172413793104,
+          "recall": 0.45901639344262296,
+          "f1": 0.6222222222222222
+        }
+      },
+      "CARD": {
+        "strict": {
+          "tp": 59,
+          "fp": 0,
+          "fn": 29,
+          "precision": 1,
+          "recall": 0.6704545454545454,
+          "f1": 0.8027210884353742
+        },
+        "overlap": {
+          "tp": 61,
+          "fp": 0,
+          "fn": 27,
+          "precision": 1,
+          "recall": 0.6931818181818182,
+          "f1": 0.8187919463087248
+        }
+      }
+    },
+    "redactedOtherPii": 14
+  },
+  "cardsLuhnValid": {
+    "labelled": 438,
+    "strictRecall": 0.9840182648401826,
+    "overlapRecall": 0.9840182648401826
+  },
+  "unsupportedTypes": {
+    "medical_record_number": 2658,
+    "date_of_birth": 2331,
+    "ssn": 1661,
+    "first_name": 1172,
+    "date": 1157,
+    "last_name": 1057,
+    "customer_id": 1033,
+    "employee_id": 1005,
+    "name": 980,
+    "ipv4": 896,
+    "street_address": 869,
+    "license_plate": 579,
+    "address": 563,
+    "user_name": 338,
+    "bank_routing_number": 257,
+    "device_identifier": 249,
+    "date_time": 211,
+    "unique_identifier": 189,
+    "company_name": 185,
+    "account_number": 141,
+    "biometric_identifier": 137,
+    "city": 128,
+    "certificate_license_number": 124,
+    "time": 106,
+    "postcode": 104,
+    "vehicle_identifier": 98,
+    "coordinate": 85,
+    "country": 71,
+    "ipv6": 66,
+    "api_key": 60,
+    "password": 59,
+    "national_id": 46,
+    "health_plan_beneficiary_number": 41,
+    "swift_bic": 28,
+    "state": 27,
+    "tax_id": 23,
+    "url": 23,
+    "cvv": 3,
+    "pin": 2
+  },
+  "examples": {
+    "missed": [
+      "CARD: 3548 6974 7128 1306",
+      "CARD: 3530-2910-7196-",
+      "CARD: 3768-7258-8504-048",
+      "PHONE: 280.900.0632x9032",
+      "PHONE: 939-227-6163",
+      "PHONE: 5635402307",
+      "PHONE: 81365803",
+      "PHONE: 8199950189",
+      "PHONE: 1-611-305-2549",
+      "PHONE: 1 (186) 115-8024",
+      "PHONE: 1657795349",
+      "PHONE: 174.225.5752",
+      "PHONE: 4622-7461",
+      "PHONE: 34275627",
+      "PHONE: 192-543-2518 x509"
+    ],
+    "falseAlarms": [
+      "EMAIL: old@example.com",
+      "EMAIL: new@example.com",
+      "EMAIL: old@example.com",
+      "EMAIL: privacy@ourhealthcare.com",
+      "EMAIL: privacy@example.com",
+      "EMAIL: privacy@example.com",
+      "PHONE: +1 (123) 456-7890.\n3",
+      "EMAIL: support@example.com",
+      "EMAIL: support@example.com",
+      "EMAIL: billing@netconnect.com",
+      "EMAIL: hr@ourcompany.com",
+      "EMAIL: hr@ourcompany.com",
+      "EMAIL: support@ourcompany.com",
+      "EMAIL: support@ourwebsite.com",
+      "EMAIL: info@pensionplan.com"
+    ]
+  }
+}
