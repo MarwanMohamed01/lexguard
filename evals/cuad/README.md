@@ -16,9 +16,30 @@ Real commercial contracts with lawyer-labelled clauses, used for Lexguard's cont
 npm run fetch:cuad -w @lexguard/evals
 ```
 
+## PII over-redaction (M1): results
+
+`redaction.test.ts` runs the redactor on all 510 contracts and writes
+`../results/cuad-redaction.json`. CUAD has no PII labels, so this **describes** what would be
+redacted; it is not a precision score.
+
+| Configuration          | Redactions | Email | Phone | Card | Characters changed | Clause spans altered |
+| ---------------------- | ---------- | ----- | ----- | ---- | ------------------ | -------------------- |
+| No regions             | 414        | 339   | 75    | 0    | 0.033%             | 0 / 13,823           |
+| `phoneRegions: ["US"]` | 947        | 339   | 608   | 0    | 0.059%             | 0 / 13,823           |
+
+- Redactions are contact details in notice blocks, signature pages and press-release
+  contacts (`Facsimile No. (708) 598-4671`, `Email: …@dova.com`). No lawyer-labelled clause
+  span is touched.
+- **Bug found and fixed here:** card detection first produced 33 hits, all false: rows of
+  table figures and patent numbers that passed Luhn by chance. Cards now require a standard
+  print layout and a card-issuer prefix (ISO/IEC 7812). Gretel card precision went to 1.000;
+  Luhn-valid card recall 0.982 → 0.977.
+- **CPU (Node, not yet measured inside Workers):** 0.40 ms per 1,000 characters with US
+  phones; about 0.5 ms per 4,000-character chunk; 243 ms for the longest contract (292k
+  characters) in one call, so redaction must run per chunk.
+
 ## Planned uses
 
-- **PII over-redaction (M1):** how often the redactor changes genuine contract text.
 - **Quote check (M5):** every labelled span must pass the verifier's exact-quote check;
   automatically altered spans (changed number, removed "not", swapped sentence) must fail.
 - **Clause extraction (M4):** precision / recall / F1 of extracted clauses against the labels,

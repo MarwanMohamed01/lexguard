@@ -1,0 +1,112 @@
+{
+  "internationalOnly": {
+    "phoneRegions": [],
+    "contracts": 510,
+    "characters": 26807133,
+    "redactions": {
+      "total": 414,
+      "EMAIL": 339,
+      "IBAN": 0,
+      "CARD": 0,
+      "PHONE": 75
+    },
+    "redactedCharacters": 8860,
+    "redactedShare": 0.0003305090477224849,
+    "perContract": {
+      "withAny": 114,
+      "median": 0,
+      "max": 22,
+      "maxTitle": "BONTONSTORESINC_04_20_2018-EX-99.3-AGENCY AGREEMENT"
+    },
+    "clauseSpans": {
+      "labelled": 13823,
+      "altered": 0,
+      "alteredShare": 0,
+      "byClauseType": {}
+    },
+    "examples": {
+      "EMAIL": [
+        "…hief Executive Officer Email: [[asapir@dova.com]] With a copy to: Dova Pharmac…",
+        "…ntion: General Counsel Email: [[mbanjak@dova.com]] if to Valeant, to: Valeant P…",
+        "… Fax: 1-510-595-8183 Email: [[salixmc@dlss.com]] Please click here for full P…",
+        "…ahn Chief Financial Officer [[mhahn@dova.com]] (919) 338-7936 Salix Invest…",
+        "…tor Contact: Arthur Shannon [[Arthur.Shannon@bauschhealth.com]] 514-856-3855 877-281-6642 (…",
+        "…icke Partners John Woolford [[john.woolford@westwicke.com]] (443) 213-0506 Salix Media …",
+        "…dia Contacts: Lainie Keller [[Lainie.Keller@bauschhealth.com]] 908-927-0617 Karen Paff CO…",
+        "…LS INC., 10-Q, 11/8/2018 [[Karen.Paff@salix.com]] 908-927-1190 AkaRx, Inc., a…",
+        "…mmunications 877-435-2524 [[s.levine@ekrtx.com]] -74- TM TM ® ® SC…",
+        "…nd Chief Legal Officer email: [[Wendy.cassity@nuance.com]] with a copy to: David Garfink…"
+      ],
+      "IBAN": [],
+      "CARD": [],
+      "PHONE": [
+        "…nd, VIC 3121 AUSTRALIA Fax :[[+613 8420 8599]] (ii) to IntriCon…",
+        "… States of America Facsimile: [[+1.312.558.5700]] Email: mcostigan@winston.com …",
+        "…go, Illinois 60654 Facsimile: [[+1.312.862.2200]] Email: henry.kleeman@kirkland…",
+        "…Republic of China Facsimile: [[+86 10 8260 7166]] Attention: Head of Legal Dep…",
+        "…Republic of China Facsimile: [[+86 10 6563 6001]] Attention: Lee Edwards, Esq.…",
+        "…Republic of China Facsimile: [[+ 86 (21) 6086 7111]] Attention: President with a…",
+        "…entral, Hong Kong Facsimile: [[+852 3740 4727]] Attention: Jonathan B. Stone…",
+        "… St., 81227 Yavne Israel Tel: [[+972 8 932 4010]] Fax: +972 8 932 4011 E-Mail: …",
+        "…ael Tel: +972 8 932 4010 Fax: [[+972 8 932 4011]] E-Mail: [***] 14.3 CBC's ad…",
+        "… Marlborough, MA 01752 Tel: [[+81 93 645 8949]] USA Fax: +81 93 645 8948 …"
+      ]
+    }
+  },
+  "withUs": {
+    "phoneRegions": [
+      "US"
+    ],
+    "contracts": 510,
+    "characters": 26807133,
+    "redactions": {
+      "total": 947,
+      "EMAIL": 339,
+      "IBAN": 0,
+      "CARD": 0,
+      "PHONE": 608
+    },
+    "redactedCharacters": 15826,
+    "redactedShare": 0.0005903652583810436,
+    "perContract": {
+      "withAny": 200,
+      "median": 0,
+      "max": 47,
+      "maxTitle": "HEMISPHERX - Sales, Marketing, Distribution, and Supply Agreement"
+    },
+    "clauseSpans": {
+      "labelled": 13823,
+      "altered": 0,
+      "alteredShare": 0,
+      "byClauseType": {}
+    },
+    "examples": {
+      "EMAIL": [
+        "…hief Executive Officer Email: [[asapir@dova.com]] With a copy to: Dova Pharmac…",
+        "…ntion: General Counsel Email: [[mbanjak@dova.com]] if to Valeant, to: Valeant P…",
+        "… Fax: 1-510-595-8183 Email: [[salixmc@dlss.com]] Please click here for full P…",
+        "…ahn Chief Financial Officer [[mhahn@dova.com]] (919) 338-7936 Salix Invest…",
+        "…tor Contact: Arthur Shannon [[Arthur.Shannon@bauschhealth.com]] 514-856-3855 877-281-6642 (…",
+        "…icke Partners John Woolford [[john.woolford@westwicke.com]] (443) 213-0506 Salix Media …",
+        "…dia Contacts: Lainie Keller [[Lainie.Keller@bauschhealth.com]] 908-927-0617 Karen Paff CO…",
+        "…LS INC., 10-Q, 11/8/2018 [[Karen.Paff@salix.com]] 908-927-1190 AkaRx, Inc., a…",
+        "…mmunications 877-435-2524 [[s.levine@ekrtx.com]] -74- TM TM ® ® SC…",
+        "…nd Chief Legal Officer email: [[Wendy.cassity@nuance.com]] with a copy to: David Garfink…"
+      ],
+      "IBAN": [],
+      "CARD": [],
+      "PHONE": [
+        "… Facsimile No. [[(708) 598-4671]] Attn: Jim …",
+        "… Facsimile No. [[(312) 346-9316]] If to Comp…",
+        "….3 I-on. (LOGO) www.i-on.com [[561.394.9484]] o 561.394-9773 fax 1733 aveni…",
+        "…) www.i-on.com 561.394.9484 o [[561.394-9773]] fax 1733 avenida del sol, boc…",
+        "…treet Houston, Texas 77054 t: [[832.968.4888]] CONSULTING AGREEMENT July 2…",
+        "…formation Call Center Phone: [[1-800-321-4576]] Fax: 1-510-595-8183 Email: …",
+        "… Phone: 1-800-321-4576 Fax: [[1-510-595-8183]] Email: salixmc@dlss.com Ple…",
+        "…cial Officer mhahn@dova.com [[(919) 338-7936]] Salix Investor Contact: Art…",
+        "…hur.Shannon@bauschhealth.com [[514-856-3855]] 877-281-6642 (toll free) We…",
+        "…uschhealth.com 514-856-3855 [[877-281-6642]] (toll free) Westwicke Partne…"
+      ]
+    }
+  }
+}

@@ -80,6 +80,11 @@ export function ibanValid(input: string): boolean {
 
 const digitsOf = (value: string) => value.replace(/\D/g, "");
 
+// Issuer prefixes of payment cards (ISO/IEC 7812): 3 (Amex, Diners, JCB), 4 (Visa),
+// 5 (Mastercard, Maestro), 6 (Discover, UnionPay, Maestro), 2221-2720 (Mastercard 2-series).
+// Rejects reference numbers such as patent numbers "2015109813242" that pass Luhn by chance.
+const CARD_ISSUER = /^(?:[3-6]|2(?:22[1-9]|2[3-9]\d|[3-6]\d\d|7[01]\d|720))/;
+
 interface RegexDetector {
   type: PiiType;
   pattern: RegExp;
@@ -100,11 +105,18 @@ const REGEX_DETECTORS: readonly RegexDetector[] = [
     accept: ibanValid,
   },
   {
+    // Card numbers are printed in standard layouts (ISO/IEC 7812 conventions): compact,
+    // groups of 4, or 4-6-5 / 4-6-4 (Amex, Diners). Allowing a space between any digits made
+    // rows of table figures ("62 23 78 21 11 41 133 42") match and pass Luhn by chance.
     type: "CARD",
-    pattern: /\b(?:\d[ -]?){12,18}\d\b/g,
+    // The separator is captured once and reused (\1, \2), so "4111 1111-1111 1111" is rejected.
+    pattern:
+      /\b(?:\d{13,19}|\d{4}([ -])\d{4}(?:\1\d{4}){1,2}(?:\1\d{1,4})?|\d{4}([ -])\d{6}\2\d{4,5})\b/g,
     accept: (value) => {
       const digits = digitsOf(value);
-      return digits.length >= 13 && digits.length <= 19 && luhnValid(digits);
+      return (
+        digits.length >= 13 && digits.length <= 19 && CARD_ISSUER.test(digits) && luhnValid(digits)
+      );
     },
   },
 ];

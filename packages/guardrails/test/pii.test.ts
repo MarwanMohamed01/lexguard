@@ -102,6 +102,24 @@ describe("findPii", () => {
     expect(phonesIn(text, ["GB", "US", "EG"])).toEqual([]);
   });
 
+  it.each([
+    ["compact", "4111111111111111"],
+    ["groups of 4 with spaces", "4111 1111 1111 1111"],
+    ["groups of 4 with dashes", "5555-5555-5555-4444"],
+    ["Amex 4-6-5", "3782 822463 10005"],
+  ])("finds a card number written %s", (_label, card) => {
+    expect(findPii(`Card ${card}.`, { types: ["CARD"] }).map((m) => m.value)).toEqual([card]);
+  });
+
+  it.each([
+    ["table row of figures", "Lewistown 62 23 78 21 11 41 133 42 5 4 Martinsburg"],
+    ["two IDs side by side", "CUDDLE BEAR 1935197 74580597 CARSON"],
+    ["mixed separators", "4111 1111-1111 1111"],
+    ["patent number with no card issuer prefix", "CN Published 2015109813242 23-Dec-15"],
+  ])("does not treat a %s as a card, even if it passes Luhn", (_label, text) => {
+    expect(findPii(text, { types: ["CARD"] })).toEqual([]);
+  });
+
   it("ignores contract numbers, amounts and dates", () => {
     const text =
       "Section 12.3.4: fee EUR 1,250,000.00, dated 2026-11-10, ref 4111111111111112, clause 2048.";

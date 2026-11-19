@@ -126,6 +126,18 @@ They change, so re-check before relying on them.
   POSSIBLE matching 0.820 / 0.761, a country-neutral shape rule 0.771 / 0.689.
 - **Accepted cost:** lower phone recall on Gretel, largely because its synthetic numbers are
   often not in any allocated range, which VALID rejects. To verify on real documents.
-- **Open constraint:** about 2 ms CPU per 1,000 characters (regex: 0.04 ms), close to the
-  10 ms CPU of a free-plan Workflow step for a 4,000-character chunk. Before M4: run
-  redaction in a Queue consumer (30 s CPU) or pre-filter chunks with a cheap shape check.
+- **CPU:** on Gretel's short, number-dense documents about 2 ms per 1,000 characters; on real
+  CUAD contracts 0.40 ms per 1,000 characters, about 0.5 ms per 4,000-character chunk (Node
+  timings). Fits a 10 ms Workflow step **per chunk**, but a whole contract in one call took up
+  to 243 ms, so redaction must run per chunk. Confirm inside Workers in M2/M4.
+- **Over-redaction on real contracts (CUAD, 510 contracts):** 0.06% of characters changed and
+  0 of 13,823 lawyer-labelled clause spans altered (`evals/cuad/README.md`).
+
+## D12. Card numbers need a standard layout and an issuer prefix
+
+- CUAD showed 33 false card detections: rows of table figures and patent numbers passing the
+  Luhn checksum by chance (about 1 in 10 random numbers does).
+- Cards must now be compact, in groups of 4, or 4-6-5 / 4-6-4, with one separator style, and
+  start with a card-issuer prefix (ISO/IEC 7812: 3-6, or 2221-2720). Country-neutral.
+- Result: 0 card false alarms on CUAD; Gretel card precision 1.000, Luhn-valid recall
+  0.982 → 0.977.

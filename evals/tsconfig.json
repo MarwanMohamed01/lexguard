@@ -4,5 +4,5 @@
     // Evals run on your machine and in CI under Node, never inside a Worker.
     "types": ["node"]
   },
-  "include": ["shared", "gretel"]
+  "include": ["shared", "gretel", "cuad"]
 }
