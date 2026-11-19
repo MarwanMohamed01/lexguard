@@ -9,6 +9,11 @@ const fakeGroqKey = "gsk_" + "b".repeat(40);
 const fakeGoogleKey = "AIza" + "c".repeat(35);
 const fakeGithubToken = "ghp_" + "d".repeat(36);
 const fakeAwsKeyId = "AKIA" + "E".repeat(16);
+// Key and value are joined at runtime too, so the source never contains "key: value" pairs
+// that look like real credentials (gitleaks flagged an earlier literal version of these).
+const fakeApiKeyJson = '{"api' + '_key": "abcdef' + '123456"}';
+const fakePasswordAssignment = "pass" + "word=hunter22" + "secret";
+const fakeBearerHeader = "Authorization: Bear" + "er abc.def.ghi";
 
 describe("scrubSecrets", () => {
   it.each([
@@ -17,9 +22,9 @@ describe("scrubSecrets", () => {
     ["Google key", `url?key=${fakeGoogleKey}`],
     ["GitHub token", `token ${fakeGithubToken}`],
     ["AWS key id", `id ${fakeAwsKeyId}`],
-    ["Bearer header", "Authorization: Bearer abc.def.ghi"],
-    ["password assignment", "password=hunter22secret"],
-    ["JSON api_key", '{"api_key": "abcdef123456"}'],
+    ["Bearer header", fakeBearerHeader],
+    ["password assignment", fakePasswordAssignment],
+    ["JSON api_key", fakeApiKeyJson],
   ])("hides a %s", (_label, text) => {
     const out = scrubSecrets(text);
     expect(out).toContain(REDACTED);
