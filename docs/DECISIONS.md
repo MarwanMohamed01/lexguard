@@ -141,3 +141,16 @@ They change, so re-check before relying on them.
   start with a card-issuer prefix (ISO/IEC 7812: 3-6, or 2221-2720). Country-neutral.
 - Result: 0 card false alarms on CUAD; Gretel card precision 1.000, Luhn-valid recall
   0.982 → 0.977.
+
+## D13. A2A: follow specification v1.0
+
+- PROJECT.md (written against older drafts) says the Agent Card lives at
+  `/.well-known/agent.json`. The current specification, v1.0.0
+  (https://a2a-protocol.org/latest/specification/), uses **`/.well-known/agent-card.json`**,
+  lists endpoints under `supportedInterfaces`, serializes enums as `TASK_STATE_*` / `ROLE_*`,
+  names operations `SendMessage`, `GetTask`, `CancelTask`, and defines error codes
+  -32001 to -32009. `@lexguard/a2a` follows v1.0.
+- The spec fixes the terminal states (completed, failed, canceled, rejected) but no full
+  transition graph; the table in `packages/a2a/src/lifecycle.ts` is our documented choice.
+- Incoming messages are untrusted (T5): unknown fields are dropped, sizes are capped, URL
+  parts must be HTTPS (T10). Security schemes and the HTTP endpoint come in M8.
