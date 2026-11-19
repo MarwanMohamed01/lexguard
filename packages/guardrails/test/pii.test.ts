@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { findPii, ibanValid, luhnValid, redactPii, restorePii } from "../src/index";
+import {
+  findPii,
+  ibanValid,
+  luhnValid,
+  redactPii,
+  restorePii,
+  type PhoneRegion,
+} from "../src/index";
 
 // Public test values: 4111 1111 1111 1111 is a standard test card number; the IBANs are
 // the examples published in the IBAN standard documentation.
@@ -42,35 +49,57 @@ describe("findPii", () => {
     ]);
   });
 
+  const phonesIn = (text: string, phoneRegions: PhoneRegion[] = []) =>
+    findPii(text, { types: ["PHONE"], phoneRegions }).map((m) => m.value);
+
   it.each([
-    ["UK national", "020 7946 0958"],
-    ["US dashes", "939-227-6163"],
-    ["US parentheses", "(415) 555-0199"],
-    ["US with country 1", "1-611-305-2549"],
-    ["US dots with extension", "280.900.0632x9032"],
-    ["international with extension", "+1-869-341-9301x7005"],
-    ["international dots", "+33.1.23.45.67.89"],
-    ["bracketed area code", "(02) 6295 0291"],
-    ["bracketed area code, no gap", "(0114) 4960648"],
-  ])("finds a phone number: %s", (_label, phone) => {
+    ["UK", "+44 20 7946 0958"],
+    ["Egypt", "+20 2 2795 1234"],
+    ["France", "+33 1 23 45 67 89"],
+    ["US", "+1 213-373-4253"],
+    ["Germany", "+49 30 901820"],
+  ])("finds an international %s number with no configuration", (_label, phone) => {
     expect(findPii(`Call ${phone} today`)).toEqual([
       { type: "PHONE", start: 5, end: 5 + phone.length, value: phone },
     ]);
   });
 
-  it("never lets a phone match run across a line break", () => {
-    expect(findPii("Tel +1 (123) 456-7890.\n3. Term").map((m) => m.value)).toEqual([
-      "+1 (123) 456-7890",
+  it.each<[string, PhoneRegion, string]>([
+    ["UK", "GB", "020 7946 0958"],
+    ["Egypt", "EG", "02 2795 1234"],
+    ["US", "US", "(213) 373-4253"],
+  ])("finds a national %s number only when that region is configured", (_label, region, phone) => {
+    const text = `Call ${phone} today`;
+    expect(phonesIn(text)).toEqual([]);
+    expect(phonesIn(text, [region])).toEqual([phone]);
+  });
+
+  it("checks several configured regions in one call", () => {
+    expect(phonesIn("UK 020 7946 0958, US (213) 373-4253", ["GB", "US"])).toEqual([
+      "020 7946 0958",
+      "(213) 373-4253",
     ]);
+  });
+
+  it("includes an extension in the redacted span", () => {
+    expect(phonesIn("Call (213) 373-4253 ext. 1234 now", ["US"])).toEqual([
+      "(213) 373-4253 ext. 1234",
+    ]);
+  });
+
+  it("never lets a phone match run across a line break", () => {
+    expect(phonesIn("Tel +1 213 373 4253.\n3. Term")).toEqual(["+1 213 373 4253"]);
   });
 
   it.each([
     ["company number", "company number 01234567"],
     ["register entry", "register entry 0123456789"],
-    ["US social security number shape", "ref 123-45-6789"],
+    ["social security number shape", "ref 123-45-6789"],
     ["ISO date", "on 2026-11-10"],
-  ])("does not treat a %s as a phone", (_label, text) => {
-    expect(findPii(text, ["PHONE"])).toEqual([]);
+    ["clause numbers", "Sections 12.3.4 and 14.1.2.7"],
+    ["amount", "EUR 1,250,000.00"],
+  ])("does not treat a %s as a phone, even with regions configured", (_label, text) => {
+    expect(phonesIn(text, ["GB", "US", "EG"])).toEqual([]);
   });
 
   it("ignores contract numbers, amounts and dates", () => {
@@ -81,7 +110,7 @@ describe("findPii", () => {
 
   it("can be limited to some types", () => {
     const text = `jane@acme.com ${CARD}`;
-    expect(findPii(text, ["CARD"]).map((m) => m.type)).toEqual(["CARD"]);
+    expect(findPii(text, { types: ["CARD"] }).map((m) => m.type)).toEqual(["CARD"]);
   });
 });
 

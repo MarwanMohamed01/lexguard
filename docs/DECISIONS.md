@@ -99,15 +99,33 @@ They change, so re-check before relying on them.
 
 ## D10. How PII redaction is evaluated
 
-- **Hand-made set (`evals/pii`, 33 cases)** is a targeted edge-case and regression suite,
-  run in CI on every push. It is not used for headline numbers: it was written by the same
-  author as the detector, which biases it (phone recall 0.875 there vs 0.456 on public data).
-- **Gretel PII masking EN v1 (`evals/gretel`)** is the independent, public benchmark
-  (Apache-2.0, 5,000 synthetic documents). Headline numbers come from here. Data is
-  downloaded locally at a pinned, hash-checked revision and is not run in CI.
+- **Rule: no hand-written evaluation datasets.** Anything that produces precision, recall or
+  accuracy numbers uses downloaded public data (licence checked, pinned revision, SHA-256).
+  Unit tests with small specific examples are still fine: they check rules, not quality.
+- Why: a first hand-made PII set (33 cases, since removed) was written by the same author as
+  the detector and flattered it (phone recall 0.875 there vs 0.456 on public data).
+- **Gretel PII masking EN v1 (`evals/gretel`)** is the PII benchmark and the CI gate
+  (Apache-2.0, 5,000 synthetic documents, 403 contract-like). CI downloads the pinned file,
+  cached by revision.
 - **CUAD** (real contracts, CC BY 4.0) is next: false-alarm rate on genuine legal text, and
-  later the clause-extraction eval.
-- Fixes are validated on Gretel, then the hand-made gate is raised; never tuned to the
-  hand-made set alone.
+  later the clause-extraction and quote-check evals.
 - Bare digit runs are deliberately not treated as phone numbers (see
   `evals/gretel/README.md`, "Known remaining misses").
+
+## D11. Phone numbers: libphonenumber (VALID) instead of hand-written patterns
+
+- **Why:** phone detection must work for any country. Hand-written patterns encoded US, UK
+  and Australian formats, and were partly tuned by looking at Gretel's misses.
+- **Decision:** `libphonenumber-js` 1.13.15 (MIT; Google's numbering-plan metadata for ~240
+  regions, "max" metadata) with **VALID** matching. International `+` numbers need no
+  configuration; national formats need `phoneRegions` set per deployment (configuration,
+  not code). A country-neutral filter rejects dates, amounts, decimals, IP addresses and
+  bare digit runs.
+- **Measured on Gretel (regions US/GB/AU):** overall precision 0.966 / recall 0.750; phone
+  precision 0.912 / recall 0.537. The hand-written patterns scored phone 0.932 / 0.778, and
+  POSSIBLE matching 0.820 / 0.761, a country-neutral shape rule 0.771 / 0.689.
+- **Accepted cost:** lower phone recall on Gretel, largely because its synthetic numbers are
+  often not in any allocated range, which VALID rejects. To verify on real documents.
+- **Open constraint:** about 2 ms CPU per 1,000 characters (regex: 0.04 ms), close to the
+  10 ms CPU of a free-plan Workflow step for a 4,000-character chunk. Before M4: run
+  redaction in a Queue consumer (30 s CPU) or pre-filter chunks with a cheap shape check.

@@ -1,14 +1,37 @@
+import { findPhoneNumbersInText, type CountryCode } from "libphonenumber-js/max";
+
 // Threat model T12: limit personal data sent to third-party model providers.
 // Detected values are swapped for placeholders like [EMAIL_1] before a model call, and
-// restored afterwards. Patterns are paired with checksums (Luhn, IBAN mod-97) so clause
-// numbers and amounts are not mistaken for card or bank numbers.
+// restored afterwards.
+//
+// Every detector is country-neutral: emails, IBANs (ISO 13616) and card numbers (Luhn) are
+// international formats, and phone numbers use Google's libphonenumber metadata for ~240
+// regions instead of hand-written country patterns. Checksums keep clause numbers and amounts
+// from being mistaken for card or bank numbers.
 //
 // Known limit: regex cannot reliably find people's names; that needs an ML model (NER),
-// too heavy for a Worker's CPU budget. The PII eval measures what we do and do not catch.
+// too heavy for a Worker's CPU budget. The PII evals measure what we do and do not catch.
 
 export type PiiType = "EMAIL" | "IBAN" | "CARD" | "PHONE";
 
 export const PII_TYPES: readonly PiiType[] = ["EMAIL", "IBAN", "CARD", "PHONE"];
+
+// ISO 3166-1 alpha-2 region code, e.g. "EG", "GB", "US".
+export type PhoneRegion = CountryCode;
+
+export interface PiiOptions {
+  types?: readonly PiiType[];
+  // Regions whose national phone formats to recognise (numbers written without "+").
+  // International "+..." numbers are always recognised, for every region. This is
+  // configuration (e.g. per tenant or document), not code: no country is built in.
+  phoneRegions?: readonly PhoneRegion[];
+  // "valid": the number must fall in a currently allocated range of a region's numbering plan.
+  // "possible": it only needs a plausible length for the region, so new, outdated or unusual
+  // numbers are still redacted, at the cost of more false alarms.
+  phoneMatching?: PhoneMatching;
+}
+
+export type PhoneMatching = "valid" | "possible";
 
 export interface PiiMatch {
   type: PiiType;
@@ -57,33 +80,13 @@ export function ibanValid(input: string): boolean {
 
 const digitsOf = (value: string) => value.replace(/\D/g, "");
 
-// Phone formats. Separators are only space, dot or dash: never \s, which would let a match
-// run across a line break into the next line.
-// International: +44 20 7946 0958, +1 (415) 555-0132, +33.1.23.45.67.89
-const PHONE_INTERNATIONAL = String.raw`\+\d[\d .()-]{6,}\d`;
-// North American: 939-227-6163, (415) 555-0199, 1-611-305-2549, 280.900.0632
-// Ends with (?!\d), not \b: "0632x9032" has no word boundary between "2" and "x".
-const PHONE_NANP = String.raw`(?:\b1[ .-]?)?(?:\(\d{3}\) ?|\b\d{3}[ .-])\d{3}[ .-]\d{4}(?!\d)`;
-// National with a leading 0 and at least one separator: 020 7946 0958, 0161 496 0000.
-// Requiring the separator keeps registration numbers like 01234567 out.
-const PHONE_NATIONAL = String.raw`\b0\d{1,4}[ .-]\d{3,4}[ .-]?\d{3,4}(?!\d)`;
-// Area code in brackets: (02) 6295 0291, (0114) 4960648, (08)-9852-4154, (02).6295.0291
-const PHONE_BRACKETED_AREA = String.raw`\(0\d{1,4}\)[ .-]?\d{3,4}[ .-]?\d{3,4}(?!\d)`;
-// Optional extension: x7005, ext. 12
-const PHONE_EXTENSION = String.raw`(?: ?(?:x|ext\.?) ?\d{1,5})?`;
-const PHONE_PATTERN = new RegExp(
-  `(?:${PHONE_INTERNATIONAL}|${PHONE_NANP}|${PHONE_NATIONAL}|${PHONE_BRACKETED_AREA})${PHONE_EXTENSION}`,
-  "g",
-);
-const PHONE_EXTENSION_AT_END = / ?(?:x|ext\.?) ?\d{1,5}$/;
-
-interface Detector {
+interface RegexDetector {
   type: PiiType;
   pattern: RegExp;
   accept: (value: string) => boolean;
 }
 
-const DETECTORS: readonly Detector[] = [
+const REGEX_DETECTORS: readonly RegexDetector[] = [
   {
     type: "EMAIL",
     pattern: /[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}/g,
@@ -104,19 +107,57 @@ const DETECTORS: readonly Detector[] = [
       return digits.length >= 13 && digits.length <= 19 && luhnValid(digits);
     },
   },
-  {
-    type: "PHONE",
-    pattern: PHONE_PATTERN,
-    accept: (value) => {
-      const count = digitsOf(value.replace(PHONE_EXTENSION_AT_END, "")).length;
-      return count >= 8 && count <= 15;
-    },
-  },
 ];
 
-export function findPii(text: string, types: readonly PiiType[] = PII_TYPES): PiiMatch[] {
+// Country-neutral shapes that are never phone numbers in a document, whatever the region.
+// libphonenumber alone accepts some of them (e.g. "1379.50" or "04.04.2016" as a possible
+// number), which would redact prices and deadlines in contracts.
+const NOT_A_PHONE: readonly RegExp[] = [
+  /^\d{1,4}[./-]\d{1,2}[./-]\d{1,4}$/, // dates: 04.04.2016, 2026-11-10, 31/12/2029
+  /^\d{1,4}[./-]\d{1,2}[./-]\d{1,4}[ T]\d{1,2}(?::\d{2})?$/, // date + hour: 2023-03-14 12
+  /^\d{1,3}(?:\.\d{1,3}){3}$/, // IPv4 addresses: 66.12.77.156
+  /^\d{8}$/, // compact dates such as 20230501 (and other bare 8-digit references)
+  /^\d+[.,]\d{1,2}$/, // amounts with cents: 650.00, 1379,50
+  /^\d{1,3}(?:[.,\s]\d{3})+(?:[.,]\d{1,2})?$/, // grouped amounts: 1,250,000.00
+  /^\d+\.\d+$/, // any plain decimal: 89.8062105
+];
+
+// A number without "+" and without any separator (5635402307, 01234567) is indistinguishable
+// from an account, customer or company number, so it is not treated as a phone.
+const hasStructure = (value: string) => value.startsWith("+") || /\d[\s().-]+\d/.test(value);
+
+const looksLikePhone = (value: string) =>
+  hasStructure(value) && !NOT_A_PHONE.some((pattern) => pattern.test(value));
+
+// One pass with no region finds international numbers; one pass per configured region adds
+// that region's national formats, using Google's metadata, then the shape filter above.
+function findPhones(
+  text: string,
+  regions: readonly PhoneRegion[],
+  matching: PhoneMatching,
+): PiiMatch[] {
+  const passes: (PhoneRegion | undefined)[] = regions.length > 0 ? [...regions] : [undefined];
+  const extended = matching === "possible";
+  const seen = new Set<string>();
+  const matches: PiiMatch[] = [];
+  for (const region of passes) {
+    const options = region === undefined ? { extended } : { defaultCountry: region, extended };
+    for (const found of findPhoneNumbersInText(text, options)) {
+      const key = `${String(found.startsAt)}:${String(found.endsAt)}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      const value = text.slice(found.startsAt, found.endsAt);
+      if (!looksLikePhone(value)) continue;
+      matches.push({ type: "PHONE", start: found.startsAt, end: found.endsAt, value });
+    }
+  }
+  return matches;
+}
+
+export function findPii(text: string, options: PiiOptions = {}): PiiMatch[] {
+  const types = options.types ?? PII_TYPES;
   const candidates: PiiMatch[] = [];
-  for (const detector of DETECTORS) {
+  for (const detector of REGEX_DETECTORS) {
     if (!types.includes(detector.type)) continue;
     for (const match of text.matchAll(detector.pattern)) {
       const value = match[0];
@@ -129,6 +170,11 @@ export function findPii(text: string, types: readonly PiiType[] = PII_TYPES): Pi
       });
     }
   }
+  if (types.includes("PHONE")) {
+    const matching = options.phoneMatching ?? "valid";
+    candidates.push(...findPhones(text, options.phoneRegions ?? [], matching));
+  }
+
   // Resolve overlaps: earliest match wins, longer match wins on a tie.
   candidates.sort((a, b) => a.start - b.start || b.end - a.end);
   const result: PiiMatch[] = [];
@@ -143,7 +189,7 @@ export function findPii(text: string, types: readonly PiiType[] = PII_TYPES): Pi
 
 const PLACEHOLDER = /\[(EMAIL|IBAN|CARD|PHONE)_(\d+)\]/g;
 
-export function redactPii(text: string, types: readonly PiiType[] = PII_TYPES): Redaction {
+export function redactPii(text: string, options: PiiOptions = {}): Redaction {
   // If the input already contains placeholder-like text (e.g. an attacker writes "[EMAIL_1]"),
   // start numbering above it, so restorePii can never swap a real value into attacker text.
   let counter = 0;
@@ -157,7 +203,7 @@ export function redactPii(text: string, types: readonly PiiType[] = PII_TYPES): 
   let out = "";
   let cursor = 0;
 
-  for (const match of findPii(text, types)) {
+  for (const match of findPii(text, options)) {
     const key = `${match.type}:${match.value}`;
     let placeholder = placeholderFor.get(key);
     if (placeholder === undefined) {

@@ -1,5 +1,12 @@
-import { findPii, luhnValid, type PiiMatch, type PiiType } from "@lexguard/guardrails";
-import { toMetrics, type Counts, type Metrics } from "../pii/metrics";
+import {
+  findPii,
+  luhnValid,
+  type PhoneRegion,
+  type PiiMatch,
+  type PiiOptions,
+  type PiiType,
+} from "@lexguard/guardrails";
+import { toMetrics, type Counts, type Metrics } from "../shared/metrics";
 import type { GretelRow } from "./load";
 
 // Gretel types that correspond to what our redactor claims to detect. Gretel has no IBANs,
@@ -10,7 +17,7 @@ export const TYPE_MAP: Readonly<Record<string, PiiType>> = {
   credit_card_number: "CARD",
 };
 
-const CONTRACT_DOC = /agreement|contract|lease|nda|terms|mandate/i;
+export const CONTRACT_DOC = /agreement|contract|lease|nda|terms|mandate/i;
 
 interface Span {
   start: number;
@@ -37,6 +44,7 @@ export interface Bucket {
 export interface GretelReport {
   dataset: string;
   revision: string;
+  phoneRegions: readonly PhoneRegion[];
   coverage: { labelledEntities: number; supportedEntities: number; share: number };
   all: Bucket;
   contracts: Bucket;
@@ -145,7 +153,13 @@ function bump(total: Counts, perType: Counts, field: "tp" | "fn") {
   perType[field]++;
 }
 
-export function evaluateGretel(rows: readonly GretelRow[], revision: string): GretelReport {
+export function evaluateGretel(
+  rows: readonly GretelRow[],
+  revision: string,
+  options: PiiOptions = {},
+  // Swappable so alternative detectors can be compared on exactly the same scoring.
+  detect: (text: string) => PiiMatch[] = (text) => findPii(text, options),
+): GretelReport {
   const all = new Accumulator();
   const contracts = new Accumulator();
   const examples: GretelReport["examples"] = { missed: [], falseAlarms: [] };
@@ -156,7 +170,7 @@ export function evaluateGretel(rows: readonly GretelRow[], revision: string): Gr
 
   for (const row of rows) {
     const entities = labelled(row);
-    const predictions = findPii(row.text);
+    const predictions = detect(row.text);
     all.add(entities, predictions, examples);
     if (CONTRACT_DOC.test(row.documentType)) contracts.add(entities, predictions);
 
@@ -175,6 +189,7 @@ export function evaluateGretel(rows: readonly GretelRow[], revision: string): Gr
   return {
     dataset: "gretelai/gretel-pii-masking-en-v1 (test split)",
     revision,
+    phoneRegions: options.phoneRegions ?? [],
     coverage: {
       labelledEntities,
       supportedEntities,

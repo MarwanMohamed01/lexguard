@@ -15,7 +15,13 @@ npm run fetch:gretel -w @lexguard/evals
 npm test -w @lexguard/evals
 ```
 
-The eval is skipped when the data is not downloaded (for example in CI).
+CI downloads the same pinned file (cached by revision) and fails if precision or recall
+drops below the thresholds in `report.test.ts`. Locally, the eval is skipped until the data
+is downloaded. For a case-by-case view of the 403 contract-like documents:
+
+```bash
+npm run eval:watch -w @lexguard/evals
+```
 
 ## How it is scored
 
@@ -36,8 +42,12 @@ The eval is skipped when the data is not downloaded (for example in CI).
 | Baseline (`+` or leading-0 phones only)                                      | 0.956     | 0.723  | 0.864 / 0.456 |
 | Phone fix: US formats, extensions, no line breaks, 0-numbers need separators | 0.967     | 0.807  | 0.925 / 0.700 |
 | Bracketed area codes `(02) 6295 0291`                                        | 0.968     | 0.834  | 0.932 / 0.778 |
+| **Generic: libphonenumber VALID, regions US/GB/AU** (current, see D11)       | 0.966     | 0.750  | 0.912 / 0.537 |
+| Same, no regions configured (international `+` numbers only)                 | 0.981     | 0.635  | 0.943 / 0.200 |
 
-Contract-like documents only (403): recall 0.750 → 0.846, phone recall 0.410 → 0.820.
+The first three rows used hand-written US/UK/AU patterns, partly tuned on Gretel's misses, so
+they are optimistic for Gretel and would not carry over to other countries. Contract-like
+documents only (403), current: precision 0.967, recall 0.781.
 
 ### Known remaining misses (deliberate)
 

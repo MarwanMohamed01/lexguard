@@ -5,7 +5,10 @@ export {
   PII_TYPES,
   redactPii,
   restorePii,
+  type PhoneMatching,
+  type PhoneRegion,
   type PiiMatch,
+  type PiiOptions,
   type PiiType,
   type Redaction,
 } from "./pii";
