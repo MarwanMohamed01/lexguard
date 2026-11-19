@@ -8,9 +8,6 @@ this file is about understanding.
 
 ## Milestone 0 — Foundations
 
-_Draft written with Claude on 2026-11-08. Marwan: rewrite anything that is not how you would
-explain it._
-
 ### The big picture
 
 - Lexguard is like a small **law firm made of AI agents**: a supervisor splits a long contract
