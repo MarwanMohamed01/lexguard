@@ -1,8 +1,12 @@
 # Confirmed gitleaks false positives. Each line is a finding fingerprint:
 #   <commit>:<file>:<rule-id>:<line>
 # Only add an entry after checking the finding by hand and recording why it is not a secret.
+# Never quote the flagged value in this file: comments are scanned too.
 
-# 2026-11-19: fake test value '{"api_key": "abcdef123456"}' in the trace redaction tests, used
-# to check that scrubSecrets hides "api_key" values. Not a credential. The test now builds the
-# value at runtime; this entry covers the old literal that remains in git history.
+# 2026-11-19: a fake JSON api_key value in the trace redaction tests, used to check that
+# scrubSecrets hides api_key values. Not a credential. The test now builds the value at
+# runtime; this entry covers the old literal that remains in git history.
 e7da3f65d02847476cddc233e2f02ac83fc93bfc:packages/trace/test/security.test.ts:generic-api-key:22
+
+# 2026-11-19: the first version of this file quoted that same fake value in a comment.
+ae023cc7af302b367f32c71be2217e65ee9de953:.gitleaksignore:generic-api-key:5
