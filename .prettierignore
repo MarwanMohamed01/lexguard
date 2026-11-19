@@ -4,6 +4,9 @@ package-lock.json
 dist/
 coverage/
 evals/.evalite/
+# Written by the eval tests themselves (JSON.stringify), not edited by hand.
+evals/results/
+evals/data/
 **/worker-configuration.d.ts
 # The original spec is kept exactly as written.
 PROJECT.md
