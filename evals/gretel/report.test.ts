@@ -25,9 +25,10 @@ describe("evaluateGretel scoring rules", () => {
 
   it("counts a partial catch as overlap only", () => {
     const report = evaluateGretel(
+      // The label includes the word "Tel", so our redaction can only cover part of it.
       [
-        row("Call +1-869-341-9301x7005", [
-          { value: "+1-869-341-9301x7005", types: ["phone_number"] },
+        row("Call Tel +44 20 7946 0958", [
+          { value: "Tel +44 20 7946 0958", types: ["phone_number"] },
         ]),
       ],
       "r",

@@ -9,20 +9,20 @@
   "all": {
     "rows": 5000,
     "strict": {
-      "tp": 1891,
-      "fp": 87,
-      "fn": 725,
-      "precision": 0.9560161779575329,
-      "recall": 0.7228593272171254,
-      "f1": 0.8232477144101003
+      "tp": 2182,
+      "fp": 73,
+      "fn": 434,
+      "precision": 0.9676274944567628,
+      "recall": 0.8340978593272171,
+      "f1": 0.8959145965920755
     },
     "overlap": {
-      "tp": 1957,
-      "fp": 22,
-      "fn": 659,
-      "precision": 0.9888832743810005,
-      "recall": 0.7480886850152905,
-      "f1": 0.8517954298150163
+      "tp": 2222,
+      "fp": 34,
+      "fn": 394,
+      "precision": 0.9849290780141844,
+      "recall": 0.849388379204893,
+      "f1": 0.9121510673234812
     },
     "byType": {
       "EMAIL": {
@@ -45,20 +45,20 @@
       },
       "PHONE": {
         "strict": {
-          "tp": 412,
-          "fp": 65,
-          "fn": 492,
-          "precision": 0.8637316561844863,
-          "recall": 0.4557522123893805,
-          "f1": 0.5966690803765388
+          "tp": 703,
+          "fp": 51,
+          "fn": 201,
+          "precision": 0.9323607427055703,
+          "recall": 0.7776548672566371,
+          "f1": 0.8480096501809409
         },
         "overlap": {
-          "tp": 461,
-          "fp": 2,
-          "fn": 443,
-          "precision": 0.9956803455723542,
-          "recall": 0.5099557522123894,
-          "f1": 0.6744696415508412
+          "tp": 726,
+          "fp": 14,
+          "fn": 178,
+          "precision": 0.981081081081081,
+          "recall": 0.8030973451327433,
+          "f1": 0.8832116788321167
         }
       },
       "CARD": {
@@ -80,25 +80,25 @@
         }
       }
     },
-    "redactedOtherPii": 133
+    "redactedOtherPii": 111
   },
   "contracts": {
     "rows": 403,
     "strict": {
-      "tp": 195,
+      "tp": 220,
       "fp": 9,
-      "fn": 65,
-      "precision": 0.9558823529411765,
-      "recall": 0.75,
-      "f1": 0.8405172413793103
+      "fn": 40,
+      "precision": 0.9606986899563319,
+      "recall": 0.8461538461538461,
+      "f1": 0.8997955010224948
     },
     "overlap": {
-      "tp": 200,
-      "fp": 4,
-      "fn": 60,
-      "precision": 0.9803921568627451,
-      "recall": 0.7692307692307693,
-      "f1": 0.8620689655172413
+      "tp": 223,
+      "fp": 6,
+      "fn": 37,
+      "precision": 0.9737991266375546,
+      "recall": 0.8576923076923076,
+      "f1": 0.9120654396728017
     },
     "byType": {
       "EMAIL": {
@@ -121,20 +121,20 @@
       },
       "PHONE": {
         "strict": {
-          "tp": 25,
+          "tp": 50,
           "fp": 6,
-          "fn": 36,
-          "precision": 0.8064516129032258,
-          "recall": 0.4098360655737705,
-          "f1": 0.5434782608695652
+          "fn": 11,
+          "precision": 0.8928571428571429,
+          "recall": 0.819672131147541,
+          "f1": 0.8547008547008548
         },
         "overlap": {
-          "tp": 28,
-          "fp": 1,
-          "fn": 33,
-          "precision": 0.9655172413793104,
-          "recall": 0.45901639344262296,
-          "f1": 0.6222222222222222
+          "tp": 51,
+          "fp": 3,
+          "fn": 10,
+          "precision": 0.9444444444444444,
+          "recall": 0.8360655737704918,
+          "f1": 0.8869565217391304
         }
       },
       "CARD": {
@@ -156,7 +156,7 @@
         }
       }
     },
-    "redactedOtherPii": 14
+    "redactedOtherPii": 9
   },
   "cardsLuhnValid": {
     "labelled": 438,
@@ -209,35 +209,35 @@
       "CARD: 3548 6974 7128 1306",
       "CARD: 3530-2910-7196-",
       "CARD: 3768-7258-8504-048",
-      "PHONE: 280.900.0632x9032",
-      "PHONE: 939-227-6163",
       "PHONE: 5635402307",
       "PHONE: 81365803",
       "PHONE: 8199950189",
-      "PHONE: 1-611-305-2549",
-      "PHONE: 1 (186) 115-8024",
       "PHONE: 1657795349",
-      "PHONE: 174.225.5752",
       "PHONE: 4622-7461",
       "PHONE: 34275627",
-      "PHONE: 192-543-2518 x509"
+      "PHONE: 08081570043",
+      "CARD: 4081 4502 8872 0843",
+      "PHONE: 01631030598",
+      "CARD: 3402 6242 8150 422",
+      "CARD: 3759-8134-5557-565",
+      "PHONE: 07765167423"
     ],
     "falseAlarms": [
       "EMAIL: old@example.com",
       "EMAIL: new@example.com",
       "EMAIL: old@example.com",
       "EMAIL: privacy@ourhealthcare.com",
+      "PHONE: (123) 456-7890",
       "EMAIL: privacy@example.com",
       "EMAIL: privacy@example.com",
-      "PHONE: +1 (123) 456-7890.\n3",
+      "PHONE: +1 (123) 456-7890",
       "EMAIL: support@example.com",
       "EMAIL: support@example.com",
+      "PHONE: 1-800-123-4567",
       "EMAIL: billing@netconnect.com",
+      "PHONE: (123) 456-7890",
       "EMAIL: hr@ourcompany.com",
-      "EMAIL: hr@ourcompany.com",
-      "EMAIL: support@ourcompany.com",
-      "EMAIL: support@ourwebsite.com",
-      "EMAIL: info@pensionplan.com"
+      "EMAIL: hr@ourcompany.com"
     ]
   }
 }

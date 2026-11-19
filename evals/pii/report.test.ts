@@ -22,11 +22,12 @@ describe("metrics", () => {
   });
 });
 
-// Regression gate: fails CI if redaction quality drops below the measured baseline
-// (pii-v1 on 2026-11-19: precision 0.926, recall 0.926, rounded down).
+// Regression gate: fails CI if redaction quality drops below the measured baseline.
+// History (pii-v1): 0.926 / 0.926 at first run; 1.000 / 0.963 after the phone pattern fix
+// (validated on Gretel, not tuned to this set). Thresholds are the latest baseline rounded down.
 // Raise these when the redactor improves; never lower them to make a change pass.
-const MIN_PRECISION = 0.92;
-const MIN_RECALL = 0.92;
+const MIN_PRECISION = 0.96;
+const MIN_RECALL = 0.96;
 
 describe(`PII redaction eval (${DATASET_VERSION})`, () => {
   const report = buildReport(piiCases, DATASET_VERSION);

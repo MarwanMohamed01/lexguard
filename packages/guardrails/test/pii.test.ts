@@ -42,8 +42,35 @@ describe("findPii", () => {
     ]);
   });
 
-  it("finds national phone numbers with a leading 0", () => {
-    expect(findPii("Call 020 7946 0958 today")).toMatchObject([{ type: "PHONE" }]);
+  it.each([
+    ["UK national", "020 7946 0958"],
+    ["US dashes", "939-227-6163"],
+    ["US parentheses", "(415) 555-0199"],
+    ["US with country 1", "1-611-305-2549"],
+    ["US dots with extension", "280.900.0632x9032"],
+    ["international with extension", "+1-869-341-9301x7005"],
+    ["international dots", "+33.1.23.45.67.89"],
+    ["bracketed area code", "(02) 6295 0291"],
+    ["bracketed area code, no gap", "(0114) 4960648"],
+  ])("finds a phone number: %s", (_label, phone) => {
+    expect(findPii(`Call ${phone} today`)).toEqual([
+      { type: "PHONE", start: 5, end: 5 + phone.length, value: phone },
+    ]);
+  });
+
+  it("never lets a phone match run across a line break", () => {
+    expect(findPii("Tel +1 (123) 456-7890.\n3. Term").map((m) => m.value)).toEqual([
+      "+1 (123) 456-7890",
+    ]);
+  });
+
+  it.each([
+    ["company number", "company number 01234567"],
+    ["register entry", "register entry 0123456789"],
+    ["US social security number shape", "ref 123-45-6789"],
+    ["ISO date", "on 2026-11-10"],
+  ])("does not treat a %s as a phone", (_label, text) => {
+    expect(findPii(text, ["PHONE"])).toEqual([]);
   });
 
   it("ignores contract numbers, amounts and dates", () => {

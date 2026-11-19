@@ -57,6 +57,26 @@ export function ibanValid(input: string): boolean {
 
 const digitsOf = (value: string) => value.replace(/\D/g, "");
 
+// Phone formats. Separators are only space, dot or dash: never \s, which would let a match
+// run across a line break into the next line.
+// International: +44 20 7946 0958, +1 (415) 555-0132, +33.1.23.45.67.89
+const PHONE_INTERNATIONAL = String.raw`\+\d[\d .()-]{6,}\d`;
+// North American: 939-227-6163, (415) 555-0199, 1-611-305-2549, 280.900.0632
+// Ends with (?!\d), not \b: "0632x9032" has no word boundary between "2" and "x".
+const PHONE_NANP = String.raw`(?:\b1[ .-]?)?(?:\(\d{3}\) ?|\b\d{3}[ .-])\d{3}[ .-]\d{4}(?!\d)`;
+// National with a leading 0 and at least one separator: 020 7946 0958, 0161 496 0000.
+// Requiring the separator keeps registration numbers like 01234567 out.
+const PHONE_NATIONAL = String.raw`\b0\d{1,4}[ .-]\d{3,4}[ .-]?\d{3,4}(?!\d)`;
+// Area code in brackets: (02) 6295 0291, (0114) 4960648, (08)-9852-4154, (02).6295.0291
+const PHONE_BRACKETED_AREA = String.raw`\(0\d{1,4}\)[ .-]?\d{3,4}[ .-]?\d{3,4}(?!\d)`;
+// Optional extension: x7005, ext. 12
+const PHONE_EXTENSION = String.raw`(?: ?(?:x|ext\.?) ?\d{1,5})?`;
+const PHONE_PATTERN = new RegExp(
+  `(?:${PHONE_INTERNATIONAL}|${PHONE_NANP}|${PHONE_NATIONAL}|${PHONE_BRACKETED_AREA})${PHONE_EXTENSION}`,
+  "g",
+);
+const PHONE_EXTENSION_AT_END = / ?(?:x|ext\.?) ?\d{1,5}$/;
+
 interface Detector {
   type: PiiType;
   pattern: RegExp;
@@ -85,12 +105,10 @@ const DETECTORS: readonly Detector[] = [
     },
   },
   {
-    // International (+44 20 7946 0958) or national with a leading 0 (020 7946 0958).
-    // Dates such as 2026-11-10 never start with + or 0, so they are not matched.
     type: "PHONE",
-    pattern: /\+\d[\d\s().-]{6,}\d|\b0\d{1,4}[\s.-]?\d{3,4}[\s.-]?\d{3,4}\b/g,
+    pattern: PHONE_PATTERN,
     accept: (value) => {
-      const count = digitsOf(value).length;
+      const count = digitsOf(value.replace(PHONE_EXTENSION_AT_END, "")).length;
       return count >= 8 && count <= 15;
     },
   },

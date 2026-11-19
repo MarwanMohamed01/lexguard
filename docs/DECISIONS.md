@@ -96,3 +96,18 @@ They change, so re-check before relying on them.
   arrive normally.
 - Revisit when typescript-eslint supports TS 7 (TypeScript rule) or when we move
   to an Evalite version built on Vitest 5 (Vitest rule). Check during M9 at the latest.
+
+## D10. How PII redaction is evaluated
+
+- **Hand-made set (`evals/pii`, 33 cases)** is a targeted edge-case and regression suite,
+  run in CI on every push. It is not used for headline numbers: it was written by the same
+  author as the detector, which biases it (phone recall 0.875 there vs 0.456 on public data).
+- **Gretel PII masking EN v1 (`evals/gretel`)** is the independent, public benchmark
+  (Apache-2.0, 5,000 synthetic documents). Headline numbers come from here. Data is
+  downloaded locally at a pinned, hash-checked revision and is not run in CI.
+- **CUAD** (real contracts, CC BY 4.0) is next: false-alarm rate on genuine legal text, and
+  later the clause-extraction eval.
+- Fixes are validated on Gretel, then the hand-made gate is raised; never tuned to the
+  hand-made set alone.
+- Bare digit runs are deliberately not treated as phone numbers (see
+  `evals/gretel/README.md`, "Known remaining misses").
