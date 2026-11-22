@@ -154,3 +154,21 @@ They change, so re-check before relying on them.
   transition graph; the table in `packages/a2a/src/lifecycle.ts` is our documented choice.
 - Incoming messages are untrusted (T5): unknown fields are dropped, sizes are capped, URL
   parts must be HTTPS (T10). Security schemes and the HTTP endpoint come in M8.
+
+## D14. Free-tier limits that shape M2 (checked 2026-11-22)
+
+| Limit (Workers Free)            | Value                                                                             | Consequence for M2                                     |
+| ------------------------------- | --------------------------------------------------------------------------------- | ------------------------------------------------------ |
+| Request body (upload)           | 100 MB (set by the domain's plan)                                                 | Reject larger uploads before reading them              |
+| CPU per HTTP request            | 10 ms                                                                             | No heavy splitting inside the upload request           |
+| CPU per Workflow step           | 10 ms; step result max 1 MiB                                                      | Splitting a whole contract cannot run in one step      |
+| CPU per Queue consumer          | 30 s default per Queues docs; **unclear on Free** (Workers page lists only 10 ms) | **Measure in M2** before relying on it                 |
+| Memory per isolate              | 128 MB                                                                            | Fine for a 300-page document's text                    |
+| `toMarkdown` file size / pages  | Not stated in the docs                                                            | Test with CUAD's largest PDFs                          |
+| D1 row / string                 | 2 MB                                                                              | A 300-page document's text (~1M chars) fits in one row |
+| D1 SQL statement / bound params | 100 KB / 100 per query                                                            | Always use bound parameters; insert chunks in batches  |
+| D1 queries per invocation       | 50 (`db.batch()` counts as one)                                                   | Batch chunk inserts                                    |
+| D1 database / account storage   | 500 MB / 5 GB                                                                     | Per-tenant growth must be watched                      |
+
+`toMarkdown` returns `{ id, name, format, mimetype, tokens, data, error? }` (note the lowercase
+`mimetype`); PDF conversion is described as free "for most format conversions".
