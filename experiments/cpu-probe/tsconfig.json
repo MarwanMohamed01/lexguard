@@ -1,0 +1,8 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "types": []
+  },
+  // Runtime types (Queue, ExportedHandler, ...) come from the main Worker's generated file.
+  "include": ["src", "../../apps/worker/worker-configuration.d.ts"]
+}

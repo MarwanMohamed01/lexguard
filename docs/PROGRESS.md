@@ -11,7 +11,7 @@ _Last updated: 2026-11-22._
 | ------------------------------------ | ----------------------------------------------- |
 | M0 Foundations                       | ✅ Done                                         |
 | M1 Core packages                     | ✅ Done (CI and full-history secret scan green) |
-| **M2 Ingestion & splitting**         | ⏳ **In progress: steps 1–4 done**              |
+| **M2 Ingestion & splitting**         | ⏳ **In progress: steps 1–4, 5a done**          |
 | M3 Index & retrieval                 | Not started                                     |
 | M4 Extraction swarm                  | Not started                                     |
 | M5 Research, verification, synthesis | Not started                                     |
@@ -41,8 +41,14 @@ D1 (every row has `tenant_id`).
    At equal chunk count: ours 99.41%, recursive (LangChain-style) 96.95%, fixed-size 83.97%.
    CI gate ≥ 0.993 and must beat both baselines (`evals/cuad/README.md`).
 5. Ingestion flow in the Worker: upload checks, fingerprint, `toMarkdown`, sanitize, chunk,
-   D1 schema as a migration, `env.DB` binding. **Open question from D14:** whether a Queue
-   consumer gets 30 s CPU on the Free plan; measure before choosing where splitting runs.
+   D1 schema as a migration, `env.DB` binding.
+   - ✅ 5a CPU measured (D16): real contracts chunk in 4–9 ms on Workers; Queues give no CPU
+     advantage on Free. Upload stays light; chunking runs as its own job step.
+   - 5b D1 database, migration, bindings, tenant API key; check Workflows Free limits and
+     Worker size limit.
+   - 5c upload + status endpoints (checks, SHA-256, toMarkdown, sanitize).
+   - 5d chunking job, in windows for documents over ~300k characters.
+   - 5e Workers-runtime tests (checks, tenant isolation, idempotency, offsets).
 6. Conversion-quality eval: `toMarkdown` output vs CUAD's own text for the same PDFs.
 7. Security tests (oversized/malformed uploads, hidden text, tenant isolation), deploy,
    learning log entry, end-of-milestone quiz.

@@ -204,3 +204,25 @@ They change, so re-check before relying on them.
   eval (step 4) found it.
 - **Measured (step 4, CUAD):** 99.41% of 13,823 labelled clauses kept whole vs 96.95% for
   LangChain-style recursive splitting at the same chunk count (`evals/cuad/README.md`).
+
+## D16. Where ingestion work runs on the Free plan (measured 2026-11-22)
+
+- **Measured** with a throwaway probe Worker (`experiments/cpu-probe/README.md`): chunking
+  real CUAD contracts of 230k–338k characters took 4–9 ms of CPU warm (Cloudflare's own
+  `cpuTime`), about 2.5× faster than the Node estimate. No invocation was killed, even at
+  57 ms, in HTTP or a Queue consumer.
+- **Not relied on:** the documented Free limit is 10 ms per invocation, with unquantified
+  "flexibility" for occasional overruns. Designs must fit 10 ms; leniency is only a margin.
+- **Queues give no CPU advantage on Free** (same per-invocation limit per the Queues docs),
+  answering the open question from D14.
+- **Decision:**
+  - The upload request does only light work: checks, SHA-256, `toMarkdown` (waiting on I/O),
+    sanitize, store the Markdown in D1 (up to 2 MB per row, D14).
+  - Chunking runs in its own invocation, as a step of a durable job, and writes chunks to D1
+    itself (a Workflow step result is capped at 1 MiB; a long document's chunks exceed it).
+    Workflow vs Queue is decided in 5b after checking Workflows' Free limits.
+  - One invocation chunks up to about 300k characters (fits 10 ms warm with margin). The
+    project's 200-page goal (roughly 600k+ characters) needs the chunker to work in windows
+    across invocations, carrying its numbering state: built in step 5d.
+- **Also learned:** `performance.now()` is frozen during CPU work on deployed Workers; the
+  probe's bundle is 783 KB, mostly Zod (Free Worker size limit to check in 5b).
