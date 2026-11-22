@@ -278,3 +278,31 @@ They change, so re-check before relying on them.
   passed in as a dependency and tests use a fake one; `remoteBindings: false` in the test
   config stops the test runner from opening a remote session with the developer's login
   (CI has none). The real converter is evaluated on CUAD PDFs in step 6.
+
+## D19. The chunking Workflow and windowed detection (M2 step 5d, 2026-11-22)
+
+- **Measured where chunking spends CPU** (Node, largest CUAD contracts): the regex passes
+  that detect headings and split points take about 90% (27.7 ms of ~29 ms on 335k chars);
+  choosing headings, building sections and packing take about 9 ms for 2.8M chars. So only
+  detection needs splitting across invocations.
+- **Windowed detection is exact by construction:** windows start just after a line break
+  (no pattern consumes a line break; look-behinds stay on their line), each window reads a
+  2,000-char margin extended across whitespace runs for look-aheads, and keeps only matches
+  that start inside it. Checked on all 510 CUAD contracts with 20k-char windows (1,055 edges):
+  identical chunks, sections and definitions. Mutation-tested: removing the margin or the
+  whitespace extension makes the unit tests fail.
+- **Workflow `ChunkDocument`:** `load` (skip unless the document is still `chunking`, clear
+  chunks from earlier attempts) → `detect i` per 200k-char window → `plan` (offsets only,
+  stays under the 1 MiB step result) → `store chunks i` (100 rows per `db.batch`,
+  `INSERT OR REPLACE` so retries are safe) → `store definitions i` → `finish` (`ready`).
+  Steps retry 3 times with exponential backoff; after that the document becomes `failed`
+  (`chunking_failed`) and a re-upload retries it. Step outputs are marked `sensitive` so
+  contract text stays out of the dashboard. A 1M-char document takes about 15 steps.
+- **Text is sliced in JavaScript, never with SQL `substr`:** SQLite counts code points,
+  JavaScript counts UTF-16 units; SQL slicing would shift every offset after an emoji.
+- **Upload starts the job** after storing the text; if it cannot start, the document fails
+  with `chunking_not_started` (503) instead of sitting in `chunking` with nobody on it.
+- **Found and fixed:** the Worker bundled Zod twice (the test plugin pins 4.6.6, which took
+  the top-level slot, so each workspace nested its own 4.6.7): 1,572 KiB. A root npm
+  `overrides` entry forces one 4.6.7: back to 798 KiB, well under the 3 MB Workflow limit.
+- Real CPU per step on Cloudflare is measured at the step 7 deploy.

@@ -111,6 +111,13 @@ inside them (evenly spaced samples in the results file):
 - **Size splits (48)** are long clauses in sections over 4,000 characters, cut at the best
   boundary available, mostly list items `(i)`, `(ii)`, `(c)`.
 
+## Windowed chunking (M2 step 5d): results
+
+The chunking Workflow detects structure in windows (separate invocations), then plans chunks
+once. `chunking.test.ts` checks that this changes nothing: on all 510 contracts, with tiny
+20,000-character windows (1,055 window edges in total), windowed chunking gives exactly the
+same chunks, sections and definitions as one pass. Runs in CI.
+
 ## Planned uses
 
 - **Quote check (M5):** every labelled span must pass the verifier's exact-quote check;

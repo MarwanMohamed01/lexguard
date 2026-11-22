@@ -2,9 +2,10 @@
 //
 // CPU budget (D16): this request does only light work. Hashing is the main CPU cost (about
 // 2 ms per MB), which is why uploads are capped at 10 MB. Waiting for toMarkdown is I/O and
-// costs no CPU. Chunking happens later, in the chunking job (step 5d).
+// costs no CPU. Chunking happens later, in the chunking job (src/chunking.ts).
 import { sanitizeText } from "@lexguard/guardrails/sanitize";
 import { sha256Hex } from "./auth";
+import type { ChunkParams } from "./chunking";
 import {
   claimForRetry,
   findBySha256,
@@ -25,8 +26,12 @@ export const STALE_CONVERSION_MS = 10 * 60 * 1000;
 /** The conversion step, passed in so tests can replace toMarkdown (it always calls Cloudflare). */
 export type Converter = (file: MarkdownDocument) => Promise<ConversionResponse>;
 
+/** Starts the chunking job; passed in so upload tests do not run it. */
+export type StartChunking = (params: ChunkParams) => Promise<void>;
+
 export interface UploadDeps {
   convert: Converter;
+  startChunking: StartChunking;
   now?: () => Date;
 }
 
@@ -39,6 +44,7 @@ type UploadError =
   | "conversion_failed"
   | "no_text"
   | "text_too_large"
+  | "chunking_not_started"
   | "conflict_retry";
 
 const fail = (status: number, error: UploadError, document?: DocumentSummary) =>
@@ -111,17 +117,26 @@ export async function handleUpload(
 
   // 4. Convert, sanitize, store. Any failure is recorded on the document so the next upload
   //    of the same file retries it instead of being blocked by the duplicate check.
-  const outcome = await convertAndSanitize(deps.convert, kind, bytes);
-  if ("error" in outcome) {
-    await markFailed(env.DB, tenantId, id, outcome.error, now().toISOString());
-  } else {
-    await markConverted(env.DB, tenantId, id, outcome, now().toISOString());
+  const converted = await convertAndSanitize(deps.convert, kind, bytes);
+  let error: UploadError | null = "error" in converted ? converted.error : null;
+  if (!("error" in converted)) {
+    await markConverted(env.DB, tenantId, id, converted, now().toISOString());
+    // 5. Hand over to the chunking job (src/chunking.ts). If it cannot start, fail the
+    //    document rather than leave it in 'chunking' with nobody working on it.
+    try {
+      await deps.startChunking({ tenantId, documentId: id });
+    } catch (cause) {
+      console.error("chunking job not started", cause instanceof Error ? cause.message : cause);
+      error = "chunking_not_started";
+    }
   }
+  if (error !== null) await markFailed(env.DB, tenantId, id, error, now().toISOString());
+
   const document = await getDocument(env.DB, tenantId, id);
   if (document === null) return fail(409, "conflict_retry");
-  return "error" in outcome
-    ? fail(422, outcome.error, document)
-    : Response.json({ document }, { status: 201 });
+  return error === null
+    ? Response.json({ document }, { status: 201 })
+    : fail(error === "chunking_not_started" ? 503 : 422, error, document);
 }
 
 async function convertAndSanitize(

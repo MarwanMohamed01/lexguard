@@ -1,4 +1,6 @@
 import { writeFileSync } from "node:fs";
+import { isDeepStrictEqual } from "node:util";
+import { chunkDocument, detectWindow, planChunks, planWindows } from "@lexguard/chunker";
 import { beforeAll, describe, expect, it } from "vitest";
 import {
   bucketOf,
@@ -193,5 +195,27 @@ describe.skipIf(!cuadAvailable())("CUAD clause integrity", () => {
     const [, recursiveEqual, fixedEqual] = reports;
     expect(ours.integrity.rate).toBeGreaterThan(recursiveEqual?.integrity.rate ?? 1);
     expect(ours.integrity.rate).toBeGreaterThan(fixedEqual?.integrity.rate ?? 1);
+  });
+});
+
+// The chunking Workflow (M2 step 5d) detects structure in windows, in separate invocations,
+// then plans chunks once. That must give exactly what one pass gives. Tiny windows (20k
+// chars) put several window edges in almost every contract: thousands of edges in total.
+describe.skipIf(!cuadAvailable())("CUAD windowed chunking", () => {
+  it("gives exactly the same chunks, sections and definitions as one pass", () => {
+    let edges = 0;
+    const mismatches: string[] = [];
+    for (const { title, text } of loadCuad()) {
+      const windows = planWindows(text, 20_000);
+      edges += windows.length - 1;
+      const windowed = planChunks(
+        text,
+        windows.map((w) => detectWindow(text, w)),
+        OPTIONS,
+      );
+      if (!isDeepStrictEqual(windowed, chunkDocument(text, OPTIONS))) mismatches.push(title);
+    }
+    expect(mismatches).toEqual([]);
+    expect(edges).toBeGreaterThan(1_000);
   });
 });

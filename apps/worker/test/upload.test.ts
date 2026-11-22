@@ -5,11 +5,20 @@ import { env } from "cloudflare:workers";
 import { describe, expect, it, vi } from "vitest";
 import { handle } from "../src/app";
 import type { DocumentSummary } from "../src/documents";
-import { MAX_MARKDOWN_BYTES, MAX_UPLOAD_BYTES, type Converter } from "../src/upload";
+import {
+  MAX_MARKDOWN_BYTES,
+  MAX_UPLOAD_BYTES,
+  type Converter,
+  type StartChunking,
+} from "../src/upload";
 import { makeDocx, makePdf } from "./files";
 import { TEST_KEYS } from "./fixtures";
 
 const BASE = "http://example.com";
+
+// The chunking job is tested on its own (chunking.test.ts); here it must not run, or it would
+// move documents to 'ready' while these tests look at them.
+const noChunking: StartChunking = () => Promise.resolve();
 
 /** A converter that returns `markdown` for any file, and records what it was given. */
 function fakeConverter(markdown = "# Agreement\n\n1. Definitions\n\nText.") {
@@ -43,6 +52,7 @@ function upload(
     tenant?: keyof typeof TEST_KEYS;
     filename?: string | null;
     length?: string | null;
+    startChunking?: StartChunking;
   } = {},
 ) {
   const headers = new Headers({ Authorization: `Bearer ${TEST_KEYS[options.tenant ?? "acme"]}` });
@@ -50,7 +60,7 @@ function upload(
   if (options.length !== null)
     headers.set("Content-Length", options.length ?? String(bytes.length));
   const request = new Request(`${BASE}/v1/documents`, { method: "POST", headers, body: bytes });
-  return handle(request, env, { convert });
+  return handle(request, env, { convert, startChunking: options.startChunking ?? noChunking });
 }
 
 function status(id: string, tenant: keyof typeof TEST_KEYS = "acme", method = "GET") {
@@ -58,7 +68,7 @@ function status(id: string, tenant: keyof typeof TEST_KEYS = "acme", method = "G
     method,
     headers: { Authorization: `Bearer ${TEST_KEYS[tenant]}` },
   });
-  return handle(request, env, { convert: fakeConverter() });
+  return handle(request, env, { convert: fakeConverter(), startChunking: noChunking });
 }
 
 function body(response: Response) {
@@ -96,6 +106,38 @@ describe("POST /v1/documents", () => {
     expect(await storedMarkdown("acme", document.id)).toBe(
       "# Agreement\n\n1. Definitions\n\nText.",
     );
+  });
+
+  it("starts the chunking job for the converted document, once", async () => {
+    const startChunking = vi.fn<StartChunking>(() => Promise.resolve());
+    const pdf = makePdf();
+    const { document } = await body(await upload(pdf, fakeConverter(), { startChunking }));
+    await upload(pdf, fakeConverter(), { startChunking }); // duplicate: no second job
+
+    expect(startChunking).toHaveBeenCalledTimes(1);
+    expect(startChunking).toHaveBeenCalledWith({ tenantId: "acme", documentId: document.id });
+  });
+
+  it("fails the document if the chunking job cannot start, so a re-upload retries", async () => {
+    const pdf = makePdf();
+    const broken = vi.fn<StartChunking>(() => Promise.reject(new Error("quota")));
+    const response = await upload(pdf, fakeConverter(), { startChunking: broken });
+
+    expect(response.status).toBe(503);
+    const failed = await body(response);
+    expect(failed.error).toBe("chunking_not_started");
+    expect(failed.document.status).toBe("failed");
+
+    const retried = await upload(pdf, fakeConverter());
+    expect(retried.status).toBe(201);
+    expect((await body(retried)).document.id).toBe(failed.document.id);
+  });
+
+  it("does not start chunking when conversion fails", async () => {
+    const startChunking = vi.fn<StartChunking>(() => Promise.resolve());
+    await upload(makePdf(), failingConverter(), { startChunking });
+
+    expect(startChunking).not.toHaveBeenCalled();
   });
 
   it("accepts a DOCX", async () => {

@@ -15,11 +15,19 @@
       "migrations_dir": "migrations",
     },
   ],
+  // Chunking job (src/chunking.ts): one instance per converted document. Created on deploy.
+  "workflows": [
+    {
+      "name": "lexguard-chunk-document",
+      "binding": "CHUNK_DOCUMENT",
+      "class_name": "ChunkDocument",
+    },
+  ],
   // Workers AI: env.AI.toMarkdown converts uploaded PDF/DOCX to Markdown (free for those
   // formats; images would use neurons, so uploads are limited to PDF and DOCX).
   "ai": { "binding": "AI", "remote": true },
   // Secret names only (values are set with `wrangler secret put`, or .dev.vars locally).
   // TENANT_KEYS: JSON object mapping SHA-256(api key) in hex to a tenant ID.
   "secrets": { "required": ["TENANT_KEYS"] },
-  // More bindings (Vectorize, Queues, Workflows...) are added in later milestones.
+  // More bindings (Vectorize, Queues...) are added in later milestones.
 }
