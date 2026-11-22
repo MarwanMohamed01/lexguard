@@ -198,4 +198,9 @@ They change, so re-check before relying on them.
   convert for characters outside the BMP.
 - **Found on CUAD and fixed:** clauses glued to an ALL-CAPS heading by PDF extraction
   ("9. PROPRIETARY MARKS 9.1 Our Representations") were missed; a marker after an ALL-CAPS
-  word now counts as a boundary.
+  word now counts as a boundary, but only a bare number followed by a short title with
+  lowercase letters. The first, looser version took cross-references in all-caps liability
+  clauses for headings ("ARISING UNDER SECTION 8 OF THIS AGREEMENT"); the clause-integrity
+  eval (step 4) found it.
+- **Measured (step 4, CUAD):** 99.41% of 13,823 labelled clauses kept whole vs 96.95% for
+  LangChain-style recursive splitting at the same chunk count (`evals/cuad/README.md`).

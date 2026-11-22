@@ -61,6 +61,56 @@ redacted; it is not a precision score.
   phones; about 0.5 ms per 4,000-character chunk; 243 ms for the longest contract (292k
   characters) in one call, so redaction must run per chunk.
 
+## Clause integrity of chunking (M2): results
+
+`chunking.test.ts` splits all 510 contracts and checks, for each of the 13,823 lawyer-labelled
+clauses, whether **one chunk contains the whole clause**. In M4 each extractor reads one
+chunk, so a clause cut in two is never seen whole: this share is a ceiling on extraction
+recall. Results in `../results/cuad-chunking.json`; the test is also the CI gate.
+
+**Equal chunk count.** Bigger chunks keep more clauses for free, so the baselines are
+calibrated to produce the same number of chunks as ours (same average length, same storage
+and embedding cost). "Recursive" is LangChain's `RecursiveCharacterTextSplitter` method
+(blank line, line, space, anywhere), the usual RAG default.
+
+| Splitter (≈17,030 chunks, mean ≈1,565 chars) | Kept whole          | Short (<200) | Medium (200–999) | Long (1,000–4,000, n=348) |
+| -------------------------------------------- | ------------------- | ------------ | ---------------- | ------------------------- |
+| **Structure-aware (ours)**                   | **99.41%** (81 cut) | 99.94%       | 99.34%           | **90.2%**                 |
+| Recursive, size 2,504                        | 96.95% (422 cut)    | 99.44%       | 95.46%           | 74.4%                     |
+| Fixed-size 1,598                             | 83.97% (2,216 cut)  | 96.00%       | 74.39%           | 20.4%                     |
+
+For reference, not at equal count: recursive at size 4,000 (8,564 chunks, double our mean
+length) keeps 99.02%; fixed-size 1,598 with 10% overlap (18,857 chunks) keeps 89.94%.
+
+- **Guarantees on all 510 contracts:** 0 offset errors, 0 chunks over 4,000 characters;
+  84% of chunks carry a section path; 20 contracts have no detectable headings (they fall
+  back to paragraph/sentence splitting).
+- **No labelled clause is longer than 4,000 characters,** so none is excluded as unfittable;
+  0 CUAD spans failed the text-at-offset check.
+- **Fixed-size long-clause numbers are luck.** With random clause positions, fixed-size would
+  be expected to keep 65.5 of the long clauses without overlap and 72.8 with it; we observed
+  83 and 64. Where the fixed grid happens to fall decides it (and identical spans labelled
+  under several clause types count several times). The headline and the recursive
+  comparison do not depend on such luck.
+
+**What the misses taught us.** Broken clauses were sorted by the kind of the first cut
+inside them (evenly spaced samples in the results file):
+
+- **Bug found and fixed:** cross-references inside ALL-CAPS liability paragraphs were taken
+  as headings (`ARISING UNDER SECTION 8 OF THIS AGREEMENT`, `(ARTICLE 12) OR ...`,
+  `PRECEDING 12 MONTHS`). They came from the "number after an ALL-CAPS word" rule added in
+  step 3. That rule now needs a bare number followed by a short title with lowercase letters
+  (`MARKS 9.1 Our Representations.`). Cuts at headings fell from 49 to 33, integrity
+  99.33% → 99.41%. These were Cap On Liability and Uncapped Liability clauses, among the most
+  important to review.
+- **Remaining cuts at headings (33)** are real sub-headings inside a long labelled clause
+  (`3.2.1 ... 3.2.2`), numbered lists inside a clause that look like restarted numbering
+  (`conditions: 1. You are in full compliance ...`), or labels that run into the next
+  heading (`... SUCH DAMAGES. 8. Arbitration.`). Not tuned further: telling lists from
+  headings would mean fitting rules to CUAD.
+- **Size splits (48)** are long clauses in sections over 4,000 characters, cut at the best
+  boundary available, mostly list items `(i)`, `(ii)`, `(c)`.
+
 ## Planned uses
 
 - **Quote check (M5):** every labelled span must pass the verifier's exact-quote check;

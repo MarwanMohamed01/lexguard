@@ -25,8 +25,9 @@ describe("measureRedaction", () => {
   });
 });
 
-// Real-contract measurement. Requires `npm run fetch:cuad -w @lexguard/evals`; not run in CI
-// (40 MB download). No thresholds: CUAD has no PII labels, so this describes, it does not score.
+// Real-contract measurement. Requires `npm run fetch:cuad -w @lexguard/evals` (CI downloads it
+// for the chunking gate, so this runs there too). No thresholds: CUAD has no PII labels, so
+// this describes, it does not score.
 describe.skipIf(!cuadAvailable())("CUAD over-redaction", () => {
   it("writes results/cuad-redaction.json", { timeout: 300_000 }, () => {
     const contracts = loadCuad();

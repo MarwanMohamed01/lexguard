@@ -32,6 +32,13 @@ describe("findHeadingCandidates", () => {
     ]);
   });
 
+  it("ignores cross-references in ALL-CAPS paragraphs (found on CUAD)", () => {
+    const text =
+      "EXCEPT FOR LIABILITY ARISING UNDER SECTION 8 OF THIS AGREEMENT, IN NO EVENT SHALL EITHER " +
+      "PARTY BE LIABLE FOR BREACH OF CONFIDENTIALITY (ARTICLE 12) OR INDEMNIFICATION OBLIGATIONS.";
+    expect(numbered(text)).toEqual([]);
+  });
+
   it("finds ARTICLE 7 once, not also as a bare 7", () => {
     expect(numbered("ARTICLE 7 FEES\n7.1 Amount.").map((c) => c.marker)).toEqual([
       "ARTICLE 7",

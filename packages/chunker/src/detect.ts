@@ -82,15 +82,26 @@ export function findHeadingCandidates(text: string): HeadingCandidate[] {
     if (keyword === undefined && !/^\d/.test(raw)) continue;
     const number = parseClauseNumber(raw);
     if (number === null) continue;
-    // After "# ", the section starts at the "#" so the marks stay with their heading.
     const lineStart = text.lastIndexOf("\n", match.index - 1) + 1;
-    const hashed = /^[ \t]*#{1,6}[ \t]+$/.test(text.slice(lineStart, match.index));
+    const before = text.slice(lineStart, match.index);
+    const title = titleAfter(text, match.index + match[0].length);
+    // Found only because an ALL-CAPS word precedes it: that rule exists for headings glued to
+    // a title line ("MARKS 9.1 Our Representations."), where the clause title switches out of
+    // capitals. So demand a bare number with a short title that has lowercase letters.
+    // Otherwise it is a number inside an all-caps sentence ("ARISING UNDER SECTION 8 OF THIS
+    // AGREEMENT", "(ARTICLE 12) OR ...", "PRECEDING 12 MONTHS"), found on CUAD liability clauses.
+    const atLineOrSentence = /^[ \t]*(?:#{1,6}[ \t]+)?$|[.:;][ \t]+$/.test(before);
+    if (!atLineOrSentence && (keyword !== undefined || title === null || !/[a-z]/.test(title))) {
+      continue;
+    }
+    // After "# ", the section starts at the "#" so the marks stay with their heading.
+    const hashed = /^[ \t]*#{1,6}[ \t]+$/.test(before);
     candidates.push({
       kind: "numbered",
       start: hashed ? lineStart : match.index,
       number,
       marker: keyword === undefined ? raw : `${keyword} ${raw}`,
-      title: titleAfter(text, match.index + match[0].length),
+      title,
     });
   }
 

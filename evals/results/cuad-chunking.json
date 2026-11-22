@@ -1,0 +1,1609 @@
+{
+  "options": {
+    "targetChars": 2000,
+    "maxChars": 4000
+  },
+  "invalidSpans": 0,
+  "reports": [
+    {
+      "name": "structure-aware (ours)",
+      "chunks": 17026,
+      "meanChars": 1574,
+      "medianChars": 1574,
+      "integrity": {
+        "kept": 13742,
+        "total": 13823,
+        "rate": 0.9941
+      },
+      "byLength": {
+        "short": {
+          "kept": 6992,
+          "total": 6996,
+          "rate": 0.9994
+        },
+        "medium": {
+          "kept": 6436,
+          "total": 6479,
+          "rate": 0.9934
+        },
+        "long": {
+          "kept": 314,
+          "total": 348,
+          "rate": 0.9023
+        },
+        "tooLong": {
+          "kept": 0,
+          "total": 0,
+          "rate": 1
+        }
+      },
+      "byClauseType": {
+        "Affiliate License-Licensee": {
+          "kept": 115,
+          "total": 115,
+          "rate": 1
+        },
+        "Affiliate License-Licensor": {
+          "kept": 69,
+          "total": 69,
+          "rate": 1
+        },
+        "Agreement Date": {
+          "kept": 476,
+          "total": 476,
+          "rate": 1
+        },
+        "Anti-Assignment": {
+          "kept": 652,
+          "total": 654,
+          "rate": 0.9969
+        },
+        "Audit Rights": {
+          "kept": 641,
+          "total": 643,
+          "rate": 0.9969
+        },
+        "Cap On Liability": {
+          "kept": 666,
+          "total": 672,
+          "rate": 0.9911
+        },
+        "Change Of Control": {
+          "kept": 248,
+          "total": 253,
+          "rate": 0.9802
+        },
+        "Competitive Restriction Exception": {
+          "kept": 122,
+          "total": 125,
+          "rate": 0.976
+        },
+        "Covenant Not To Sue": {
+          "kept": 170,
+          "total": 173,
+          "rate": 0.9827
+        },
+        "Document Name": {
+          "kept": 521,
+          "total": 521,
+          "rate": 1
+        },
+        "Effective Date": {
+          "kept": 447,
+          "total": 447,
+          "rate": 1
+        },
+        "Exclusivity": {
+          "kept": 407,
+          "total": 410,
+          "rate": 0.9927
+        },
+        "Expiration Date": {
+          "kept": 467,
+          "total": 467,
+          "rate": 1
+        },
+        "Governing Law": {
+          "kept": 464,
+          "total": 464,
+          "rate": 1
+        },
+        "Insurance": {
+          "kept": 555,
+          "total": 560,
+          "rate": 0.9911
+        },
+        "Ip Ownership Assignment": {
+          "kept": 317,
+          "total": 318,
+          "rate": 0.9969
+        },
+        "Irrevocable Or Perpetual License": {
+          "kept": 161,
+          "total": 165,
+          "rate": 0.9758
+        },
+        "Joint Ip Ownership": {
+          "kept": 115,
+          "total": 115,
+          "rate": 1
+        },
+        "License Grant": {
+          "kept": 771,
+          "total": 777,
+          "rate": 0.9923
+        },
+        "Liquidated Damages": {
+          "kept": 120,
+          "total": 121,
+          "rate": 0.9917
+        },
+        "Minimum Commitment": {
+          "kept": 414,
+          "total": 424,
+          "rate": 0.9764
+        },
+        "Most Favored Nation": {
+          "kept": 38,
+          "total": 38,
+          "rate": 1
+        },
+        "No-Solicit Of Customers": {
+          "kept": 56,
+          "total": 58,
+          "rate": 0.9655
+        },
+        "No-Solicit Of Employees": {
+          "kept": 90,
+          "total": 91,
+          "rate": 0.989
+        },
+        "Non-Compete": {
+          "kept": 256,
+          "total": 259,
+          "rate": 0.9884
+        },
+        "Non-Disparagement": {
+          "kept": 65,
+          "total": 65,
+          "rate": 1
+        },
+        "Non-Transferable License": {
+          "kept": 294,
+          "total": 298,
+          "rate": 0.9866
+        },
+        "Notice Period To Terminate Renewal": {
+          "kept": 122,
+          "total": 122,
+          "rate": 1
+        },
+        "Parties": {
+          "kept": 2554,
+          "total": 2554,
+          "rate": 1
+        },
+        "Post-Termination Services": {
+          "kept": 447,
+          "total": 450,
+          "rate": 0.9933
+        },
+        "Price Restrictions": {
+          "kept": 26,
+          "total": 27,
+          "rate": 0.963
+        },
+        "Renewal Term": {
+          "kept": 208,
+          "total": 210,
+          "rate": 0.9905
+        },
+        "Revenue/Profit Sharing": {
+          "kept": 412,
+          "total": 418,
+          "rate": 0.9856
+        },
+        "Rofr/Rofo/Rofn": {
+          "kept": 366,
+          "total": 367,
+          "rate": 0.9973
+        },
+        "Source Code Escrow": {
+          "kept": 64,
+          "total": 66,
+          "rate": 0.9697
+        },
+        "Termination For Convenience": {
+          "kept": 246,
+          "total": 246,
+          "rate": 1
+        },
+        "Third Party Beneficiary": {
+          "kept": 39,
+          "total": 39,
+          "rate": 1
+        },
+        "Uncapped Liability": {
+          "kept": 167,
+          "total": 167,
+          "rate": 1
+        },
+        "Unlimited/All-You-Can-Eat-License": {
+          "kept": 32,
+          "total": 32,
+          "rate": 1
+        },
+        "Volume Restriction": {
+          "kept": 168,
+          "total": 171,
+          "rate": 0.9825
+        },
+        "Warranty Duration": {
+          "kept": 174,
+          "total": 176,
+          "rate": 0.9886
+        }
+      }
+    },
+    {
+      "name": "recursive, size 2504 (equal chunk count)",
+      "chunks": 17018,
+      "meanChars": 1575,
+      "medianChars": 2047,
+      "integrity": {
+        "kept": 13401,
+        "total": 13823,
+        "rate": 0.9695
+      },
+      "byLength": {
+        "short": {
+          "kept": 6957,
+          "total": 6996,
+          "rate": 0.9944
+        },
+        "medium": {
+          "kept": 6185,
+          "total": 6479,
+          "rate": 0.9546
+        },
+        "long": {
+          "kept": 259,
+          "total": 348,
+          "rate": 0.7443
+        },
+        "tooLong": {
+          "kept": 0,
+          "total": 0,
+          "rate": 1
+        }
+      },
+      "byClauseType": {
+        "Affiliate License-Licensee": {
+          "kept": 109,
+          "total": 115,
+          "rate": 0.9478
+        },
+        "Affiliate License-Licensor": {
+          "kept": 64,
+          "total": 69,
+          "rate": 0.9275
+        },
+        "Agreement Date": {
+          "kept": 476,
+          "total": 476,
+          "rate": 1
+        },
+        "Anti-Assignment": {
+          "kept": 642,
+          "total": 654,
+          "rate": 0.9817
+        },
+        "Audit Rights": {
+          "kept": 620,
+          "total": 643,
+          "rate": 0.9642
+        },
+        "Cap On Liability": {
+          "kept": 644,
+          "total": 672,
+          "rate": 0.9583
+        },
+        "Change Of Control": {
+          "kept": 243,
+          "total": 253,
+          "rate": 0.9605
+        },
+        "Competitive Restriction Exception": {
+          "kept": 116,
+          "total": 125,
+          "rate": 0.928
+        },
+        "Covenant Not To Sue": {
+          "kept": 163,
+          "total": 173,
+          "rate": 0.9422
+        },
+        "Document Name": {
+          "kept": 521,
+          "total": 521,
+          "rate": 1
+        },
+        "Effective Date": {
+          "kept": 447,
+          "total": 447,
+          "rate": 1
+        },
+        "Exclusivity": {
+          "kept": 392,
+          "total": 410,
+          "rate": 0.9561
+        },
+        "Expiration Date": {
+          "kept": 461,
+          "total": 467,
+          "rate": 0.9872
+        },
+        "Governing Law": {
+          "kept": 453,
+          "total": 464,
+          "rate": 0.9763
+        },
+        "Insurance": {
+          "kept": 536,
+          "total": 560,
+          "rate": 0.9571
+        },
+        "Ip Ownership Assignment": {
+          "kept": 301,
+          "total": 318,
+          "rate": 0.9465
+        },
+        "Irrevocable Or Perpetual License": {
+          "kept": 156,
+          "total": 165,
+          "rate": 0.9455
+        },
+        "Joint Ip Ownership": {
+          "kept": 110,
+          "total": 115,
+          "rate": 0.9565
+        },
+        "License Grant": {
+          "kept": 731,
+          "total": 777,
+          "rate": 0.9408
+        },
+        "Liquidated Damages": {
+          "kept": 115,
+          "total": 121,
+          "rate": 0.9504
+        },
+        "Minimum Commitment": {
+          "kept": 406,
+          "total": 424,
+          "rate": 0.9575
+        },
+        "Most Favored Nation": {
+          "kept": 35,
+          "total": 38,
+          "rate": 0.9211
+        },
+        "No-Solicit Of Customers": {
+          "kept": 56,
+          "total": 58,
+          "rate": 0.9655
+        },
+        "No-Solicit Of Employees": {
+          "kept": 88,
+          "total": 91,
+          "rate": 0.967
+        },
+        "Non-Compete": {
+          "kept": 246,
+          "total": 259,
+          "rate": 0.9498
+        },
+        "Non-Disparagement": {
+          "kept": 61,
+          "total": 65,
+          "rate": 0.9385
+        },
+        "Non-Transferable License": {
+          "kept": 279,
+          "total": 298,
+          "rate": 0.9362
+        },
+        "Notice Period To Terminate Renewal": {
+          "kept": 115,
+          "total": 122,
+          "rate": 0.9426
+        },
+        "Parties": {
+          "kept": 2554,
+          "total": 2554,
+          "rate": 1
+        },
+        "Post-Termination Services": {
+          "kept": 426,
+          "total": 450,
+          "rate": 0.9467
+        },
+        "Price Restrictions": {
+          "kept": 25,
+          "total": 27,
+          "rate": 0.9259
+        },
+        "Renewal Term": {
+          "kept": 199,
+          "total": 210,
+          "rate": 0.9476
+        },
+        "Revenue/Profit Sharing": {
+          "kept": 396,
+          "total": 418,
+          "rate": 0.9474
+        },
+        "Rofr/Rofo/Rofn": {
+          "kept": 354,
+          "total": 367,
+          "rate": 0.9646
+        },
+        "Source Code Escrow": {
+          "kept": 61,
+          "total": 66,
+          "rate": 0.9242
+        },
+        "Termination For Convenience": {
+          "kept": 240,
+          "total": 246,
+          "rate": 0.9756
+        },
+        "Third Party Beneficiary": {
+          "kept": 38,
+          "total": 39,
+          "rate": 0.9744
+        },
+        "Uncapped Liability": {
+          "kept": 158,
+          "total": 167,
+          "rate": 0.9461
+        },
+        "Unlimited/All-You-Can-Eat-License": {
+          "kept": 29,
+          "total": 32,
+          "rate": 0.9063
+        },
+        "Volume Restriction": {
+          "kept": 168,
+          "total": 171,
+          "rate": 0.9825
+        },
+        "Warranty Duration": {
+          "kept": 167,
+          "total": 176,
+          "rate": 0.9489
+        }
+      }
+    },
+    {
+      "name": "fixed-size 1598 (equal chunk count)",
+      "chunks": 17029,
+      "meanChars": 1574,
+      "medianChars": 1598,
+      "integrity": {
+        "kept": 11607,
+        "total": 13823,
+        "rate": 0.8397
+      },
+      "byLength": {
+        "short": {
+          "kept": 6716,
+          "total": 6996,
+          "rate": 0.96
+        },
+        "medium": {
+          "kept": 4820,
+          "total": 6479,
+          "rate": 0.7439
+        },
+        "long": {
+          "kept": 71,
+          "total": 348,
+          "rate": 0.204
+        },
+        "tooLong": {
+          "kept": 0,
+          "total": 0,
+          "rate": 1
+        }
+      },
+      "byClauseType": {
+        "Affiliate License-Licensee": {
+          "kept": 70,
+          "total": 115,
+          "rate": 0.6087
+        },
+        "Affiliate License-Licensor": {
+          "kept": 44,
+          "total": 69,
+          "rate": 0.6377
+        },
+        "Agreement Date": {
+          "kept": 476,
+          "total": 476,
+          "rate": 1
+        },
+        "Anti-Assignment": {
+          "kept": 527,
+          "total": 654,
+          "rate": 0.8058
+        },
+        "Audit Rights": {
+          "kept": 517,
+          "total": 643,
+          "rate": 0.804
+        },
+        "Cap On Liability": {
+          "kept": 520,
+          "total": 672,
+          "rate": 0.7738
+        },
+        "Change Of Control": {
+          "kept": 192,
+          "total": 253,
+          "rate": 0.7589
+        },
+        "Competitive Restriction Exception": {
+          "kept": 95,
+          "total": 125,
+          "rate": 0.76
+        },
+        "Covenant Not To Sue": {
+          "kept": 124,
+          "total": 173,
+          "rate": 0.7168
+        },
+        "Document Name": {
+          "kept": 516,
+          "total": 521,
+          "rate": 0.9904
+        },
+        "Effective Date": {
+          "kept": 438,
+          "total": 447,
+          "rate": 0.9799
+        },
+        "Exclusivity": {
+          "kept": 314,
+          "total": 410,
+          "rate": 0.7659
+        },
+        "Expiration Date": {
+          "kept": 387,
+          "total": 467,
+          "rate": 0.8287
+        },
+        "Governing Law": {
+          "kept": 406,
+          "total": 464,
+          "rate": 0.875
+        },
+        "Insurance": {
+          "kept": 442,
+          "total": 560,
+          "rate": 0.7893
+        },
+        "Ip Ownership Assignment": {
+          "kept": 240,
+          "total": 318,
+          "rate": 0.7547
+        },
+        "Irrevocable Or Perpetual License": {
+          "kept": 101,
+          "total": 165,
+          "rate": 0.6121
+        },
+        "Joint Ip Ownership": {
+          "kept": 92,
+          "total": 115,
+          "rate": 0.8
+        },
+        "License Grant": {
+          "kept": 574,
+          "total": 777,
+          "rate": 0.7387
+        },
+        "Liquidated Damages": {
+          "kept": 89,
+          "total": 121,
+          "rate": 0.7355
+        },
+        "Minimum Commitment": {
+          "kept": 349,
+          "total": 424,
+          "rate": 0.8231
+        },
+        "Most Favored Nation": {
+          "kept": 28,
+          "total": 38,
+          "rate": 0.7368
+        },
+        "No-Solicit Of Customers": {
+          "kept": 49,
+          "total": 58,
+          "rate": 0.8448
+        },
+        "No-Solicit Of Employees": {
+          "kept": 70,
+          "total": 91,
+          "rate": 0.7692
+        },
+        "Non-Compete": {
+          "kept": 196,
+          "total": 259,
+          "rate": 0.7568
+        },
+        "Non-Disparagement": {
+          "kept": 50,
+          "total": 65,
+          "rate": 0.7692
+        },
+        "Non-Transferable License": {
+          "kept": 219,
+          "total": 298,
+          "rate": 0.7349
+        },
+        "Notice Period To Terminate Renewal": {
+          "kept": 100,
+          "total": 122,
+          "rate": 0.8197
+        },
+        "Parties": {
+          "kept": 2540,
+          "total": 2554,
+          "rate": 0.9945
+        },
+        "Post-Termination Services": {
+          "kept": 325,
+          "total": 450,
+          "rate": 0.7222
+        },
+        "Price Restrictions": {
+          "kept": 20,
+          "total": 27,
+          "rate": 0.7407
+        },
+        "Renewal Term": {
+          "kept": 170,
+          "total": 210,
+          "rate": 0.8095
+        },
+        "Revenue/Profit Sharing": {
+          "kept": 324,
+          "total": 418,
+          "rate": 0.7751
+        },
+        "Rofr/Rofo/Rofn": {
+          "kept": 285,
+          "total": 367,
+          "rate": 0.7766
+        },
+        "Source Code Escrow": {
+          "kept": 50,
+          "total": 66,
+          "rate": 0.7576
+        },
+        "Termination For Convenience": {
+          "kept": 214,
+          "total": 246,
+          "rate": 0.8699
+        },
+        "Third Party Beneficiary": {
+          "kept": 31,
+          "total": 39,
+          "rate": 0.7949
+        },
+        "Uncapped Liability": {
+          "kept": 118,
+          "total": 167,
+          "rate": 0.7066
+        },
+        "Unlimited/All-You-Can-Eat-License": {
+          "kept": 25,
+          "total": 32,
+          "rate": 0.7813
+        },
+        "Volume Restriction": {
+          "kept": 140,
+          "total": 171,
+          "rate": 0.8187
+        },
+        "Warranty Duration": {
+          "kept": 140,
+          "total": 176,
+          "rate": 0.7955
+        }
+      }
+    },
+    {
+      "name": "recursive, size 2000",
+      "chunks": 21392,
+      "meanChars": 1253,
+      "medianChars": 1608,
+      "integrity": {
+        "kept": 13206,
+        "total": 13823,
+        "rate": 0.9554
+      },
+      "byLength": {
+        "short": {
+          "kept": 6933,
+          "total": 6996,
+          "rate": 0.991
+        },
+        "medium": {
+          "kept": 6061,
+          "total": 6479,
+          "rate": 0.9355
+        },
+        "long": {
+          "kept": 212,
+          "total": 348,
+          "rate": 0.6092
+        },
+        "tooLong": {
+          "kept": 0,
+          "total": 0,
+          "rate": 1
+        }
+      },
+      "byClauseType": {
+        "Affiliate License-Licensee": {
+          "kept": 105,
+          "total": 115,
+          "rate": 0.913
+        },
+        "Affiliate License-Licensor": {
+          "kept": 59,
+          "total": 69,
+          "rate": 0.8551
+        },
+        "Agreement Date": {
+          "kept": 476,
+          "total": 476,
+          "rate": 1
+        },
+        "Anti-Assignment": {
+          "kept": 623,
+          "total": 654,
+          "rate": 0.9526
+        },
+        "Audit Rights": {
+          "kept": 620,
+          "total": 643,
+          "rate": 0.9642
+        },
+        "Cap On Liability": {
+          "kept": 636,
+          "total": 672,
+          "rate": 0.9464
+        },
+        "Change Of Control": {
+          "kept": 239,
+          "total": 253,
+          "rate": 0.9447
+        },
+        "Competitive Restriction Exception": {
+          "kept": 115,
+          "total": 125,
+          "rate": 0.92
+        },
+        "Covenant Not To Sue": {
+          "kept": 159,
+          "total": 173,
+          "rate": 0.9191
+        },
+        "Document Name": {
+          "kept": 521,
+          "total": 521,
+          "rate": 1
+        },
+        "Effective Date": {
+          "kept": 446,
+          "total": 447,
+          "rate": 0.9978
+        },
+        "Exclusivity": {
+          "kept": 382,
+          "total": 410,
+          "rate": 0.9317
+        },
+        "Expiration Date": {
+          "kept": 456,
+          "total": 467,
+          "rate": 0.9764
+        },
+        "Governing Law": {
+          "kept": 451,
+          "total": 464,
+          "rate": 0.972
+        },
+        "Insurance": {
+          "kept": 529,
+          "total": 560,
+          "rate": 0.9446
+        },
+        "Ip Ownership Assignment": {
+          "kept": 293,
+          "total": 318,
+          "rate": 0.9214
+        },
+        "Irrevocable Or Perpetual License": {
+          "kept": 149,
+          "total": 165,
+          "rate": 0.903
+        },
+        "Joint Ip Ownership": {
+          "kept": 107,
+          "total": 115,
+          "rate": 0.9304
+        },
+        "License Grant": {
+          "kept": 719,
+          "total": 777,
+          "rate": 0.9254
+        },
+        "Liquidated Damages": {
+          "kept": 114,
+          "total": 121,
+          "rate": 0.9421
+        },
+        "Minimum Commitment": {
+          "kept": 398,
+          "total": 424,
+          "rate": 0.9387
+        },
+        "Most Favored Nation": {
+          "kept": 35,
+          "total": 38,
+          "rate": 0.9211
+        },
+        "No-Solicit Of Customers": {
+          "kept": 55,
+          "total": 58,
+          "rate": 0.9483
+        },
+        "No-Solicit Of Employees": {
+          "kept": 84,
+          "total": 91,
+          "rate": 0.9231
+        },
+        "Non-Compete": {
+          "kept": 233,
+          "total": 259,
+          "rate": 0.8996
+        },
+        "Non-Disparagement": {
+          "kept": 59,
+          "total": 65,
+          "rate": 0.9077
+        },
+        "Non-Transferable License": {
+          "kept": 274,
+          "total": 298,
+          "rate": 0.9195
+        },
+        "Notice Period To Terminate Renewal": {
+          "kept": 113,
+          "total": 122,
+          "rate": 0.9262
+        },
+        "Parties": {
+          "kept": 2554,
+          "total": 2554,
+          "rate": 1
+        },
+        "Post-Termination Services": {
+          "kept": 413,
+          "total": 450,
+          "rate": 0.9178
+        },
+        "Price Restrictions": {
+          "kept": 23,
+          "total": 27,
+          "rate": 0.8519
+        },
+        "Renewal Term": {
+          "kept": 195,
+          "total": 210,
+          "rate": 0.9286
+        },
+        "Revenue/Profit Sharing": {
+          "kept": 376,
+          "total": 418,
+          "rate": 0.8995
+        },
+        "Rofr/Rofo/Rofn": {
+          "kept": 342,
+          "total": 367,
+          "rate": 0.9319
+        },
+        "Source Code Escrow": {
+          "kept": 61,
+          "total": 66,
+          "rate": 0.9242
+        },
+        "Termination For Convenience": {
+          "kept": 240,
+          "total": 246,
+          "rate": 0.9756
+        },
+        "Third Party Beneficiary": {
+          "kept": 39,
+          "total": 39,
+          "rate": 1
+        },
+        "Uncapped Liability": {
+          "kept": 157,
+          "total": 167,
+          "rate": 0.9401
+        },
+        "Unlimited/All-You-Can-Eat-License": {
+          "kept": 30,
+          "total": 32,
+          "rate": 0.9375
+        },
+        "Volume Restriction": {
+          "kept": 162,
+          "total": 171,
+          "rate": 0.9474
+        },
+        "Warranty Duration": {
+          "kept": 164,
+          "total": 176,
+          "rate": 0.9318
+        }
+      }
+    },
+    {
+      "name": "recursive, size 4000",
+      "chunks": 8564,
+      "meanChars": 3130,
+      "medianChars": 3557,
+      "integrity": {
+        "kept": 13688,
+        "total": 13823,
+        "rate": 0.9902
+      },
+      "byLength": {
+        "short": {
+          "kept": 6989,
+          "total": 6996,
+          "rate": 0.999
+        },
+        "medium": {
+          "kept": 6401,
+          "total": 6479,
+          "rate": 0.988
+        },
+        "long": {
+          "kept": 298,
+          "total": 348,
+          "rate": 0.8563
+        },
+        "tooLong": {
+          "kept": 0,
+          "total": 0,
+          "rate": 1
+        }
+      },
+      "byClauseType": {
+        "Affiliate License-Licensee": {
+          "kept": 113,
+          "total": 115,
+          "rate": 0.9826
+        },
+        "Affiliate License-Licensor": {
+          "kept": 67,
+          "total": 69,
+          "rate": 0.971
+        },
+        "Agreement Date": {
+          "kept": 476,
+          "total": 476,
+          "rate": 1
+        },
+        "Anti-Assignment": {
+          "kept": 646,
+          "total": 654,
+          "rate": 0.9878
+        },
+        "Audit Rights": {
+          "kept": 639,
+          "total": 643,
+          "rate": 0.9938
+        },
+        "Cap On Liability": {
+          "kept": 668,
+          "total": 672,
+          "rate": 0.994
+        },
+        "Change Of Control": {
+          "kept": 249,
+          "total": 253,
+          "rate": 0.9842
+        },
+        "Competitive Restriction Exception": {
+          "kept": 121,
+          "total": 125,
+          "rate": 0.968
+        },
+        "Covenant Not To Sue": {
+          "kept": 173,
+          "total": 173,
+          "rate": 1
+        },
+        "Document Name": {
+          "kept": 521,
+          "total": 521,
+          "rate": 1
+        },
+        "Effective Date": {
+          "kept": 447,
+          "total": 447,
+          "rate": 1
+        },
+        "Exclusivity": {
+          "kept": 401,
+          "total": 410,
+          "rate": 0.978
+        },
+        "Expiration Date": {
+          "kept": 465,
+          "total": 467,
+          "rate": 0.9957
+        },
+        "Governing Law": {
+          "kept": 461,
+          "total": 464,
+          "rate": 0.9935
+        },
+        "Insurance": {
+          "kept": 553,
+          "total": 560,
+          "rate": 0.9875
+        },
+        "Ip Ownership Assignment": {
+          "kept": 315,
+          "total": 318,
+          "rate": 0.9906
+        },
+        "Irrevocable Or Perpetual License": {
+          "kept": 161,
+          "total": 165,
+          "rate": 0.9758
+        },
+        "Joint Ip Ownership": {
+          "kept": 113,
+          "total": 115,
+          "rate": 0.9826
+        },
+        "License Grant": {
+          "kept": 764,
+          "total": 777,
+          "rate": 0.9833
+        },
+        "Liquidated Damages": {
+          "kept": 121,
+          "total": 121,
+          "rate": 1
+        },
+        "Minimum Commitment": {
+          "kept": 416,
+          "total": 424,
+          "rate": 0.9811
+        },
+        "Most Favored Nation": {
+          "kept": 38,
+          "total": 38,
+          "rate": 1
+        },
+        "No-Solicit Of Customers": {
+          "kept": 58,
+          "total": 58,
+          "rate": 1
+        },
+        "No-Solicit Of Employees": {
+          "kept": 87,
+          "total": 91,
+          "rate": 0.956
+        },
+        "Non-Compete": {
+          "kept": 250,
+          "total": 259,
+          "rate": 0.9653
+        },
+        "Non-Disparagement": {
+          "kept": 64,
+          "total": 65,
+          "rate": 0.9846
+        },
+        "Non-Transferable License": {
+          "kept": 292,
+          "total": 298,
+          "rate": 0.9799
+        },
+        "Notice Period To Terminate Renewal": {
+          "kept": 122,
+          "total": 122,
+          "rate": 1
+        },
+        "Parties": {
+          "kept": 2554,
+          "total": 2554,
+          "rate": 1
+        },
+        "Post-Termination Services": {
+          "kept": 442,
+          "total": 450,
+          "rate": 0.9822
+        },
+        "Price Restrictions": {
+          "kept": 26,
+          "total": 27,
+          "rate": 0.963
+        },
+        "Renewal Term": {
+          "kept": 206,
+          "total": 210,
+          "rate": 0.981
+        },
+        "Revenue/Profit Sharing": {
+          "kept": 409,
+          "total": 418,
+          "rate": 0.9785
+        },
+        "Rofr/Rofo/Rofn": {
+          "kept": 362,
+          "total": 367,
+          "rate": 0.9864
+        },
+        "Source Code Escrow": {
+          "kept": 64,
+          "total": 66,
+          "rate": 0.9697
+        },
+        "Termination For Convenience": {
+          "kept": 245,
+          "total": 246,
+          "rate": 0.9959
+        },
+        "Third Party Beneficiary": {
+          "kept": 39,
+          "total": 39,
+          "rate": 1
+        },
+        "Uncapped Liability": {
+          "kept": 166,
+          "total": 167,
+          "rate": 0.994
+        },
+        "Unlimited/All-You-Can-Eat-License": {
+          "kept": 32,
+          "total": 32,
+          "rate": 1
+        },
+        "Volume Restriction": {
+          "kept": 170,
+          "total": 171,
+          "rate": 0.9942
+        },
+        "Warranty Duration": {
+          "kept": 172,
+          "total": 176,
+          "rate": 0.9773
+        }
+      }
+    },
+    {
+      "name": "fixed-size 1598, 10% overlap",
+      "chunks": 18857,
+      "meanChars": 1577,
+      "medianChars": 1598,
+      "integrity": {
+        "kept": 12433,
+        "total": 13823,
+        "rate": 0.8994
+      },
+      "byLength": {
+        "short": {
+          "kept": 6984,
+          "total": 6996,
+          "rate": 0.9983
+        },
+        "medium": {
+          "kept": 5380,
+          "total": 6479,
+          "rate": 0.8304
+        },
+        "long": {
+          "kept": 69,
+          "total": 348,
+          "rate": 0.1983
+        },
+        "tooLong": {
+          "kept": 0,
+          "total": 0,
+          "rate": 1
+        }
+      },
+      "byClauseType": {
+        "Affiliate License-Licensee": {
+          "kept": 85,
+          "total": 115,
+          "rate": 0.7391
+        },
+        "Affiliate License-Licensor": {
+          "kept": 47,
+          "total": 69,
+          "rate": 0.6812
+        },
+        "Agreement Date": {
+          "kept": 476,
+          "total": 476,
+          "rate": 1
+        },
+        "Anti-Assignment": {
+          "kept": 596,
+          "total": 654,
+          "rate": 0.9113
+        },
+        "Audit Rights": {
+          "kept": 577,
+          "total": 643,
+          "rate": 0.8974
+        },
+        "Cap On Liability": {
+          "kept": 550,
+          "total": 672,
+          "rate": 0.8185
+        },
+        "Change Of Control": {
+          "kept": 212,
+          "total": 253,
+          "rate": 0.8379
+        },
+        "Competitive Restriction Exception": {
+          "kept": 101,
+          "total": 125,
+          "rate": 0.808
+        },
+        "Covenant Not To Sue": {
+          "kept": 144,
+          "total": 173,
+          "rate": 0.8324
+        },
+        "Document Name": {
+          "kept": 521,
+          "total": 521,
+          "rate": 1
+        },
+        "Effective Date": {
+          "kept": 445,
+          "total": 447,
+          "rate": 0.9955
+        },
+        "Exclusivity": {
+          "kept": 359,
+          "total": 410,
+          "rate": 0.8756
+        },
+        "Expiration Date": {
+          "kept": 438,
+          "total": 467,
+          "rate": 0.9379
+        },
+        "Governing Law": {
+          "kept": 443,
+          "total": 464,
+          "rate": 0.9547
+        },
+        "Insurance": {
+          "kept": 490,
+          "total": 560,
+          "rate": 0.875
+        },
+        "Ip Ownership Assignment": {
+          "kept": 267,
+          "total": 318,
+          "rate": 0.8396
+        },
+        "Irrevocable Or Perpetual License": {
+          "kept": 114,
+          "total": 165,
+          "rate": 0.6909
+        },
+        "Joint Ip Ownership": {
+          "kept": 100,
+          "total": 115,
+          "rate": 0.8696
+        },
+        "License Grant": {
+          "kept": 626,
+          "total": 777,
+          "rate": 0.8057
+        },
+        "Liquidated Damages": {
+          "kept": 104,
+          "total": 121,
+          "rate": 0.8595
+        },
+        "Minimum Commitment": {
+          "kept": 372,
+          "total": 424,
+          "rate": 0.8774
+        },
+        "Most Favored Nation": {
+          "kept": 27,
+          "total": 38,
+          "rate": 0.7105
+        },
+        "No-Solicit Of Customers": {
+          "kept": 52,
+          "total": 58,
+          "rate": 0.8966
+        },
+        "No-Solicit Of Employees": {
+          "kept": 76,
+          "total": 91,
+          "rate": 0.8352
+        },
+        "Non-Compete": {
+          "kept": 220,
+          "total": 259,
+          "rate": 0.8494
+        },
+        "Non-Disparagement": {
+          "kept": 53,
+          "total": 65,
+          "rate": 0.8154
+        },
+        "Non-Transferable License": {
+          "kept": 242,
+          "total": 298,
+          "rate": 0.8121
+        },
+        "Notice Period To Terminate Renewal": {
+          "kept": 112,
+          "total": 122,
+          "rate": 0.918
+        },
+        "Parties": {
+          "kept": 2554,
+          "total": 2554,
+          "rate": 1
+        },
+        "Post-Termination Services": {
+          "kept": 349,
+          "total": 450,
+          "rate": 0.7756
+        },
+        "Price Restrictions": {
+          "kept": 24,
+          "total": 27,
+          "rate": 0.8889
+        },
+        "Renewal Term": {
+          "kept": 192,
+          "total": 210,
+          "rate": 0.9143
+        },
+        "Revenue/Profit Sharing": {
+          "kept": 372,
+          "total": 418,
+          "rate": 0.89
+        },
+        "Rofr/Rofo/Rofn": {
+          "kept": 312,
+          "total": 367,
+          "rate": 0.8501
+        },
+        "Source Code Escrow": {
+          "kept": 51,
+          "total": 66,
+          "rate": 0.7727
+        },
+        "Termination For Convenience": {
+          "kept": 228,
+          "total": 246,
+          "rate": 0.9268
+        },
+        "Third Party Beneficiary": {
+          "kept": 37,
+          "total": 39,
+          "rate": 0.9487
+        },
+        "Uncapped Liability": {
+          "kept": 130,
+          "total": 167,
+          "rate": 0.7784
+        },
+        "Unlimited/All-You-Can-Eat-License": {
+          "kept": 27,
+          "total": 32,
+          "rate": 0.8438
+        },
+        "Volume Restriction": {
+          "kept": 153,
+          "total": 171,
+          "rate": 0.8947
+        },
+        "Warranty Duration": {
+          "kept": 155,
+          "total": 176,
+          "rate": 0.8807
+        }
+      }
+    }
+  ],
+  "diagnostics": {
+    "offsetViolations": 0,
+    "oversizedChunks": 0,
+    "chunksWithSectionPath": 14280,
+    "contractsWithoutHeadings": 20,
+    "brokenBy": {
+      "heading": 33,
+      "sizeSplit": 48
+    },
+    "examples": {
+      "heading": [
+        {
+          "contract": "HEALTHGATEDATACORP_11_24_1999-EX-10.1-HOSTING AND MANAGEMENT AGREEMENT (1)",
+          "clauseType": "Post-Termination Services",
+          "spanChars": 1075,
+          "aroundCut": " for a period of six (6) months       thereafter, the Publishers will have the following rights and obligations:\n\n      ⟦|⟧33.1. Commencing upon any notice of termination by the Publishers,             HealthGate will comply with the Publisher"
+        },
+        {
+          "contract": "GRANTIERRAENERGYINC_05_07_2012-EX-10.6-TRANSPORTATION CONTRACT",
+          "clauseType": "Minimum Commitment",
+          "spanChars": 1656,
+          "aroundCut": "If by any reason the delivery is less than 95% or more than 105% of their Scheduled Capacity, the Sender shall Pay:     ⟦|⟧22.2.1.1.1 The Transportation fee for volumes delivered when they are higher than the Contracted Capacity in firm. When "
+        },
+        {
+          "contract": "ScansourceInc_20190822_10-K_EX-10.38_11793958_EX-10.38_Distributor Agreement1",
+          "clauseType": "Warranty Duration",
+          "spanChars": 2265,
+          "aroundCut": "ription of the problem.\n\n3.4.2.3 Cisco will not accept any Product returned which is not accompanied by an RMA number.\n\n⟦|⟧3.4.3 Title and risk of loss to failed Product and parts transfers to Cisco upon delivery to the Cisco repair center spe"
+        },
+        {
+          "contract": "TomOnlineInc_20060501_20-F_EX-4.46_749700_EX-4.46_Co-Branding Agreement",
+          "clauseType": "Competitive Restriction Exception",
+          "spanChars": 1791,
+          "aroundCut": "In the case of Skype and its Affiliates, the foregoing restrictions shall not apply:\n\n⟦|⟧8.2.1 (a) (i) for the avoidance of doubt, to the operations of Skype as existing now or hereafter undertaken with respec"
+        },
+        {
+          "contract": "BUFFALOWILDWINGSINC_06_05_1998-EX-10.3-FRANCHISE AGREEMENT",
+          "clauseType": "Non-Compete",
+          "spanChars": 1029,
+          "aroundCut": " sells or offers to dispense prepared food products the same as or similar to the type sold in the System:\n\n            ⟦|⟧1.    At the premises of the former Franchised Restaurant;\n\n            2.    Within a radius of ten (10) miles of the f"
+        },
+        {
+          "contract": "BUFFALOWILDWINGSINC_06_05_1998-EX-10.3-FRANCHISE AGREEMENT",
+          "clauseType": "Change Of Control",
+          "spanChars": 1480,
+          "aroundCut": "e will not withhold our consent to a Transfer, subject to all of the following conditions being satisfied:\n\n            ⟦|⟧1.    You are in full compliance with this Agreement, you have no uncured defaults, all your fees, debts and financial o"
+        },
+        {
+          "contract": "BUFFALOWILDWINGSINC_06_05_1998-EX-10.3-FRANCHISE AGREEMENT",
+          "clauseType": "Insurance",
+          "spanChars": 2380,
+          "aroundCut": "ecified for all franchisees from time to time by us in the Manuals or otherwise in writing) the following:\n\n            ⟦|⟧1.    All risks coverage insurance on the Franchised Restaurant and all fixtures, equipment, supplies and other property"
+        },
+        {
+          "contract": "KUBIENT,INC_07_02_2020-EX-10.14-MASTER SERVICES AGREEMENT_Part1",
+          "clauseType": "Cap On Liability",
+          "spanChars": 506,
+          "aroundCut": "S OF RECOVERY, EVEN IF THE OTHER PARTY WAS OR SHOULD HAVE BEEN AWARE OR WAS ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. ⟦|⟧8. Arbitration."
+        },
+        {
+          "contract": "BerkshireHillsBancorpInc_20120809_10-Q_EX-10.16_7708169_EX-10.16_Endorsement Agreement",
+          "clauseType": "Volume Restriction",
+          "spanChars": 967,
+          "aroundCut": " including travel  time, to record a television advertising spot at a date and location to be mutually agreed upon;     ⟦|⟧4. Auriemma will participate in one (1) photo session annually during the Services Period of not more than two (2) hours"
+        },
+        {
+          "contract": "HertzGroupRealtyTrustInc_20190920_S-11A_EX-10.8_11816941_EX-10.8_Trademark License Agreement",
+          "clauseType": "Change Of Control",
+          "spanChars": 274,
+          "aroundCut": "censes granted under this Agreement shall terminate as soon as practicable, but no longer than thirty (30) days, after: ⟦|⟧3.2.1 Licensee is acquired by a third party; or 3.2.2 Licensor or any affiliate of Licensor ceases to manage Licensee."
+        },
+        {
+          "contract": "SoupmanInc_20150814_8-K_EX-10.1_9230148_EX-10.1_Franchise Agreement1",
+          "clauseType": "Renewal Term",
+          "spanChars": 2783,
+          "aroundCut": ".5 You shall pay us a renewal fee in the sum of Ten Thousand Dollars ($10,000) for the right to renew this Agreement.   ⟦|⟧3.2.6 You shall execute a general release, in a form prescribed by us, of any and all claims which you may have or belie"
+        },
+        {
+          "contract": "HEALTHGATEDATACORP_11_24_1999-EX-10.1-HOSTING AND MANAGEMENT AGREEMENT - Escrow Agreement",
+          "clauseType": "Source Code Escrow",
+          "spanChars": 3884,
+          "aroundCut": "ndertakings given under it are the undertakings       given under it by each of the other parties.\n\nIt is agreed that:\n\n⟦|⟧1     Definitions\n\n      In this Agreement the following terms shall have the following meanings:\n\n      1.1   \"Full Ver"
+        }
+      ],
+      "sizeSplit": [
+        {
+          "contract": "ZEBRATECHNOLOGIESCORP_04_16_2014-EX-10.1-INTELLECTUAL PROPERTY AGREEMENT",
+          "clauseType": "License Grant",
+          "spanChars": 797,
+          "aroundCut": "cept as expressly set forth herein), non-exclusive license, under the Licensed IP (other than Trademarks and Patents):\n\n⟦|⟧(i) (A) to use such Licensed IP in the operation of the Business and to practice any methods, processes, and procedures "
+        },
+        {
+          "contract": "ZEBRATECHNOLOGIESCORP_04_16_2014-EX-10.1-INTELLECTUAL PROPERTY AGREEMENT",
+          "clauseType": "Irrevocable Or Perpetual License",
+          "spanChars": 797,
+          "aroundCut": "cept as expressly set forth herein), non-exclusive license, under the Licensed IP (other than Trademarks and Patents):\n\n⟦|⟧(i) (A) to use such Licensed IP in the operation of the Business and to practice any methods, processes, and procedures "
+        },
+        {
+          "contract": "UpjohnInc_20200121_10-12G_EX-2.6_11948692_EX-2.6_Manufacturing Agreement_ Supply Agreement",
+          "clauseType": "Price Restrictions",
+          "spanChars": 905,
+          "aroundCut": "rsion Costs of a Facility during any Facility Conversion Cost Adjustment Fiscal Year are estimated to be (a) less -28-\n\n⟦|⟧Source: UPJOHN INC, 10-12G, 1/21/2020\n\n\n\n\n\nthan eighty percent (80%) of the Facility Conversion Costs for the Facility C"
+        },
+        {
+          "contract": "ScansourceInc_20190822_10-K_EX-10.38_11793958_EX-10.38_Distributor Agreement2",
+          "clauseType": "Warranty Duration",
+          "spanChars": 575,
+          "aroundCut": "90) days or (b) the software warranty period (if any) set forth in the warranty card accompanying the Product (if any): ⟦|⟧(a) the media on which the Software is furnished will be free of defects in materials and workmanship under normal use; "
+        },
+        {
+          "contract": "PapaJohnsInternationalInc_20190617_8-K_EX-10.1_11707365_EX-10.1_Endorsement Agreement",
+          "clauseType": "Volume Restriction",
+          "spanChars": 210,
+          "aroundCut": "At least eight (8) \"Service Days\", including but not limited to:\n\n⟦|⟧1. Production days. Up to four (4) production days (defined as a maximum of eight (8) consecutive hours each), with PAPA"
+        },
+        {
+          "contract": "SUMMAFOURINC_06_19_1998-EX-10.3-SOFTWARE LICENSE AND MAINTENANCE AGREEMENT",
+          "clauseType": "Minimum Commitment",
+          "spanChars": 3546,
+          "aroundCut": "ct                                                 - -------------------------------------------------------------\n\n\n\n\n\n⟦|⟧----------------------------------------------------- Minimum Interdigital          Must accept                   Must a"
+        },
+        {
+          "contract": "BUFFALOWILDWINGSINC_06_05_1998-EX-10.3-FRANCHISE AGREEMENT",
+          "clauseType": "Audit Rights",
+          "spanChars": 333,
+          "aroundCut": "In order to preserve the validity and integrity of the Marks and\n\n\n\n\n\n⟦|⟧copyrighted material licensed to you and to assure that you are properly employing the same in the operation of your Fra"
+        },
+        {
+          "contract": "RevolutionMedicinesInc_20200117_S-1_EX-10.1_11948417_EX-10.1_Development Agreement",
+          "clauseType": "Post-Termination Services",
+          "spanChars": 1579,
+          "aroundCut": "is sublicensed to RevMed pursuant to Section 12.3(c)(ii)A, unless RevMed declines in writing to obtain such sublicense. ⟦|⟧\"Post-Termination Royalty Term\" means: (I) with respect to a particular country and a particular Termination Product tha"
+        },
+        {
+          "contract": "GentechHoldingsInc_20190808_1-A_EX1A-6 MAT CTRCT_11776814_EX1A-6 MAT CTRCT_Distributor Agreement",
+          "clauseType": "Volume Restriction",
+          "spanChars": 371,
+          "aroundCut": "In addition to any other responsibilities stated in this Agreement, Company will: ⟦|⟧(a) Provide, at Distributor's reasonable request and without charge, up to 10 hours of training with regard to any chara"
+        },
+        {
+          "contract": "StampscomInc_20001114_10-Q_EX-10.47_2631630_EX-10.47_Co-Branding Agreement",
+          "clauseType": "Revenue/Profit Sharing",
+          "spanChars": 2563,
+          "aroundCut": "unt of [***]* per Bounty Package shipped via                                       --- ground transportation;\n\n         ⟦|⟧(ii)  in the event that at least [***]* but less than [***]* Bounty                                            ---      "
+        },
+        {
+          "contract": "GluMobileInc_20070319_S-1A_EX-10.09_436630_EX-10.09_Content License Agreement1",
+          "clauseType": "Non-Transferable License",
+          "spanChars": 759,
+          "aroundCut": "cts, including any PSM included therein, solely (i) for use on mobile or cellular telephones (the \"Wireless Platform\"); ⟦|⟧(ii) in the Territory (as defined in Paragraph 3), (iii) during the Term (as defined in Paragraph 4), (iv) for distribut"
+        },
+        {
+          "contract": "IMPCOTECHNOLOGIESINC_04_15_2003-EX-10.65-JOINT VENTURE AGREEMENT",
+          "clauseType": "Non-Compete",
+          "spanChars": 748,
+          "aroundCut": "IL, since it will have access to the Technical Know-How which it would not have had otherwise, expressly agree that:\n\n\n\n⟦|⟧(a)   during the term of the Agreement, and thereafter for a period of five (5) years after the termination of the Agree"
+        }
+      ]
+    }
+  }
+}

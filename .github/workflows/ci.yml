@@ -40,10 +40,17 @@ jobs:
       # SHA-256 either way, so a cached file can be trusted as much as a fresh download.
       - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
-          path: evals/data
+          path: evals/data/gretel
           key: eval-data-gretel-e06eb1499ca8d54470f085021cd8e54f9efac7fd
 
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: evals/data/cuad/CUAD_v1.json
+          key: eval-data-cuad-a3c393f5d103fd0c516374e4fdff676c8176dcb1
+
       - run: npm run fetch:gretel -w @lexguard/evals
+      # 40 MB; needed for the clause-integrity gate (evals/cuad/chunking.test.ts).
+      - run: npm run fetch:cuad -w @lexguard/evals
 
       - run: npm run check
 
