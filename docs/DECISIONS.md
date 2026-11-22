@@ -172,3 +172,30 @@ They change, so re-check before relying on them.
 
 `toMarkdown` returns `{ id, name, format, mimetype, tokens, data, error? }` (note the lowercase
 `mimetype`); PDF conversion is described as free "for most format conversions".
+
+## D15. How `packages/chunker` splits documents
+
+- **Pipeline:** detect candidates (numbered markers, ARTICLE/Section, EXHIBIT, Markdown
+  headings, list items, definitions) → keep plausible headings → section tree → pack to size.
+- **Numbering-sequence check instead of special cases:** a numbered marker is a heading only
+  if it is the next step from the last one (deeper `.1`, next sibling, or up and next). This
+  rejects cross-references ("Section 5.3" inside 17.2) and numbers in text ("thirty (30)").
+  **Resync:** a rejected marker is still accepted when the next two markers continue from it,
+  which recovers from headings garbled by PDF extraction and from tables of contents.
+- **Contiguous coverage:** chunks cover the text with no gaps or overlap, so nothing can be
+  lost and `chunk.text === text.slice(start, end)` is easy to prove. The contextual header
+  for embeddings (M3) is built from `sectionPath`, never written into `text`.
+- **Packing:** merge neighbouring sections up to `targetChars`; a new top-level section starts
+  a new chunk unless the current one is under a quarter of the target; a section over
+  `maxChars` is split at list items/definitions, then paragraph, line, sentence, whitespace,
+  hard cut (never inside a surrogate pair). `sectionPath` is the path shared by all sections
+  in the chunk, so it is empty when a chunk spans several top-level clauses (common in
+  contracts numbered flat 1, 2, 3); `heading` names the first one.
+- **Sizes are provisional:** 2,000 target / 4,000 max characters (the 4,000 matches the
+  per-chunk redaction budget, D11). Final values follow the embedding model's documented
+  input limit, checked in M3.
+- **Offsets are UTF-16 code units** (JavaScript string indices). Python consumers must
+  convert for characters outside the BMP.
+- **Found on CUAD and fixed:** clauses glued to an ALL-CAPS heading by PDF extraction
+  ("9. PROPRIETARY MARKS 9.1 Our Representations") were missed; a marker after an ALL-CAPS
+  word now counts as a boundary.

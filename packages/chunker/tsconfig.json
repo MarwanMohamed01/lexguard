@@ -1,0 +1,8 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    // No ambient runtime types: pure logic that runs in Workers, Node and tests alike.
+    "types": []
+  },
+  "include": ["src", "test"]
+}

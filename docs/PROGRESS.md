@@ -11,7 +11,7 @@ _Last updated: 2026-11-22._
 | ------------------------------------ | ----------------------------------------------- |
 | M0 Foundations                       | ✅ Done                                         |
 | M1 Core packages                     | ✅ Done (CI and full-history secret scan green) |
-| **M2 Ingestion & splitting**         | ⏳ **In progress: steps 1–2 done**              |
+| **M2 Ingestion & splitting**         | ⏳ **In progress: steps 1–3 done**              |
 | M3 Index & retrieval                 | Not started                                     |
 | M4 Extraction swarm                  | Not started                                     |
 | M5 Research, verification, synthesis | Not started                                     |
@@ -32,8 +32,10 @@ D1 (every row has `tenant_id`).
 1. ✅ Verify free-tier limits (results in `docs/DECISIONS.md` D14).
 2. ✅ Download a pinned subset of CUAD contract PDFs: 30 PDFs (5 longest + 25 by hash order),
    up to ~154 pages, manifest with SHA-256 (`evals/cuad/README.md`, "Contract PDFs").
-3. `packages/chunker`: structure-aware splitter (headings, numbered clauses like 7 / 7.1 /
-   (a), definitions; size limits; offsets; section path), pure logic with unit tests.
+3. ✅ `packages/chunker`: structure-aware splitter (headings, numbered clauses like 7 / 7.1 /
+   (a), definitions; size limits; offsets; section path), pure logic with unit tests. Design in
+   `docs/DECISIONS.md` D15. Sanity run on all 510 CUAD contracts: 0 offset errors, 0 chunks
+   over 4,000 chars, 0.067 ms per 1,000 chars (Node).
 4. Evals on CUAD text: offset correctness (must be 100%), clause integrity (share of the
    13,823 lawyer-labelled clauses kept in one chunk; fixed-size splitting is the baseline).
 5. Ingestion flow in the Worker: upload checks, fingerprint, `toMarkdown`, sanitize, chunk,
@@ -71,4 +73,4 @@ npm run deploy -w @lexguard/worker         # deploy (after `npx wrangler login`)
 - PII redaction on Gretel (5,000 docs): precision 0.966, recall 0.750 (CI gate 0.96 / 0.74).
 - CUAD (510 real contracts): redaction changes 0.06% of characters, touches 0 of 13,823
   lawyer-labelled clauses.
-- Tests: 164 (worker 3, trace 24, guardrails 72, router 13, a2a 34, evals 18).
+- Tests: 210 (worker 3, trace 24, guardrails 72, router 13, a2a 34, chunker 46, evals 18).
