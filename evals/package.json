@@ -18,6 +18,7 @@
     "eval": "evalite run",
     "eval:watch": "evalite watch",
     "fetch:gretel": "node gretel/fetch.mjs",
-    "fetch:cuad": "node cuad/fetch.mjs"
+    "fetch:cuad": "node cuad/fetch.mjs",
+    "fetch:cuad-pdfs": "node cuad/fetch-pdfs.mjs"
   }
 }

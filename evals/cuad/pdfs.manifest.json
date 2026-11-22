@@ -1,0 +1,248 @@
+{
+  "repo": "theatticusproject/cuad",
+  "revision": "a3c393f5d103fd0c516374e4fdff676c8176dcb1",
+  "licence": "CC BY 4.0",
+  "rule": "5 longest by CUAD text characters + first 25 other titles by ascending SHA-256(title); only PDFs whose name equals a CUAD_v1.json title",
+  "files": [
+    {
+      "title": "MANUFACTURERSSERVICESLTD_06_05_2000-EX-10.14-OUTSOURCING AGREEMENT",
+      "reason": "longest",
+      "chars": 338211,
+      "path": "CUAD_v1/full_contract_pdf/Part_III/Outsourcing/MANUFACTURERSSERVICESLTD_06_05_2000-EX-10.14-OUTSOURCING AGREEMENT.PDF",
+      "size": 328203,
+      "sha256": "7a0a768f0b7eb776e48abbd8ceae001c0c90b879983907fc8499c33cd67425f4"
+    },
+    {
+      "title": "CERES,INC_01_25_2012-EX-10.20-Collaboration Agreement",
+      "reason": "longest",
+      "chars": 335282,
+      "path": "CUAD_v1/full_contract_pdf/Part_III/Collaboration/CERES,INC_01_25_2012-EX-10.20-Collaboration Agreement.PDF",
+      "size": 1557129,
+      "sha256": "47aecdabb5438fa71f2c223d4f9bb7cd00133f96b0eda52c69ed9e621dfa9b9d"
+    },
+    {
+      "title": "GOOSEHEADINSURANCE,INC_04_02_2018-EX-10.6-Franchise Agreement",
+      "reason": "longest",
+      "chars": 300768,
+      "path": "CUAD_v1/full_contract_pdf/Part_III/Franchise/GOOSEHEADINSURANCE,INC_04_02_2018-EX-10.6-Franchise Agreement.PDF",
+      "size": 654719,
+      "sha256": "578e5bc41ea4a37cdf1d1b3cfb7a1c3265acdb071239157abf228a0bc3121683"
+    },
+    {
+      "title": "PhasebioPharmaceuticalsInc_20200330_10-K_EX-10.21_12086810_EX-10.21_Development Agreement",
+      "reason": "longest",
+      "chars": 291873,
+      "path": "CUAD_v1/full_contract_pdf/Part_I/Development/PhasebioPharmaceuticalsInc_20200330_10-K_EX-10.21_12086810_EX-10.21_Development Agreement.pdf",
+      "size": 529547,
+      "sha256": "547717aded05b26b2828f9ca0f2ba2f5972c3e470f401aa1f3ec8ca50115aced"
+    },
+    {
+      "title": "VerizonAbsLlc_20200123_8-K_EX-10.4_11952335_EX-10.4_Service Agreement",
+      "reason": "longest",
+      "chars": 289615,
+      "path": "CUAD_v1/full_contract_pdf/Part_I/Service/VerizonAbsLlc_20200123_8-K_EX-10.4_11952335_EX-10.4_Service Agreement.pdf",
+      "size": 530998,
+      "sha256": "b1da4842b679e8fffe5937d533e8df6f4e8c47325b62195d4ad8d532b5b82b30"
+    },
+    {
+      "title": "DRKOOPCOMINC_04_21_1999-EX-10.28-SPONSORSHIP AGREEMENT",
+      "reason": "hash-order",
+      "chars": 39177,
+      "path": "CUAD_v1/full_contract_pdf/Part_III/Sponsorship/DRKOOPCOMINC_04_21_1999-EX-10.28-SPONSORSHIP AGREEMENT.PDF",
+      "size": 73417,
+      "sha256": "06fe761575a4e233472eebe39cd51e443dab289c277a418be31dd9bc80c81053"
+    },
+    {
+      "title": "VEONEER,INC_02_21_2020-EX-10.11-JOINT VENTURE AGREEMENT",
+      "reason": "hash-order",
+      "chars": 8257,
+      "path": "CUAD_v1/full_contract_pdf/Part_I/Joint Venture/VEONEER,INC_02_21_2020-EX-10.11-JOINT VENTURE AGREEMENT.PDF",
+      "size": 119848,
+      "sha256": "ac02468941fdcda11199308ac28d7e7c4ffcf3c3e5eaf99b4dff7f3618200460"
+    },
+    {
+      "title": "OMINTO,INC_03_29_2004-EX-10-RESELLER AGREEMENT",
+      "reason": "hash-order",
+      "chars": 28463,
+      "path": "CUAD_v1/full_contract_pdf/Part_II/Commercial Contracts (Part II-A)/Reseller/OMINTO,INC_03_29_2004-EX-10-RESELLER AGREEMENT.PDF",
+      "size": 66579,
+      "sha256": "f691b606a08be9225de653c577fe7bb96d7d72bab5327a743c257abefd88cdd7"
+    },
+    {
+      "title": "ArconicRolledProductsCorp_20191217_10-12B_EX-2.7_11923804_EX-2.7_Trademark License Agreement",
+      "reason": "hash-order",
+      "chars": 18069,
+      "path": "CUAD_v1/full_contract_pdf/Part_I/License_Agreements/ArconicRolledProductsCorp_20191217_10-12B_EX-2.7_11923804_EX-2.7_Trademark License Agreement.pdf",
+      "size": 152678,
+      "sha256": "0bf080f4a8a0aaddb1d1a96e336f22009068c89090ffbb237ed7f899adf0beba"
+    },
+    {
+      "title": "SUNTRONCORP_05_17_2006-EX-10.22-MAINTENANCE AGREEMENT",
+      "reason": "hash-order",
+      "chars": 32263,
+      "path": "CUAD_v1/full_contract_pdf/Part_III/Maintenance/SUNTRONCORP_05_17_2006-EX-10.22-MAINTENANCE AGREEMENT.PDF",
+      "size": 65732,
+      "sha256": "ba84dd7c98832524e65c34212039a2324cd2e65a0ddd9d2bc6291f90cc653ca0"
+    },
+    {
+      "title": "BERKELEYLIGHTS,INC_06_26_2020-EX-10.12-COLLABORATION AGREEMENT",
+      "reason": "hash-order",
+      "chars": 209067,
+      "path": "CUAD_v1/full_contract_pdf/Part_II/Commercial Contracts (Part II-A)/Collaboration/BERKELEYLIGHTS,INC_06_26_2020-EX-10.12-COLLABORATION AGREEMENT.PDF",
+      "size": 443021,
+      "sha256": "288276e927b2841d09459a337ffb9d107865ec3f040e20864845deb5238addc7"
+    },
+    {
+      "title": "ENTERPRISEPRODUCTSPARTNERSLP_07_08_1998-EX-10.3-TRANSPORTATION CONTRACT",
+      "reason": "hash-order",
+      "chars": 74915,
+      "path": "CUAD_v1/full_contract_pdf/Part_III/Transportation/ENTERPRISEPRODUCTSPARTNERSLP_07_08_1998-EX-10.3-TRANSPORTATION CONTRACT.PDF",
+      "size": 103509,
+      "sha256": "07ed0f3ef696f46ddb7723c6dedc72544eedd6e6605bafcbd7b383d89eb48e9e"
+    },
+    {
+      "title": "PACIRA PHARMACEUTICALS, INC. - A_R STRATEGIC LICENSING, DISTRIBUTION AND MARKETING AGREEMENT ",
+      "reason": "hash-order",
+      "chars": 145168,
+      "path": "CUAD_v1/full_contract_pdf/Part_III/Marketing/PACIRA PHARMACEUTICALS, INC. - A_R STRATEGIC LICENSING, DISTRIBUTION AND MARKETING AGREEMENT .PDF",
+      "size": 335267,
+      "sha256": "3c53c1c8fc68484fdb8f91729b7d228e81eb6d205b3c6431353d16c0b0ca88f4"
+    },
+    {
+      "title": "HPILHOLDING_01_07_2015-EX-99.1-COOPERATION AGREEMENT",
+      "reason": "hash-order",
+      "chars": 20008,
+      "path": "CUAD_v1/full_contract_pdf/Part_III/Collaboration/HPILHOLDING_01_07_2015-EX-99.1-COOPERATION AGREEMENT.PDF",
+      "size": 141479,
+      "sha256": "e18f3010b7df2b9e14692a8c4293e197aadb457455b87ef418c0035b402fa1a3"
+    },
+    {
+      "title": "BONTONSTORESINC_04_20_2018-EX-99.3-AGENCY AGREEMENT",
+      "reason": "hash-order",
+      "chars": 161626,
+      "path": "CUAD_v1/full_contract_pdf/Part_II/Commercial Contracts (Part II-A)/Agency Agreements/BONTONSTORESINC_04_20_2018-EX-99.3-AGENCY AGREEMENT.PDF",
+      "size": 517264,
+      "sha256": "caf6a07e692ba52d025186c15dc317f73f3d442e81ec15196077fd772c7462bc"
+    },
+    {
+      "title": "LinkPlusCorp_20050802_8-K_EX-10_3240252_EX-10_Affiliate Agreement",
+      "reason": "hash-order",
+      "chars": 25619,
+      "path": "CUAD_v1/full_contract_pdf/Part_I/Affiliate_Agreements/LinkPlusCorp_20050802_8-K_EX-10_3240252_EX-10_Affiliate Agreement.pdf",
+      "size": 88121,
+      "sha256": "d3d4d0b6fae30ae4bc84d85ec30b745433e43f00d2aaab1487839a56eea2069c"
+    },
+    {
+      "title": "MusclepharmCorp_20170208_10-KA_EX-10.38_9893581_EX-10.38_Co-Branding Agreement",
+      "reason": "hash-order",
+      "chars": 87795,
+      "path": "CUAD_v1/full_contract_pdf/Part_I/Co_Branding/MusclepharmCorp_20170208_10-KA_EX-10.38_9893581_EX-10.38_Co-Branding Agreement.pdf",
+      "size": 275429,
+      "sha256": "2a449f040e6b724bc4de62c5901b78ede23c6df75df91c36a476ee11cb06a38b"
+    },
+    {
+      "title": "ArcGroupInc_20171211_8-K_EX-10.1_10976103_EX-10.1_Sponsorship Agreement",
+      "reason": "hash-order",
+      "chars": 16773,
+      "path": "CUAD_v1/full_contract_pdf/Part_I/Sponsorship/ArcGroupInc_20171211_8-K_EX-10.1_10976103_EX-10.1_Sponsorship Agreement.pdf",
+      "size": 159195,
+      "sha256": "0bc652ae6ab3a7a3c6415671980b954c4acabf5aa5f05e6a298d419160c09508"
+    },
+    {
+      "title": "NETZEEINC_11_14_2002-EX-10.3-MAINTENANCE AGREEMENT",
+      "reason": "hash-order",
+      "chars": 3474,
+      "path": "CUAD_v1/full_contract_pdf/Part_II/Commercial Contracts (Part II-A)/Maintenance/NETZEEINC_11_14_2002-EX-10.3-MAINTENANCE AGREEMENT.PDF",
+      "size": 41044,
+      "sha256": "eaf48d5a5ce3284e47cfe34351dd39a6ed874cc4ada28a859e9413440ea63a0f"
+    },
+    {
+      "title": "DigitalCinemaDestinationsCorp_20111220_S-1_EX-10.10_7346719_EX-10.10_Affiliate Agreement",
+      "reason": "hash-order",
+      "chars": 109014,
+      "path": "CUAD_v1/full_contract_pdf/Part_I/Affiliate_Agreements/DigitalCinemaDestinationsCorp_20111220_S-1_EX-10.10_7346719_EX-10.10_Affiliate Agreement.pdf",
+      "size": 217908,
+      "sha256": "bdb7d1532a642920cd915516243718bfbcf6c436248902c58b97c4cc005b317d"
+    },
+    {
+      "title": "HOSPITALITYINVESTORSTRUST,INC_04_07_2014-EX-10.26-FRANCHISE AGREEMENT",
+      "reason": "hash-order",
+      "chars": 146992,
+      "path": "CUAD_v1/full_contract_pdf/Part_III/Franchise/HOSPITALITYINVESTORSTRUST,INC_04_07_2014-EX-10.26-FRANCHISE AGREEMENT.PDF",
+      "size": 302234,
+      "sha256": "f8d1c8d99b200f8bad2b82e174b0b61839af4e3fe5c962a6e246b928b1b1ed5a"
+    },
+    {
+      "title": "WASTE2ENERGYHOLDINGS,INC_06_03_2010-EX-10.2-STRATEGIC ALLIANCE AGREEMENT",
+      "reason": "hash-order",
+      "chars": 40442,
+      "path": "CUAD_v1/full_contract_pdf/Part_III/Strategic Alliance/WASTE2ENERGYHOLDINGS,INC_06_03_2010-EX-10.2-STRATEGIC ALLIANCE AGREEMENT.PDF",
+      "size": 143705,
+      "sha256": "3774f2ef56f247d04053730d7a948765b4ca3a2146c866af24fe537596cc4147"
+    },
+    {
+      "title": "AzulSa_20170303_F-1A_EX-10.3_9943903_EX-10.3_Maintenance Agreement1",
+      "reason": "hash-order",
+      "chars": 233248,
+      "path": "CUAD_v1/full_contract_pdf/Part_I/Maintenance/AzulSa_20170303_F-1A_EX-10.3_9943903_EX-10.3_Maintenance Agreement1.pdf",
+      "size": 824876,
+      "sha256": "c322968f237fadc1090834038ae8cf3012b39954bc5b3c94576d77f2d596f2e0"
+    },
+    {
+      "title": "INTERNATIONALFASTFOODCORP_04_04_1997-EX-99-FRANCHISE AGREEMENT",
+      "reason": "hash-order",
+      "chars": 116873,
+      "path": "CUAD_v1/full_contract_pdf/Part_III/Franchise/INTERNATIONALFASTFOODCORP_04_04_1997-EX-99-FRANCHISE AGREEMENT.PDF",
+      "size": 144849,
+      "sha256": "9f0bd160801278dde2dd342a8416d158eaf86a7c74b059a737bee973c5e38861"
+    },
+    {
+      "title": "GridironBionutrientsInc_20171206_8-K_EX-10.2_10972556_EX-10.2_Endorsement Agreement",
+      "reason": "hash-order",
+      "chars": 3456,
+      "path": "CUAD_v1/full_contract_pdf/Part_I/Endorsement/GridironBionutrientsInc_20171206_8-K_EX-10.2_10972556_EX-10.2_Endorsement Agreement.pdf",
+      "size": 160922,
+      "sha256": "70242fc7cf247c23199e77c3eb3d6a9496412b79c2431655ed8ade17adfff876"
+    },
+    {
+      "title": "SoupmanInc_20150814_8-K_EX-10.1_9230148_EX-10.1_Franchise Agreement4",
+      "reason": "hash-order",
+      "chars": 3314,
+      "path": "CUAD_v1/full_contract_pdf/Part_I/Franchise/SoupmanInc_20150814_8-K_EX-10.1_9230148_EX-10.1_Franchise Agreement4.pdf",
+      "size": 116033,
+      "sha256": "250d9d4a2908f656bf4364f8c742fd0bfa39e4c331be297e1c624121efac161b"
+    },
+    {
+      "title": "AgapeAtpCorp_20191202_10-KA_EX-10.1_11911128_EX-10.1_Supply Agreement",
+      "reason": "hash-order",
+      "chars": 20693,
+      "path": "CUAD_v1/full_contract_pdf/Part_I/Supply/AgapeAtpCorp_20191202_10-KA_EX-10.1_11911128_EX-10.1_Supply Agreement.pdf",
+      "size": 178486,
+      "sha256": "623d1896671b5e948c55988edc44cdd74d0a3e0056e54aa3a266ff4b1480bfb0"
+    },
+    {
+      "title": "ON4COMMUNICATIONSINC_07_02_2009-EX-10.1-PROMOTION AGREEMENT",
+      "reason": "hash-order",
+      "chars": 15103,
+      "path": "CUAD_v1/full_contract_pdf/Part_II/Commercial Contracts (Part II-A)/Promotion/ON4COMMUNICATIONSINC_07_02_2009-EX-10.1-PROMOTION AGREEMENT.PDF",
+      "size": 56702,
+      "sha256": "a9b066d1f29d100987170a1249f4067126b8f3cffd016438e64007f63ae6fb65"
+    },
+    {
+      "title": "HYPERIONSOFTWARECORP_09_28_1994-EX-10.47-EXCLUSIVE DISTRIBUTOR AGREEMENT",
+      "reason": "hash-order",
+      "chars": 37682,
+      "path": "CUAD_v1/full_contract_pdf/Part_III/Distributor/HYPERIONSOFTWARECORP_09_28_1994-EX-10.47-EXCLUSIVE DISTRIBUTOR AGREEMENT.PDF",
+      "size": 74135,
+      "sha256": "5588f3c98f929d0e8399d33fe66cef2526cefd657aaa5c9dc2b4fd97a3a3e2c4"
+    },
+    {
+      "title": "ALLISONTRANSMISSIONHOLDINGSINC_12_15_2014-EX-99.1-COOPERATION AGREEMENT",
+      "reason": "hash-order",
+      "chars": 32826,
+      "path": "CUAD_v1/full_contract_pdf/Part_II/Commercial Contracts (Part II-A)/Collaboration/ALLISONTRANSMISSIONHOLDINGSINC_12_15_2014-EX-99.1-COOPERATION AGREEMENT.PDF",
+      "size": 139128,
+      "sha256": "8448d77468a7ac3183ce5d9b6986ed563e273fbfbba1d74098de05c893887d2a"
+    }
+  ]
+}

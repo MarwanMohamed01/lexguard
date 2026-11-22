@@ -11,7 +11,7 @@ _Last updated: 2026-11-22._
 | ------------------------------------ | ----------------------------------------------- |
 | M0 Foundations                       | ✅ Done                                         |
 | M1 Core packages                     | ✅ Done (CI and full-history secret scan green) |
-| **M2 Ingestion & splitting**         | ⏳ **In progress: step 1 done**                 |
+| **M2 Ingestion & splitting**         | ⏳ **In progress: steps 1–2 done**              |
 | M3 Index & retrieval                 | Not started                                     |
 | M4 Extraction swarm                  | Not started                                     |
 | M5 Research, verification, synthesis | Not started                                     |
@@ -30,7 +30,8 @@ chunks with exact offsets (`chunk.text === fullText.slice(start, end)`) and sect
 D1 (every row has `tenant_id`).
 
 1. ✅ Verify free-tier limits (results in `docs/DECISIONS.md` D14).
-2. Download a pinned subset of CUAD contract PDFs (same dataset, `evals/cuad`).
+2. ✅ Download a pinned subset of CUAD contract PDFs: 30 PDFs (5 longest + 25 by hash order),
+   up to ~154 pages, manifest with SHA-256 (`evals/cuad/README.md`, "Contract PDFs").
 3. `packages/chunker`: structure-aware splitter (headings, numbered clauses like 7 / 7.1 /
    (a), definitions; size limits; offsets; section path), pure logic with unit tests.
 4. Evals on CUAD text: offset correctness (must be 100%), clause integrity (share of the
@@ -60,6 +61,7 @@ D1 (every row has `tenant_id`).
 npm run check                              # hidden chars, typecheck, lint, format, all tests
 npm run fetch:gretel -w @lexguard/evals    # PII benchmark data (also downloaded in CI)
 npm run fetch:cuad -w @lexguard/evals      # 510 real contracts with lawyer-labelled clauses
+npm run fetch:cuad-pdfs -w @lexguard/evals # 30 original contract PDFs (M2 ingestion tests)
 npm run eval:watch -w @lexguard/evals      # Evalite case-by-case view
 npm run deploy -w @lexguard/worker         # deploy (after `npx wrangler login`)
 ```

@@ -13,8 +13,31 @@ Real commercial contracts with lawyer-labelled clauses, used for Lexguard's cont
 ## Run
 
 ```bash
-npm run fetch:cuad -w @lexguard/evals
+npm run fetch:cuad -w @lexguard/evals        # text + labels (CUAD_v1.json)
+npm run fetch:cuad-pdfs -w @lexguard/evals   # the 30 original PDFs in pdfs.manifest.json
 ```
+
+## Contract PDFs (M2)
+
+The original PDFs of a 30-contract subset, for testing ingestion (`toMarkdown`, limits, CPU)
+and comparing conversion output with CUAD's own text for the same contract.
+
+- **Same pinned revision**, folder `CUAD_v1/full_contract_pdf` (510 PDFs, 101 MB in total).
+- **Selection is a fixed rule, not hand-picked** (`select-pdfs.mjs`, which wrote the committed
+  `pdfs.manifest.json`; re-running it gives a byte-identical manifest):
+  - only PDFs whose file name equals a `CUAD_v1.json` title, so each pairs exactly with its
+    text (506 of 510; the other 4 differ by trailing spaces or punctuation);
+  - the **5 longest** by CUAD text characters (290k–338k). Characters, not PDF bytes: the
+    largest PDFs are often scans, not long documents;
+  - the **first 25 other titles by ascending SHA-256(title)**, a reproducible pseudo-random
+    sample (3k–233k characters).
+- **Integrity:** at selection, each file was checked against the hash Hugging Face publishes
+  (SHA-256 for the 9 LFS files, git blob SHA-1 for the rest); the manifest records size and
+  SHA-256, and `fetch-pdfs.mjs` verifies both. Files are stored as
+  `evals/data/cuad/pdf/<sha256>.pdf` (8.3 MB, not committed).
+- **Length:** about 1 to 154 pages (rough count of PDF page objects); 7 have more than 85
+  pages. CUAD's longest contract is about 150 pages, so tests at 200–300 pages need the
+  synthetic long document planned for the needle eval.
 
 ## PII over-redaction (M1): results
 
