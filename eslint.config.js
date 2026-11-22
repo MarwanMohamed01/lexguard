@@ -29,7 +29,12 @@ export default defineConfig(
   },
   {
     // Repo and eval scripts run in Node.
-    files: ["scripts/**/*.mjs", "evals/**/*.mjs", "experiments/**/*.mjs"],
+    files: [
+      "scripts/**/*.mjs",
+      "apps/*/scripts/**/*.mjs",
+      "evals/**/*.mjs",
+      "experiments/**/*.mjs",
+    ],
     languageOptions: {
       globals: {
         process: "readonly",

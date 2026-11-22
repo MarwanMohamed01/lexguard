@@ -5,5 +5,18 @@
   "main": "src/index.ts",
   // Pins runtime behaviour to this date so Cloudflare updates never change our Worker silently.
   "compatibility_date": "2026-11-01",
-  // Bindings (D1, Vectorize, Queues, Workflows, AI...) are added here in later milestones.
+  // System of record: documents, chunks, definitions (schema in migrations/). The ID is not a
+  // secret: only code deployed to this account can use the binding.
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "lexguard",
+      "database_id": "cf8c7765-9d5a-4ae0-afac-40c7d96b359f",
+      "migrations_dir": "migrations",
+    },
+  ],
+  // Secret names only (values are set with `wrangler secret put`, or .dev.vars locally).
+  // TENANT_KEYS: JSON object mapping SHA-256(api key) in hex to a tenant ID.
+  "secrets": { "required": ["TENANT_KEYS"] },
+  // More bindings (Vectorize, Queues, Workflows, AI...) are added in later milestones.
 }

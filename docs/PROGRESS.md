@@ -11,7 +11,7 @@ _Last updated: 2026-11-22._
 | ------------------------------------ | ----------------------------------------------- |
 | M0 Foundations                       | ✅ Done                                         |
 | M1 Core packages                     | ✅ Done (CI and full-history secret scan green) |
-| **M2 Ingestion & splitting**         | ⏳ **In progress: steps 1–4, 5a done**          |
+| **M2 Ingestion & splitting**         | ⏳ **In progress: steps 1–4, 5a–5b done**       |
 | M3 Index & retrieval                 | Not started                                     |
 | M4 Extraction swarm                  | Not started                                     |
 | M5 Research, verification, synthesis | Not started                                     |
@@ -44,8 +44,9 @@ D1 (every row has `tenant_id`).
    D1 schema as a migration, `env.DB` binding.
    - ✅ 5a CPU measured (D16): real contracts chunk in 4–9 ms on Workers; Queues give no CPU
      advantage on Free. Upload stays light; chunking runs as its own job step.
-   - 5b D1 database, migration, bindings, tenant API key; check Workflows Free limits and
-     Worker size limit.
+   - ✅ 5b D1 database `lexguard` created and migrated (local + remote), `DB` binding,
+     tenant API keys as SHA-256 hashes in secret `TENANT_KEYS`, `/v1/*` requires a key;
+     schema-level tenant isolation tested (D17). Chunking job will be a Workflow.
    - 5c upload + status endpoints (checks, SHA-256, toMarkdown, sanitize).
    - 5d chunking job, in windows for documents over ~300k characters.
    - 5e Workers-runtime tests (checks, tenant isolation, idempotency, offsets).
@@ -74,6 +75,7 @@ npm run fetch:cuad -w @lexguard/evals      # 510 real contracts with lawyer-labe
 npm run fetch:cuad-pdfs -w @lexguard/evals # 30 original contract PDFs (M2 ingestion tests)
 npm run eval:watch -w @lexguard/evals      # Evalite case-by-case view
 npm run deploy -w @lexguard/worker         # deploy (after `npx wrangler login`)
+node apps/worker/scripts/new-tenant-key.mjs <tenant>  # new API key (run it yourself)
 ```
 
 ## Key numbers so far
@@ -83,4 +85,4 @@ npm run deploy -w @lexguard/worker         # deploy (after `npx wrangler login`)
   lawyer-labelled clauses.
 - Chunking on CUAD (510 contracts, 13,823 clauses): 99.41% of clauses kept whole vs 96.95%
   for LangChain-style recursive splitting at the same chunk count; 0 offset errors.
-- Tests: 223 (worker 3, trace 24, guardrails 72, router 13, a2a 34, chunker 47, evals 30).
+- Tests: 245 (worker 25, trace 24, guardrails 72, router 13, a2a 34, chunker 47, evals 30).

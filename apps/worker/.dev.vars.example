@@ -1,0 +1,4 @@
+# Copy to .dev.vars (git-ignored) for `wrangler dev`. Create entries with
+#   node scripts/new-tenant-key.mjs <tenant-id>
+# and merge them into one JSON object on a single line.
+TENANT_KEYS={}

@@ -9,5 +9,8 @@
     "types": "wrangler types",
     "typecheck": "tsc --noEmit -p .",
     "test": "vitest run"
+  },
+  "dependencies": {
+    "zod": "4.6.7"
   }
 }

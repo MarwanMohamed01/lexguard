@@ -226,3 +226,28 @@ They change, so re-check before relying on them.
     across invocations, carrying its numbering state: built in step 5d.
 - **Also learned:** `performance.now()` is frozen during CPU work on deployed Workers; the
   probe's bundle is 783 KB, mostly Zod (Free Worker size limit to check in 5b).
+
+## D17. D1 schema, tenant isolation and API keys (2026-11-22)
+
+- **D1 Free daily limits confirmed** on the pricing page: 5 million rows read, 100,000 rows
+  written (an index adds one write per indexed row), reset at 00:00 UTC; over the limit every
+  query fails until reset. A 300-page contract writes about 700 rows (chunks + definitions),
+  so writes are the budget to watch: no secondary indexes until M3 needs them, and every
+  query goes through a primary key (an unindexed filter counts every scanned row as read).
+- **Schema** (`apps/worker/migrations/0001_ingestion.sql`): `documents`, `chunks`,
+  `definitions`. Every primary key starts with `tenant_id`; children reference documents by
+  `(tenant_id, document_id)`, so the database refuses a row linking one tenant's data to
+  another tenant's document (tested). Duplicate files are detected per tenant
+  (`UNIQUE (tenant_id, sha256)`), never globally: a global check would reveal to tenant B
+  that tenant A uploaded the same file. Chunk text is stored next to its offsets because
+  M3's keyword search (FTS5) needs it in a table (about 2× storage; CUAD-sized corpus ≈ 54 MB
+  of the 500 MB per database).
+- **Workflows, not Queues, for the chunking job** (5d): 10 ms CPU per step and up to 1,024
+  steps per instance on Free, per-step retries that resume where they stopped, step results
+  up to 1 MiB. Windowed chunking maps onto one step per window. Workflow code is capped at
+  3 MB on Free; the Worker bundle is 770 KiB today (dry run), mostly Zod.
+- **Tenant API keys:** the Worker stores only SHA-256 hashes, in the secret `TENANT_KEYS`
+  (`{"<hash>": "<tenant id>"}`), validated with Zod; a missing or invalid secret refuses
+  every request (fails closed, 500). Keys are `lg_` + 256 random bits, created locally with
+  `apps/worker/scripts/new-tenant-key.mjs` and never shown to anyone but their owner.
+  Everything under `/v1/` requires a key. A minimal stand-in until M8's scoped tokens.
