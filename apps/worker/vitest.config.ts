@@ -19,6 +19,9 @@ export default defineConfig(async () => {
     plugins: [
       cloudflareTest({
         wrangler: { configPath: "./wrangler.jsonc" },
+        // Never reach Cloudflare from tests (CI has no login): env.AI is unusable here, and
+        // upload tests pass a fake converter instead.
+        remoteBindings: false,
         miniflare: { bindings: { TEST_MIGRATIONS: migrations } },
       }),
     ],

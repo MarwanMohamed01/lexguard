@@ -11,7 +11,7 @@ _Last updated: 2026-11-22._
 | ------------------------------------ | ----------------------------------------------- |
 | M0 Foundations                       | ✅ Done                                         |
 | M1 Core packages                     | ✅ Done (CI and full-history secret scan green) |
-| **M2 Ingestion & splitting**         | ⏳ **In progress: steps 1–4, 5a–5b done**       |
+| **M2 Ingestion & splitting**         | ⏳ **In progress: steps 1–4, 5a–5c done**       |
 | M3 Index & retrieval                 | Not started                                     |
 | M4 Extraction swarm                  | Not started                                     |
 | M5 Research, verification, synthesis | Not started                                     |
@@ -47,7 +47,8 @@ D1 (every row has `tenant_id`).
    - ✅ 5b D1 database `lexguard` created and migrated (local + remote), `DB` binding,
      tenant API keys as SHA-256 hashes in secret `TENANT_KEYS`, `/v1/*` requires a key;
      schema-level tenant isolation tested (D17). Chunking job will be a Workflow.
-   - 5c upload + status endpoints (checks, SHA-256, toMarkdown, sanitize).
+   - ✅ 5c `POST /v1/documents` (PDF/DOCX by bytes, 10 MB cap, SHA-256, toMarkdown,
+     sanitize, idempotent and race-safe) and `GET /v1/documents/:id` (D18).
    - 5d chunking job, in windows for documents over ~300k characters.
    - 5e Workers-runtime tests (checks, tenant isolation, idempotency, offsets).
 6. Conversion-quality eval: `toMarkdown` output vs CUAD's own text for the same PDFs.
@@ -85,4 +86,4 @@ node apps/worker/scripts/new-tenant-key.mjs <tenant>  # new API key (run it your
   lawyer-labelled clauses.
 - Chunking on CUAD (510 contracts, 13,823 clauses): 99.41% of clauses kept whole vs 96.95%
   for LangChain-style recursive splitting at the same chunk count; 0 offset errors.
-- Tests: 245 (worker 25, trace 24, guardrails 72, router 13, a2a 34, chunker 47, evals 30).
+- Tests: 286 (worker 66, trace 24, guardrails 72, router 13, a2a 34, chunker 47, evals 30).

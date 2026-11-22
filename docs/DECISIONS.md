@@ -251,3 +251,30 @@ They change, so re-check before relying on them.
   every request (fails closed, 500). Keys are `lg_` + 256 random bits, created locally with
   `apps/worker/scripts/new-tenant-key.mjs` and never shown to anyone but their owner.
   Everything under `/v1/` requires a key. A minimal stand-in until M8's scoped tokens.
+
+## D18. Upload and status endpoints (M2 step 5c, 2026-11-22)
+
+- **API:** `POST /v1/documents` takes the raw file as the body (display name in a
+  percent-encoded `X-Filename` header); `GET /v1/documents/:id` returns status and metadata,
+  never the full text. Another tenant's ID answers 404 exactly like a missing one.
+- **Only PDF and DOCX, detected from the bytes** (`%PDF-` header; a ZIP whose central
+  directory lists `word/document.xml`). Name and `Content-Type` are ignored. Reasons:
+  they are the contract formats, and `toMarkdown` is free for them, while image
+  conversion uses Workers AI models and neurons (docs). The converter receives a name built
+  from the detected type.
+- **10 MB cap**, refused from `Content-Length` before the body is read. Hashing costs
+  CPU (about 2 ms per MB); the largest CUAD PDF is 1.56 MB. To be measured at deploy (step 7)
+  and lowered if needed. The converted text must fit one D1 row (2 MB) or the document fails
+  with `text_too_large`, never truncated. The `toMarkdown` docs state no size or page limits.
+- **Idempotent and race-safe:** the upload reserves a `converting` row with
+  `INSERT ... ON CONFLICT DO NOTHING`, so the same file uploaded twice at once converts once.
+  A failed document, or one stuck in `converting` for 10 minutes (its request died; tracked
+  by `updated_at`, migration 0002), is reclaimed by the next upload of the same file with a
+  single atomic `UPDATE`.
+- **Sanitized once, at upload** (`sanitizeText` from `@lexguard/guardrails/sanitize`, a
+  subpath export so the Worker does not bundle the PII code): the stored text is what every
+  offset and citation refers to; the number of removed hidden characters is stored.
+- **Tests never reach Cloudflare:** `toMarkdown` always runs remotely, so the converter is
+  passed in as a dependency and tests use a fake one; `remoteBindings: false` in the test
+  config stops the test runner from opening a remote session with the developer's login
+  (CI has none). The real converter is evaluated on CUAD PDFs in step 6.
