@@ -8,6 +8,7 @@ import type { DocumentSummary } from "../src/documents";
 import {
   MAX_MARKDOWN_BYTES,
   MAX_UPLOAD_BYTES,
+  readCapped,
   type Converter,
   type StartChunking,
 } from "../src/upload";
@@ -115,7 +116,11 @@ describe("POST /v1/documents", () => {
     await upload(pdf, fakeConverter(), { startChunking }); // duplicate: no second job
 
     expect(startChunking).toHaveBeenCalledTimes(1);
-    expect(startChunking).toHaveBeenCalledWith({ tenantId: "acme", documentId: document.id });
+    expect(startChunking).toHaveBeenCalledWith({
+      tenantId: "acme",
+      documentId: document.id,
+      jobId: expect.stringMatching(/^[0-9a-f-]{36}$/) as unknown,
+    });
   });
 
   it("fails the document if the chunking job cannot start, so a re-upload retries", async () => {
@@ -281,6 +286,34 @@ describe("POST /v1/documents", () => {
       expect(response.status).toBe(415);
       expect(await response.json()).toEqual({ error: "unsupported_file_type" });
       expect(convert).not.toHaveBeenCalled();
+    });
+
+    it("a body over the cap even when the header lies about its size", async () => {
+      // Measured: the runtime passes a Content-Length that understates the body.
+      const big = new Uint8Array(MAX_UPLOAD_BYTES + 1);
+      big.set(makePdf());
+      const response = await upload(big, fakeConverter(), { length: "1000" });
+
+      expect(response.status).toBe(413);
+      expect(await response.json()).toEqual({ error: "file_too_large" });
+    });
+
+    it("stops reading a stream as soon as it passes the cap", async () => {
+      let pulled = 0;
+      const endless = new ReadableStream<Uint8Array>({
+        pull(controller) {
+          pulled++;
+          controller.enqueue(new Uint8Array(1024 * 1024)); // 1 MB per pull, forever
+        },
+      });
+      const request = new Request("http://example.com/", {
+        method: "POST",
+        body: endless,
+        duplex: "half",
+      } as RequestInit);
+
+      expect(await readCapped(request, MAX_UPLOAD_BYTES)).toBeNull();
+      expect(pulled).toBeLessThanOrEqual(12); // ~11 MB read, not 100 MB or more
     });
 
     it("a declared size over the cap, without reading the body", async () => {

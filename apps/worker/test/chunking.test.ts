@@ -1,54 +1,48 @@
 // The chunking Workflow, run for real in the local Workers runtime against the migrated D1.
 import { chunkDocument } from "@lexguard/chunker";
-import { introspectWorkflowInstance } from "cloudflare:test";
+import { introspectWorkflowInstance, type WorkflowInstanceIntrospector } from "cloudflare:test";
 import { env } from "cloudflare:workers";
 import { describe, expect, it } from "vitest";
 import { CHUNK_OPTIONS, WINDOW_CHARS, type ChunkParams } from "../src/chunking";
+import { contractText } from "./files";
 
-/** Contract-like text of at least `minChars`, with numbered clauses, definitions and emoji. */
-function contractText(minChars: number): string {
-  const parts = ["MASTER SERVICES AGREEMENT\n\n"];
-  let length = parts[0]?.length ?? 0;
-  for (let article = 1; length < minChars; article++) {
-    const part =
-      `${String(article)}. Article Title ${String(article)}\n` +
-      `"Term ${String(article)}" means the period set out in this clause 📄.\n` +
-      `${String(article)}.1 Scope. The Supplier shall provide the services (a) on time; ` +
-      `(b) with care. ${"Further obligations apply. ".repeat(20)}\n` +
-      `${String(article)}.2 Fees. Payable within 30 days of invoice.\n\n`;
-    parts.push(part);
-    length += part.length;
-  }
-  return parts.join("");
-}
-
-async function insertConverted(tenantId: string, markdown: string, status = "chunking") {
+/** A converted document waiting for chunking, owned by job `jobId` (its ticket). */
+async function insertConverted(
+  tenantId: string,
+  markdown: string,
+  options: { status?: string; jobId?: string } = {},
+) {
   const id = crypto.randomUUID();
+  const jobId = options.jobId ?? crypto.randomUUID();
   await env.DB.prepare(
     `INSERT INTO documents (tenant_id, id, sha256, filename, mime_type, size_bytes, status,
-       markdown, chars, hidden_chars_removed, created_at)
-     VALUES (?, ?, ?, 'c.pdf', 'application/pdf', 1, ?, ?, ?, 0, ?)`,
+       markdown, chars, hidden_chars_removed, chunk_job, created_at)
+     VALUES (?, ?, ?, 'c.pdf', 'application/pdf', 1, ?, ?, ?, 0, ?, ?)`,
   )
     .bind(
       tenantId,
       id,
       crypto.randomUUID().replaceAll("-", "").padEnd(64, "0"),
-      status,
+      options.status ?? "chunking",
       markdown,
       markdown.length,
+      jobId,
       new Date().toISOString(),
     )
     .run();
-  return id;
+  return { id, jobId };
 }
 
-async function run(params: ChunkParams) {
-  const instanceId = crypto.randomUUID();
-  const instance = await introspectWorkflowInstance(env.CHUNK_DOCUMENT, instanceId);
+type Modifier = Parameters<Parameters<WorkflowInstanceIntrospector["modify"]>[0]>[0];
+
+/** Starts the job like upload does (ticket = instance ID), with retries but no delays. */
+async function run(params: ChunkParams, modify?: (m: Modifier) => Promise<void>) {
+  const instance = await introspectWorkflowInstance(env.CHUNK_DOCUMENT, params.jobId);
   await instance.modify(async (m) => {
     await m.disableRetryDelays();
+    await modify?.(m);
   });
-  await env.CHUNK_DOCUMENT.create({ id: instanceId, params });
+  await env.CHUNK_DOCUMENT.create({ id: params.jobId, params });
   return instance;
 }
 
@@ -80,8 +74,8 @@ async function storedChunks(tenantId: string, id: string) {
 describe("ChunkDocument workflow", () => {
   it("chunks a multi-window document exactly like one pass, and marks it ready", async () => {
     const markdown = contractText(WINDOW_CHARS * 2 + 50_000); // 3 detection windows
-    const id = await insertConverted("acme", markdown);
-    await using instance = await run({ tenantId: "acme", documentId: id });
+    const { id, jobId } = await insertConverted("acme", markdown);
+    await using instance = await run({ tenantId: "acme", documentId: id, jobId });
 
     await instance.waitForStatus("complete");
     await expect(instance.waitForStepResult({ name: "detect 3" })).resolves.toBeDefined();
@@ -109,24 +103,25 @@ describe("ChunkDocument workflow", () => {
     });
 
     const { results: definitions } = await env.DB.prepare(
-      "SELECT term, start_offset AS start FROM definitions WHERE tenant_id = ? AND document_id = ? ORDER BY idx",
+      `SELECT term, start_offset AS start FROM definitions
+       WHERE tenant_id = ? AND document_id = ? ORDER BY idx`,
     )
       .bind("acme", id)
       .all();
     expect(definitions).toEqual(expected.definitions);
     expect(await documentRow("acme", id)).toEqual({ status: "ready", error: null });
-  });
+  }, 30_000); // three windows, 200+ chunks: seconds, more on CI
 
   it("replaces chunks left by an earlier attempt", async () => {
     const markdown = contractText(5_000);
-    const id = await insertConverted("acme", markdown);
+    const { id, jobId } = await insertConverted("acme", markdown);
     await env.DB.prepare(
       `INSERT INTO chunks (tenant_id, document_id, idx, start_offset, end_offset, text, section_path)
        VALUES ('acme', ?, 999, 0, 3, 'old', '[]')`,
     )
       .bind(id)
       .run();
-    await using instance = await run({ tenantId: "acme", documentId: id });
+    await using instance = await run({ tenantId: "acme", documentId: id, jobId });
 
     await instance.waitForStatus("complete");
 
@@ -136,8 +131,8 @@ describe("ChunkDocument workflow", () => {
   });
 
   it("does nothing for a document that is not waiting for chunking", async () => {
-    const id = await insertConverted("acme", contractText(5_000), "ready");
-    await using instance = await run({ tenantId: "acme", documentId: id });
+    const { id, jobId } = await insertConverted("acme", contractText(5_000), { status: "ready" });
+    await using instance = await run({ tenantId: "acme", documentId: id, jobId });
 
     await instance.waitForStatus("complete");
 
@@ -145,9 +140,9 @@ describe("ChunkDocument workflow", () => {
     expect(await storedChunks("acme", id)).toEqual([]);
   });
 
-  it("cannot touch another tenant's document, even when given its ID", async () => {
-    const id = await insertConverted("acme", contractText(5_000));
-    await using instance = await run({ tenantId: "globex", documentId: id });
+  it("cannot touch another tenant's document, even with its ID and ticket", async () => {
+    const { id, jobId } = await insertConverted("acme", contractText(5_000));
+    await using instance = await run({ tenantId: "globex", documentId: id, jobId });
 
     await instance.waitForStatus("complete");
 
@@ -156,16 +151,9 @@ describe("ChunkDocument workflow", () => {
   });
 
   it("marks the document failed when a step keeps failing after its retries", async () => {
-    const id = await insertConverted("acme", contractText(5_000));
-    const instanceId = crypto.randomUUID();
-    await using instance = await introspectWorkflowInstance(env.CHUNK_DOCUMENT, instanceId);
-    await instance.modify(async (m) => {
-      await m.disableRetryDelays();
+    const { id, jobId } = await insertConverted("acme", contractText(5_000));
+    await using instance = await run({ tenantId: "acme", documentId: id, jobId }, async (m) => {
       await m.mockStepError({ name: "plan" }, new Error("boom")); // every attempt
-    });
-    await env.CHUNK_DOCUMENT.create({
-      id: instanceId,
-      params: { tenantId: "acme", documentId: id },
     });
 
     await instance.waitForStatus("errored");
@@ -175,20 +163,58 @@ describe("ChunkDocument workflow", () => {
   });
 
   it("recovers when a step fails once and then succeeds (retry)", async () => {
-    const id = await insertConverted("acme", contractText(5_000));
-    const instanceId = crypto.randomUUID();
-    await using instance = await introspectWorkflowInstance(env.CHUNK_DOCUMENT, instanceId);
-    await instance.modify(async (m) => {
-      await m.disableRetryDelays();
+    const { id, jobId } = await insertConverted("acme", contractText(5_000));
+    await using instance = await run({ tenantId: "acme", documentId: id, jobId }, async (m) => {
       await m.mockStepError({ name: "store chunks 1" }, new Error("D1 busy"), 1);
-    });
-    await env.CHUNK_DOCUMENT.create({
-      id: instanceId,
-      params: { tenantId: "acme", documentId: id },
     });
 
     await instance.waitForStatus("complete");
 
     expect(await documentRow("acme", id)).toEqual({ status: "ready", error: null });
+  });
+});
+
+describe("fencing: only the job holding the ticket writes", () => {
+  it("a job whose ticket went to a newer job does nothing", async () => {
+    const { id } = await insertConverted("acme", contractText(5_000), { jobId: "job-new" });
+    await using instance = await run({ tenantId: "acme", documentId: id, jobId: "job-old" });
+
+    await instance.waitForStatus("complete");
+
+    expect(await instance.getOutput()).toEqual({ skipped: true });
+    expect(await storedChunks("acme", id)).toEqual([]);
+  });
+
+  it("a job replaced mid-run stops, writes nothing, and does not fail the document", async () => {
+    // The old job got through 'load' while it still held the ticket (simulated with a mocked
+    // result); then a re-upload handed the document to a newer job.
+    const markdown = contractText(5_000);
+    const { id } = await insertConverted("acme", markdown, { jobId: "job-new" });
+    await using instance = await run(
+      { tenantId: "acme", documentId: id, jobId: "job-old" },
+      async (m) => {
+        await m.mockStepResult({ name: "load" }, { windows: [{ from: 0, to: markdown.length }] });
+      },
+    );
+
+    await instance.waitForStatus("complete");
+
+    expect(await instance.getOutput()).toEqual({ superseded: true });
+    expect(await storedChunks("acme", id)).toEqual([]);
+    // Still the newer job's document: the old one did not fail it.
+    expect(await documentRow("acme", id)).toEqual({ status: "chunking", error: null });
+  });
+
+  it("clears the ticket when done, so no late job can write afterwards", async () => {
+    const { id, jobId } = await insertConverted("acme", contractText(5_000));
+    await using instance = await run({ tenantId: "acme", documentId: id, jobId });
+    await instance.waitForStatus("complete");
+
+    const row = await env.DB.prepare(
+      "SELECT chunk_job FROM documents WHERE tenant_id = 'acme' AND id = ?",
+    )
+      .bind(id)
+      .first<{ chunk_job: string | null }>();
+    expect(row?.chunk_job).toBeNull();
   });
 });

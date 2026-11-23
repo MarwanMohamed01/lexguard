@@ -9,7 +9,8 @@ export default {
     return handle(request, env, {
       convert: (file) => env.AI.toMarkdown(file),
       startChunking: async (params) => {
-        await env.CHUNK_DOCUMENT.create({ params });
+        // The ticket doubles as the instance ID: one instance per ticket, never two.
+        await env.CHUNK_DOCUMENT.create({ id: params.jobId, params });
       },
     });
   },

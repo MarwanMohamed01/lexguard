@@ -8,16 +8,24 @@
 // Steps for one document (a 1M-char document takes about 15 of the 1,024 allowed):
 //   load -> detect 1..N -> plan -> store chunks 1..M -> store definitions 1..K -> finish
 //
+// Fencing (D20): the job only works while the document's chunk_job is its own jobId. Every
+// read checks it and every write is conditional on it, inside the same SQL statement, so a
+// job that was replaced (the document was re-uploaded after this job looked dead) can no
+// longer change anything, even if it wakes up mid-step.
+//
 // Every step re-reads the text from D1 and cuts it in JavaScript: SQLite's substr() counts
 // code points, JavaScript counts UTF-16 units, so SQL slicing would shift offsets after any
 // emoji or rare symbol.
 import { planChunks, planWindows, detectWindow, type Detections } from "@lexguard/chunker";
 import { WorkflowEntrypoint, type WorkflowEvent, type WorkflowStep } from "cloudflare:workers";
+import { NonRetryableError } from "cloudflare:workflows";
 import { markFailed } from "./documents";
 
 export interface ChunkParams {
   tenantId: string;
   documentId: string;
+  /** The ticket stored in documents.chunk_job when this job was started; also the instance ID. */
+  jobId: string;
 }
 
 /** Same limits as the CUAD eval (D15). */
@@ -35,6 +43,10 @@ const STEP = {
   sensitive: "output",
 } as const;
 
+/** SQL condition: this job still holds the document's ticket. Binds tenant, document, job. */
+const OWNS = `EXISTS (SELECT 1 FROM documents
+  WHERE tenant_id = ? AND id = ? AND chunk_job = ? AND status = 'chunking')`;
+
 interface PlannedChunk {
   start: number;
   end: number;
@@ -49,26 +61,30 @@ interface PlannedDefinition {
 
 export class ChunkDocument extends WorkflowEntrypoint<Env, ChunkParams> {
   override async run(event: Readonly<WorkflowEvent<ChunkParams>>, step: WorkflowStep) {
-    const { tenantId, documentId } = event.payload;
+    const { tenantId, documentId, jobId } = event.payload;
     const db = this.env.DB;
-    const text = () => loadMarkdown(db, tenantId, documentId);
+    const owner = [tenantId, documentId, jobId] as const;
+    const text = () => loadOwnedMarkdown(db, tenantId, documentId, jobId);
 
     try {
       const loaded = await step.do("load", STEP, async () => {
         const doc = await db
-          .prepare("SELECT status, markdown FROM documents WHERE tenant_id = ? AND id = ?")
-          .bind(tenantId, documentId)
-          .first<{ status: string; markdown: string | null }>();
-        // Deleted, re-uploaded or already done: nothing to do, and not an error.
-        if (doc?.status !== "chunking" || doc.markdown === null) return null;
-        // A re-run (retry after failure) starts clean.
+          .prepare(
+            `SELECT markdown FROM documents
+             WHERE tenant_id = ? AND id = ? AND chunk_job = ? AND status = 'chunking'`,
+          )
+          .bind(...owner)
+          .first<{ markdown: string | null }>();
+        // Deleted, done, or handed to a newer job: nothing to do, and not an error.
+        if (doc?.markdown == null) return null;
+        // A re-run starts clean. Conditional too: the ticket may be revoked meanwhile.
         await db.batch([
           db
-            .prepare("DELETE FROM chunks WHERE tenant_id = ? AND document_id = ?")
-            .bind(tenantId, documentId),
+            .prepare(`DELETE FROM chunks WHERE tenant_id = ? AND document_id = ? AND ${OWNS}`)
+            .bind(tenantId, documentId, ...owner),
           db
-            .prepare("DELETE FROM definitions WHERE tenant_id = ? AND document_id = ?")
-            .bind(tenantId, documentId),
+            .prepare(`DELETE FROM definitions WHERE tenant_id = ? AND document_id = ? AND ${OWNS}`)
+            .bind(tenantId, documentId, ...owner),
         ]);
         return { windows: planWindows(doc.markdown, WINDOW_CHARS) };
       });
@@ -103,7 +119,7 @@ export class ChunkDocument extends WorkflowEntrypoint<Env, ChunkParams> {
               .prepare(
                 `INSERT OR REPLACE INTO chunks
                    (tenant_id, document_id, idx, start_offset, end_offset, text, section_path, heading)
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+                 SELECT ?, ?, ?, ?, ?, ?, ?, ? WHERE ${OWNS}`,
               )
               .bind(
                 tenantId,
@@ -114,10 +130,10 @@ export class ChunkDocument extends WorkflowEntrypoint<Env, ChunkParams> {
                 markdown.slice(chunk.start, chunk.end),
                 JSON.stringify(chunk.sectionPath),
                 chunk.heading,
+                ...owner,
               ),
           );
-          await db.batch(batch);
-          return batch.length;
+          return written(await db.batch(batch), batch.length);
         });
       }
 
@@ -127,44 +143,63 @@ export class ChunkDocument extends WorkflowEntrypoint<Env, ChunkParams> {
             db
               .prepare(
                 `INSERT OR REPLACE INTO definitions (tenant_id, document_id, idx, term, start_offset)
-                 VALUES (?, ?, ?, ?, ?)`,
+                 SELECT ?, ?, ?, ?, ? WHERE ${OWNS}`,
               )
-              .bind(tenantId, documentId, from + i, definition.term, definition.start),
+              .bind(tenantId, documentId, from + i, definition.term, definition.start, ...owner),
           );
-          await db.batch(batch);
-          return batch.length;
+          return written(await db.batch(batch), batch.length);
         });
       }
 
       await step.do("finish", STEP, async () => {
-        await db
+        const result = await db
           .prepare(
-            `UPDATE documents SET status = 'ready', updated_at = ?
-             WHERE tenant_id = ? AND id = ? AND status = 'chunking'`,
+            `UPDATE documents SET status = 'ready', chunk_job = NULL, updated_at = ?
+             WHERE tenant_id = ? AND id = ? AND chunk_job = ? AND status = 'chunking'`,
           )
-          .bind(new Date().toISOString(), tenantId, documentId)
+          .bind(new Date().toISOString(), ...owner)
           .run();
+        if (result.meta.changes !== 1) throw superseded();
         return true;
       });
 
       return { chunks: plan.chunks.length, definitions: plan.definitions.length };
     } catch (error) {
-      // A step failed after all its retries: record it on the document, so the tenant sees
-      // 'failed' (not 'chunking' forever) and a re-upload of the file retries it.
-      await step.do("mark failed", STEP, async () => {
-        await markFailed(db, tenantId, documentId, "chunking_failed", new Date().toISOString());
-        return true;
-      });
+      // A step failed for good. Mark the document failed, but only if this job still owns it:
+      // a replaced job must not fail a document a newer job is working on.
+      const failed = await step.do("mark failed", STEP, () =>
+        markFailed(db, tenantId, documentId, "chunking_failed", new Date().toISOString(), jobId),
+      );
+      if (!failed) return { superseded: true };
       throw error;
     }
   }
 }
 
-async function loadMarkdown(db: D1Database, tenantId: string, id: string): Promise<string> {
+function superseded(): NonRetryableError {
+  return new NonRetryableError("a newer chunking job owns this document");
+}
+
+/** Every row written, or the ticket was revoked mid-batch: stop without retrying. */
+function written(results: D1Result[], expected: number): number {
+  const rows = results.reduce((sum, r) => sum + r.meta.changes, 0);
+  if (rows < expected) throw superseded();
+  return rows;
+}
+
+async function loadOwnedMarkdown(
+  db: D1Database,
+  tenantId: string,
+  id: string,
+  jobId: string,
+): Promise<string> {
   const row = await db
-    .prepare("SELECT markdown FROM documents WHERE tenant_id = ? AND id = ?")
-    .bind(tenantId, id)
+    .prepare(
+      `SELECT markdown FROM documents
+       WHERE tenant_id = ? AND id = ? AND chunk_job = ? AND status = 'chunking'`,
+    )
+    .bind(tenantId, id, jobId)
     .first<{ markdown: string | null }>();
-  if (row?.markdown == null) throw new Error("document text is gone");
+  if (row?.markdown == null) throw superseded();
   return row.markdown;
 }

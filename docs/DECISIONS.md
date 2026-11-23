@@ -306,3 +306,27 @@ They change, so re-check before relying on them.
   the top-level slot, so each workspace nested its own 4.6.7): 1,572 KiB. A root npm
   `overrides` entry forces one 4.6.7: back to 798 KiB, well under the 3 MB Workflow limit.
 - Real CPU per step on Cloudflare is measured at the step 7 deploy.
+
+## D20. Fencing the chunking job; hardening the upload (M2 step 5e, 2026-11-23)
+
+- **Gap found:** a document stuck in `chunking` (its job ended without managing to mark it
+  failed) could never recover, and simply letting a re-upload restart it was unsafe: if the
+  old job was only slow, two jobs would interleave deletes and inserts and finish `ready`
+  with chunks missing.
+- **Fix: a fencing token** (`documents.chunk_job`, migration 0003). Each conversion hands the
+  document to a new job ID, which is also the Workflow instance ID. Every Workflow read
+  checks it and every write is conditional on it in the same SQL statement
+  (`INSERT ... SELECT ... WHERE EXISTS (owner check)`); a retry claim and the finish step
+  clear it. A replaced job stops and ends `superseded` without failing the document. Same
+  idea as a JPA `@Version` column. With it, a re-upload restarts a document stuck in
+  `chunking` for over an hour (`STALE_CHUNKING_MS`). Mutation-tested: the SQL-level check
+  alone stops a replaced job; removing both layers makes the test fail.
+- **Measured: the runtime does not enforce `Content-Length`** (header 10, body 20: all 20
+  bytes are read). The upload now reads the body as a stream and stops as soon as it passes
+  10 MB, so a lying header cannot make the Worker buffer up to 100 MB in a 128 MB isolate.
+- **Hostile files tested:** a ZIP naming `word/document.xml` only in an entry header (not in
+  the central directory) is rejected; an end record claiming 65,535 entries is rejected in
+  under 50 ms.
+- **End-to-end test:** upload → real Workflow → `ready`, with hidden characters, emoji and
+  CRLF in the converted text: chunks equal the chunker's output on the stored sanitized text,
+  each is an exact slice, and together they rebuild the text.

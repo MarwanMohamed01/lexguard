@@ -217,5 +217,5 @@ describe.skipIf(!cuadAvailable())("CUAD windowed chunking", () => {
     }
     expect(mismatches).toEqual([]);
     expect(edges).toBeGreaterThan(1_000);
-  });
+  }, 120_000); // 1,020 chunking passes over 510 contracts
 });

@@ -22,6 +22,11 @@ export const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
 export const MAX_MARKDOWN_BYTES = 2_000_000;
 /** A 'converting' document untouched this long belongs to a request that died. */
 export const STALE_CONVERSION_MS = 10 * 60 * 1000;
+/**
+ * A 'chunking' document untouched this long lost its job (a real job takes seconds, a few
+ * minutes with retries). Safe to restart because a restart revokes the old job's ticket.
+ */
+export const STALE_CHUNKING_MS = 60 * 60 * 1000;
 
 /** The conversion step, passed in so tests can replace toMarkdown (it always calls Cloudflare). */
 export type Converter = (file: MarkdownDocument) => Promise<ConversionResponse>;
@@ -82,9 +87,11 @@ export async function handleUpload(
   const filename = parseFilename(request.headers.get("X-Filename"));
   if (filename === null) return fail(400, "invalid_filename");
 
-  const bytes = new Uint8Array(await request.arrayBuffer());
+  // The header can lie (the runtime does not enforce it), so the body is read as a stream
+  // and reading stops as soon as it passes the cap: never more than 10 MB in memory.
+  const bytes = await readCapped(request, MAX_UPLOAD_BYTES);
+  if (bytes === null) return fail(413, "file_too_large");
   if (bytes.length === 0) return fail(400, "empty_file");
-  if (bytes.length > MAX_UPLOAD_BYTES) return fail(413, "file_too_large");
 
   // 2. What the file really is, from its bytes.
   const kind = detectFileKind(bytes);
@@ -102,15 +109,12 @@ export async function handleUpload(
   if (!created) {
     const existing = await findBySha256(env.DB, tenantId, sha256);
     if (existing === null) return fail(409, "conflict_retry"); // deleted in between
-    const staleBefore = new Date(now().getTime() - STALE_CONVERSION_MS).toISOString();
-    const retry = await claimForRetry(
-      env.DB,
-      tenantId,
-      existing.id,
-      now().toISOString(),
-      staleBefore,
-    );
-    // Already converted, or being converted right now by another request: nothing to redo.
+    const ago = (ms: number) => new Date(now().getTime() - ms).toISOString();
+    const retry = await claimForRetry(env.DB, tenantId, existing.id, now().toISOString(), {
+      converting: ago(STALE_CONVERSION_MS),
+      chunking: ago(STALE_CHUNKING_MS),
+    });
+    // Already done, or in progress right now (converting or chunking): nothing to redo.
     if (!retry) return Response.json({ document: existing }, { status: 200 });
     id = existing.id;
   }
@@ -120,11 +124,13 @@ export async function handleUpload(
   const converted = await convertAndSanitize(deps.convert, kind, bytes);
   let error: UploadError | null = "error" in converted ? converted.error : null;
   if (!("error" in converted)) {
-    await markConverted(env.DB, tenantId, id, converted, now().toISOString());
-    // 5. Hand over to the chunking job (src/chunking.ts). If it cannot start, fail the
-    //    document rather than leave it in 'chunking' with nobody working on it.
+    // 5. Hand over to a chunking job (src/chunking.ts) with a fresh ticket: only the job
+    //    holding it may write this document's chunks. If it cannot start, fail the document
+    //    rather than leave it in 'chunking' with nobody working on it.
+    const jobId = crypto.randomUUID();
+    await markConverted(env.DB, tenantId, id, converted, jobId, now().toISOString());
     try {
-      await deps.startChunking({ tenantId, documentId: id });
+      await deps.startChunking({ tenantId, documentId: id, jobId });
     } catch (cause) {
       console.error("chunking job not started", cause instanceof Error ? cause.message : cause);
       error = "chunking_not_started";
@@ -137,6 +143,32 @@ export async function handleUpload(
   return error === null
     ? Response.json({ document }, { status: 201 })
     : fail(error === "chunking_not_started" ? 503 : 422, error, document);
+}
+
+/** The request body, or null as soon as it grows past `max` bytes. */
+export async function readCapped(request: Request, max: number): Promise<Uint8Array | null> {
+  if (request.body === null) return new Uint8Array();
+  // A request body is always bytes; the runtime types its stream items loosely (any).
+  const reader = (request.body as ReadableStream<Uint8Array>).getReader();
+  const parts: Uint8Array[] = [];
+  let total = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    total += value.length;
+    if (total > max) {
+      await reader.cancel();
+      return null;
+    }
+    parts.push(value);
+  }
+  const bytes = new Uint8Array(total);
+  let at = 0;
+  for (const part of parts) {
+    bytes.set(part, at);
+    at += part.length;
+  }
+  return bytes;
 }
 
 async function convertAndSanitize(

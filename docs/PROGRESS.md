@@ -11,7 +11,7 @@ _Last updated: 2026-11-22._
 | ------------------------------------ | ----------------------------------------------- |
 | M0 Foundations                       | ✅ Done                                         |
 | M1 Core packages                     | ✅ Done (CI and full-history secret scan green) |
-| **M2 Ingestion & splitting**         | ⏳ **In progress: steps 1–4, 5a–5d done**       |
+| **M2 Ingestion & splitting**         | ⏳ **In progress: steps 1–5 done**              |
 | M3 Index & retrieval                 | Not started                                     |
 | M4 Extraction swarm                  | Not started                                     |
 | M5 Research, verification, synthesis | Not started                                     |
@@ -40,7 +40,7 @@ D1 (every row has `tenant_id`).
    13,823 lawyer-labelled clauses kept in one chunk; fixed-size splitting is the baseline).
    At equal chunk count: ours 99.41%, recursive (LangChain-style) 96.95%, fixed-size 83.97%.
    CI gate ≥ 0.993 and must beat both baselines (`evals/cuad/README.md`).
-5. Ingestion flow in the Worker: upload checks, fingerprint, `toMarkdown`, sanitize, chunk,
+5. ✅ Ingestion flow in the Worker: upload checks, fingerprint, `toMarkdown`, sanitize, chunk,
    D1 schema as a migration, `env.DB` binding.
    - ✅ 5a CPU measured (D16): real contracts chunk in 4–9 ms on Workers; Queues give no CPU
      advantage on Free. Upload stays light; chunking runs as its own job step.
@@ -52,7 +52,8 @@ D1 (every row has `tenant_id`).
    - ✅ 5d chunking Workflow `ChunkDocument`: detection in 200k-char windows (one step
      each), plan, store in batches of 100, then `ready`; windowed == one pass on all 510 CUAD
      contracts (D19).
-   - 5e Workers-runtime tests (checks, tenant isolation, idempotency, offsets).
+   - ✅ 5e end-to-end test, fencing token for the chunking job (stuck jobs restartable
+     safely), capped streaming upload read, hostile ZIP tests (D20).
 6. Conversion-quality eval: `toMarkdown` output vs CUAD's own text for the same PDFs.
 7. Security tests (oversized/malformed uploads, hidden text, tenant isolation), deploy,
    learning log entry, end-of-milestone quiz.
@@ -88,4 +89,4 @@ node apps/worker/scripts/new-tenant-key.mjs <tenant>  # new API key (run it your
   lawyer-labelled clauses.
 - Chunking on CUAD (510 contracts, 13,823 clauses): 99.41% of clauses kept whole vs 96.95%
   for LangChain-style recursive splitting at the same chunk count; 0 offset errors.
-- Tests: 307 (worker 75, trace 24, guardrails 72, router 13, a2a 34, chunker 58, evals 31).
+- Tests: 317 (worker 85, trace 24, guardrails 72, router 13, a2a 34, chunker 58, evals 31).

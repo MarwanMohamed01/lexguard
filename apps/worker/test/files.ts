@@ -63,3 +63,20 @@ export function makeZip(names: readonly string[]): Uint8Array {
 }
 
 export const makeDocx = () => makeZip(["[Content_Types].xml", "_rels/.rels", "word/document.xml"]);
+
+/** Contract-like text of at least `minChars`, with numbered clauses, definitions and emoji. */
+export function contractText(minChars: number): string {
+  const parts = ["MASTER SERVICES AGREEMENT\n\n"];
+  let length = parts[0]?.length ?? 0;
+  for (let article = 1; length < minChars; article++) {
+    const part =
+      `${String(article)}. Article Title ${String(article)}\n` +
+      `"Term ${String(article)}" means the period set out in this clause 📄.\n` +
+      `${String(article)}.1 Scope. The Supplier shall provide the services (a) on time; ` +
+      `(b) with care. ${"Further obligations apply. ".repeat(20)}\n` +
+      `${String(article)}.2 Fees. Payable within 30 days of invoice.\n\n`;
+    parts.push(part);
+    length += part.length;
+  }
+  return parts.join("");
+}

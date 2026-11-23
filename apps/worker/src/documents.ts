@@ -75,26 +75,36 @@ export function getDocument(
     .first<DocumentSummary>();
 }
 
+/** Before these times, a document still 'converting' or 'chunking' is considered stuck. */
+export interface StaleBefore {
+  converting: string;
+  chunking: string;
+}
+
 /**
- * Takes over a document for another conversion attempt: allowed when the last attempt failed,
- * or when it has sat in 'converting' since before `staleBefore` (its request died). Returns
- * true when this call won; a single UPDATE makes the check-and-claim atomic.
+ * Takes over a document for another conversion attempt. Allowed when the last attempt failed,
+ * or when the document has not moved since before the stale time of its state: a
+ * 'converting' request died, or a chunking job died without managing to mark it failed.
+ * Clearing chunk_job revokes the old job's ticket at once, so even if it is only slow, none
+ * of its later writes land (chunking.ts checks the ticket on every write). Returns true when
+ * this call won; a single UPDATE makes the check-and-claim atomic.
  */
 export async function claimForRetry(
   db: D1Database,
   tenantId: string,
   id: string,
   now: string,
-  staleBefore: string,
+  staleBefore: StaleBefore,
 ): Promise<boolean> {
   const result = await db
     .prepare(
-      `UPDATE documents SET status = 'converting', error = NULL, updated_at = ?
+      `UPDATE documents SET status = 'converting', error = NULL, chunk_job = NULL, updated_at = ?
        WHERE tenant_id = ? AND id = ?
          AND (status = 'failed'
-              OR (status = 'converting' AND COALESCE(updated_at, created_at) < ?))`,
+              OR (status = 'converting' AND COALESCE(updated_at, created_at) < ?)
+              OR (status = 'chunking' AND COALESCE(updated_at, created_at) < ?))`,
     )
-    .bind(now, tenantId, id, staleBefore)
+    .bind(now, tenantId, id, staleBefore.converting, staleBefore.chunking)
     .run();
   return result.meta.changes === 1;
 }
@@ -104,36 +114,49 @@ export interface ConvertedText {
   hiddenCharsRemoved: number;
 }
 
-/** Stores the sanitized text and hands the document to the chunking job (step 5d). */
+/**
+ * Stores the sanitized text and hands the document to a chunking job, identified by
+ * `chunkJob`: from now on only that job may write the document's chunks.
+ */
 export async function markConverted(
   db: D1Database,
   tenantId: string,
   id: string,
   text: ConvertedText,
+  chunkJob: string,
   now: string,
 ): Promise<void> {
   await db
     .prepare(
       `UPDATE documents SET status = 'chunking', markdown = ?, chars = ?, hidden_chars_removed = ?,
-         error = NULL, updated_at = ?
+         error = NULL, chunk_job = ?, updated_at = ?
        WHERE tenant_id = ? AND id = ?`,
     )
-    .bind(text.markdown, text.markdown.length, text.hiddenCharsRemoved, now, tenantId, id)
+    .bind(text.markdown, text.markdown.length, text.hiddenCharsRemoved, chunkJob, now, tenantId, id)
     .run();
 }
 
+/**
+ * Marks a document failed. With `chunkJob`, only if that job still owns it (a replaced job
+ * must not fail a document another job is working on). Returns whether it changed anything.
+ */
 export async function markFailed(
   db: D1Database,
   tenantId: string,
   id: string,
   error: string,
   now: string,
-): Promise<void> {
-  await db
+  chunkJob?: string,
+): Promise<boolean> {
+  const fenced = chunkJob === undefined ? "" : " AND chunk_job = ?";
+  const params: (string | number)[] = [error, now, tenantId, id];
+  if (chunkJob !== undefined) params.push(chunkJob);
+  const result = await db
     .prepare(
-      `UPDATE documents SET status = 'failed', error = ?, updated_at = ?
-       WHERE tenant_id = ? AND id = ?`,
+      `UPDATE documents SET status = 'failed', error = ?, chunk_job = NULL, updated_at = ?
+       WHERE tenant_id = ? AND id = ?${fenced}`,
     )
-    .bind(error, now, tenantId, id)
+    .bind(...params)
     .run();
+  return result.meta.changes === 1;
 }

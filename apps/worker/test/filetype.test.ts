@@ -5,6 +5,13 @@ import { makeDocx, makePdf, makeZip } from "./files";
 
 const text = (s: string) => new TextEncoder().encode(s);
 
+function lastIndexOf(haystack: Uint8Array, needle: Uint8Array): number {
+  for (let i = haystack.length - needle.length; i >= 0; i--) {
+    if (needle.every((byte, j) => haystack[i + j] === byte)) return i;
+  }
+  return -1;
+}
+
 describe("detectFileKind (from bytes, never the name)", () => {
   it("recognises a PDF by its %PDF- header", () => {
     expect(detectFileKind(makePdf())).toBe("pdf");
@@ -36,6 +43,29 @@ describe("detectFileKind (from bytes, never the name)", () => {
     const docx = makeDocx();
     new DataView(docx.buffer).setUint32(docx.length - 6, 0xffff_ff00, true);
     expect(zipEntryNames(docx)).toBeNull();
+  });
+
+  it("rejects a fake DOCX that names word/document.xml only in an entry's own header", () => {
+    // The table of contents (central directory, at the end) is what counts. Here the
+    // entry's local header says word/document.xml but the table of contents disagrees.
+    const zip = makeZip(["[Content_Types].xml", "word/document.xml"]);
+    const name = new TextEncoder().encode("word/document.xml");
+    const last = lastIndexOf(zip, name); // the central directory copy comes last
+    zip[last + 5] = "X".charCodeAt(0); // "word/Xocument.xml"
+
+    expect(lastIndexOf(zip, name)).toBeLessThan(last); // the local header still has it
+    expect(detectFileKind(zip)).toBeNull();
+  });
+
+  it("rejects quickly a ZIP whose end record claims 65,535 entries it does not have", () => {
+    const zip = makeDocx();
+    const view = new DataView(zip.buffer);
+    view.setUint16(zip.length - 22 + 8, 0xffff, true);
+    view.setUint16(zip.length - 22 + 10, 0xffff, true);
+
+    const started = Date.now();
+    expect(zipEntryNames(zip)).toBeNull();
+    expect(Date.now() - started).toBeLessThan(50);
   });
 
   it("lists entry names in order", () => {
