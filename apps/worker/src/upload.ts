@@ -13,8 +13,10 @@ import {
   markConverted,
   markFailed,
   reserveDocument,
+  type ConvertedText,
   type DocumentSummary,
 } from "./documents";
+import { extractPages } from "./pages";
 import { detectFileKind, MIME_TYPES } from "./filetype";
 
 export const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
@@ -27,6 +29,19 @@ export const STALE_CONVERSION_MS = 10 * 60 * 1000;
  * minutes with retries). Safe to restart because a restart revokes the old job's ticket.
  */
 export const STALE_CHUNKING_MS = 60 * 60 * 1000;
+
+/**
+ * Asked of toMarkdown for every upload. No PDF metadata (not contract text; can leak the
+ * author or software). No image conversion: it would spend Workers AI neurons, and a model's
+ * description of an image would enter the stored text as if the contract said it, which an
+ * attacker could exploit with a planted image.
+ */
+export const CONVERSION_OPTIONS = {
+  conversionOptions: {
+    pdf: { metadata: false, images: { convert: false } },
+    docx: { images: { convert: false } },
+  },
+} satisfies ConversionRequestOptions;
 
 /** The conversion step, passed in so tests can replace toMarkdown (it always calls Cloudflare). */
 export type Converter = (file: MarkdownDocument) => Promise<ConversionResponse>;
@@ -175,11 +190,13 @@ async function convertAndSanitize(
   convert: Converter,
   kind: "pdf" | "docx",
   bytes: Uint8Array,
-): Promise<{ markdown: string; hiddenCharsRemoved: number } | { error: UploadError }> {
+): Promise<ConvertedText | { error: UploadError }> {
   let result: ConversionResponse;
   try {
-    // The name tells toMarkdown the format; built from the detected kind, not the upload name.
-    result = await convert({ name: `document.${kind}`, blob: new Blob([bytes]) });
+    // Name and MIME type tell toMarkdown the format; both come from the detected kind, never
+    // from the client. toMarkdown rejects a Blob without a type (found in step 6).
+    const blob = new Blob([bytes], { type: MIME_TYPES[kind] });
+    result = await convert({ name: `document.${kind}`, blob });
   } catch (error) {
     console.error("toMarkdown threw", error instanceof Error ? error.message : error);
     return { error: "conversion_failed" };
@@ -189,11 +206,14 @@ async function convertAndSanitize(
     return { error: "conversion_failed" };
   }
 
-  // Sanitized once, here: every chunk offset and citation points into this stored text.
-  const { text, removed } = sanitizeText(result.data);
-  if (text.trim().length === 0) return { error: "no_text" }; // e.g. a scan with no text layer
+  // Sanitized once, here, then the converter's page markers become a page map (pages.ts):
+  // every chunk offset and citation points into this stored text.
+  const { text: clean, removed } = sanitizeText(result.data);
+  const { text, pageStarts } = extractPages(clean);
+  // After removing the wrapper, so a scan with no text layer (wrapper only) counts as empty.
+  if (text.trim().length === 0) return { error: "no_text" };
   if (new TextEncoder().encode(text).length > MAX_MARKDOWN_BYTES)
     return { error: "text_too_large" };
   const hiddenCharsRemoved = Object.values(removed).reduce((sum, count) => sum + count, 0);
-  return { markdown: text, hiddenCharsRemoved };
+  return { markdown: text, hiddenCharsRemoved, pageStarts };
 }

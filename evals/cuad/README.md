@@ -118,6 +118,61 @@ once. `chunking.test.ts` checks that this changes nothing: on all 510 contracts,
 20,000-character windows (1,055 window edges in total), windowed chunking gives exactly the
 same chunks, sections and definitions as one pass. Runs in CI.
 
+## Conversion quality: toMarkdown on the 30 PDFs (M2 step 6): results
+
+`convert-run.mjs` sends the 30 PDFs through the real Worker under `wrangler dev` (local code,
+D1 and Workflow; only `toMarkdown` runs on Cloudflare, via `wrangler login`) and saves what
+was stored. `conversion.test.ts` compares it with CUAD's text for the same contracts and
+writes `evals/results/cuad-conversion.json`. Local only (CI has neither the PDFs nor a
+login); the test skips when the converted files are absent.
+
+```bash
+node evals/cuad/convert-run.mjs                       # ~1.5 min, from the repo root
+npx vitest run cuad/conversion.test.ts                 # in evals/
+```
+
+CUAD's text is a reference, not the truth (the CUAD authors extracted it with their own tool),
+so disagreements were sampled and read.
+
+| Measure (30 contracts, 1,174 labelled clauses)                   | Result                             |
+| ---------------------------------------------------------------- | ---------------------------------- |
+| Converted and chunked                                            | 30 / 30 (largest: 154 pages, 23 s) |
+| Word precision / recall vs CUAD text (median)                    | 0.997 / 0.995                      |
+| Word order: CUAD's 8-word sequences found (median, min)          | 0.98, 0.75                         |
+| Clauses found in the converted text                              | **97.96%** (92.9% word for word)   |
+| Clauses kept whole in chunks of the converted text               | **98.63%** (1,081 / 1,096)         |
+| Same clauses kept whole, chunking CUAD's text (step 4's setting) | 99.74% (1,171 / 1,174)             |
+
+How the integrity number got there:
+
+| Version                                                         | Clauses kept whole |
+| --------------------------------------------------------------- | ------------------ |
+| As converted (toMarkdown's `### Page N` headings left in text)  | 98.54%             |
+| Page markers turned into a page map, chunker unchanged          | 96.90%             |
+| + chunker cuts at sentence ends before bare line breaks (final) | **98.63%**         |
+
+What was found:
+
+- **toMarkdown marks every PDF page with a `### Page N` heading** (1,166 in total), often
+  mid-sentence, under a `# document.pdf` / `## Metadata` / `## Contents` wrapper. As headings,
+  they cut clauses that run across pages. They are now removed and kept as a page map
+  (`documents.page_starts`) for page-level citations.
+- **Removing them exposed two other things.** toMarkdown often glues separate text pieces
+  without a space (`PROPERTY RIGHTS10.1 Except`, `TRIALS2.1 The Protocols.`), so fewer
+  headings are found (3,244 sections vs 4,021 on CUAD text); the page markers had been
+  hiding this by cutting sections short. And its output has no blank lines at all: every
+  wrapped line ends in a line break, so "cut at a line break" cut mid-sentence (25 of 34
+  broken clauses). The chunker now ranks a sentence end above a bare line break; on CUAD's
+  own text the result is unchanged (99.41%, same 17,026 chunks).
+- **Missing clauses (24) are mostly reference quirks:** document titles and dates set apart on
+  a cover page, a table row, a lone "." labelled as a date, page footers inside CUAD's own
+  extraction.
+- **Still open:** glued headings are not repaired (guessing where words split could break
+  real words); 1,786 repeated lines (page footers such as `Source: ... 10-K`) stay in the
+  text. Both are candidates for a later fix, measured with this eval.
+- Found on the way: **every real upload failed**: toMarkdown rejects a Blob without a MIME
+  type, which the tests' fake converter accepted. Fixed and pinned by a test.
+
 ## Planned uses
 
 - **Quote check (M5):** every labelled span must pass the verifier's exact-quote check;

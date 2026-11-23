@@ -330,3 +330,34 @@ They change, so re-check before relying on them.
 - **End-to-end test:** upload → real Workflow → `ready`, with hidden characters, emoji and
   CRLF in the converted text: chunks equal the chunker's output on the stored sanitized text,
   each is an exact slice, and together they rebuild the text.
+
+## D21. Conversion quality and what it changed (M2 step 6, 2026-11-23)
+
+- **Measured on the 30 CUAD PDFs through the real Worker** (`wrangler dev`, real
+  `toMarkdown`): all 30 convert (largest 154 pages, 23 s); 97.96% of 1,174 labelled clauses
+  found in the converted text; 98.63% kept whole in chunks, vs 99.74% when chunking CUAD's
+  own text for the same contracts. Details in `evals/cuad/README.md`.
+- **Bug found: every real upload failed.** `toMarkdown` rejects a Blob without a MIME type;
+  the fake converter in tests did not. The Blob now carries the type detected from the bytes,
+  pinned by a test. Lesson: a fake must be checked against the real thing at least once.
+- **Page markers become a page map.** toMarkdown writes `### Page N` headings (mid-sentence)
+  inside a `# document.pdf` / `## Metadata` / `## Contents` wrapper. `src/pages.ts` removes
+  them, joins pages with one line break and stores page start offsets in
+  `documents.page_starts` (migration 0004) for page-level citations; the status endpoint
+  reports `pages`. Strict: only markers numbered 1, 2, 3... in order after the wrapper;
+  anything else leaves the text unchanged with no page map. `no_text` is checked after
+  removing the wrapper, so a scan (wrapper only) is still refused.
+- **Conversion options:** `pdf.metadata: false` (not contract text; can leak author or
+  software) and image conversion off for PDF and DOCX: no Workers AI neurons, and no
+  model-written image descriptions entering the stored text as if the contract said them
+  (a planted image could otherwise inject text).
+- **Chunker cut ranking changed:** sentence end (and line break after a sentence end) now
+  rank above a bare line break. toMarkdown output has no blank lines and a line break per
+  wrapped line, so line-break cuts fell mid-sentence (25 of 34 broken clauses). CUAD-text
+  results unchanged (99.41%, same 17,026 chunks).
+- **Known limits, not fixed yet:** toMarkdown glues separate text pieces without a space
+  (`RIGHTS10.1 Except`), so headings are under-detected (3,244 sections vs 4,021); repeated
+  page footers stay in the text. Repairing either by guessing risks damaging real text.
+- **Local-only eval:** CI has neither the PDFs nor a Cloudflare login. The run is recorded
+  (`evals/results/cuad-conversion.json`), the gates (clause recall ≥ 0.975, integrity
+  ≥ 0.98, stored chunks = chunker output) run whenever the converted files exist.

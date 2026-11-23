@@ -11,7 +11,7 @@ _Last updated: 2026-11-22._
 | ------------------------------------ | ----------------------------------------------- |
 | M0 Foundations                       | ✅ Done                                         |
 | M1 Core packages                     | ✅ Done (CI and full-history secret scan green) |
-| **M2 Ingestion & splitting**         | ⏳ **In progress: steps 1–5 done**              |
+| **M2 Ingestion & splitting**         | ⏳ **In progress: steps 1–6 done**              |
 | M3 Index & retrieval                 | Not started                                     |
 | M4 Extraction swarm                  | Not started                                     |
 | M5 Research, verification, synthesis | Not started                                     |
@@ -54,7 +54,9 @@ D1 (every row has `tenant_id`).
      contracts (D19).
    - ✅ 5e end-to-end test, fencing token for the chunking job (stuck jobs restartable
      safely), capped streaming upload read, hostile ZIP tests (D20).
-6. Conversion-quality eval: `toMarkdown` output vs CUAD's own text for the same PDFs.
+6. ✅ Conversion-quality eval: 30 CUAD PDFs through the real Worker. 97.96% of labelled clauses
+   found, 98.63% kept whole (99.74% on CUAD text). Fixed: uploads failing (Blob type), page
+   markers turned into a page map, chunker cut ranking (D21).
 7. Security tests (oversized/malformed uploads, hidden text, tenant isolation), deploy,
    learning log entry, end-of-milestone quiz.
 
@@ -77,6 +79,7 @@ npm run check                              # hidden chars, typecheck, lint, form
 npm run fetch:gretel -w @lexguard/evals    # PII benchmark data (also downloaded in CI)
 npm run fetch:cuad -w @lexguard/evals      # 510 real contracts with lawyer-labelled clauses
 npm run fetch:cuad-pdfs -w @lexguard/evals # 30 original contract PDFs (M2 ingestion tests)
+node evals/cuad/convert-run.mjs            # those PDFs through the real Worker (local, needs login)
 npm run eval:watch -w @lexguard/evals      # Evalite case-by-case view
 npm run deploy -w @lexguard/worker         # deploy (after `npx wrangler login`)
 node apps/worker/scripts/new-tenant-key.mjs <tenant>  # new API key (run it yourself)
@@ -89,4 +92,6 @@ node apps/worker/scripts/new-tenant-key.mjs <tenant>  # new API key (run it your
   lawyer-labelled clauses.
 - Chunking on CUAD (510 contracts, 13,823 clauses): 99.41% of clauses kept whole vs 96.95%
   for LangChain-style recursive splitting at the same chunk count; 0 offset errors.
-- Tests: 317 (worker 85, trace 24, guardrails 72, router 13, a2a 34, chunker 58, evals 31).
+- Real toMarkdown output (30 PDFs): 97.96% of clauses found, 98.63% kept whole.
+- Tests: 339 (worker 94, trace 24, guardrails 72, router 13, a2a 34, chunker 59, evals 43, of
+  which 6 need the locally converted PDFs and skip in CI).

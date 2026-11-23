@@ -1,0 +1,1363 @@
+{
+  "documents": 30,
+  "ready": 30,
+  "withPageMap": 30,
+  "pages": 1166,
+  "pageMarkersLeftInText": 0,
+  "options": {
+    "targetChars": 2000,
+    "maxChars": 4000
+  },
+  "clauses": {
+    "exact": 1091,
+    "fuzzy": 59,
+    "missing": 24
+  },
+  "clauseRecall": 0.9796,
+  "clauseExactRate": 0.9293,
+  "integrityOnConverted": {
+    "kept": 1081,
+    "total": 1096,
+    "rate": 0.9863
+  },
+  "integrityOnCuadText": {
+    "kept": 1171,
+    "total": 1174,
+    "rate": 0.9974
+  },
+  "workflowMismatches": [],
+  "perDocument": [
+    {
+      "title": "NETZEEINC_11_14_2002-EX-10.3-MAINTENANCE AGREEMENT",
+      "pdfBytes": 41044,
+      "status": "ready",
+      "error": null,
+      "uploadMs": 514,
+      "readyMs": 1546,
+      "cuadChars": 3474,
+      "markdownChars": 3216,
+      "hiddenCharsRemoved": 0,
+      "pages": 1,
+      "wordPrecision": 1,
+      "wordRecall": 1,
+      "ngramRecall": 1,
+      "clauses": {
+        "exact": 9,
+        "fuzzy": 0,
+        "missing": 0
+      },
+      "chunks": 2,
+      "chunksOnCuadText": 2,
+      "sections": 2,
+      "sectionsOnCuadText": 2,
+      "repeatedLines": {
+        "lines": 0,
+        "chars": 0,
+        "top": []
+      },
+      "start": "EXHIBIT 10.3\nNETZEE, INC.\nMAINTENANCE AGREEMENT\nThis Agreement provides for Continued Service and for Netzee to provide basic\nmaintenance in support following expiration of the initial one (1) year term of\nthe License/Services Schedule.\nThe Continued Service provided by Netzee will be the operation,"
+    },
+    {
+      "title": "ON4COMMUNICATIONSINC_07_02_2009-EX-10.1-PROMOTION AGREEMENT",
+      "pdfBytes": 56702,
+      "status": "ready",
+      "error": null,
+      "uploadMs": 542,
+      "readyMs": 1574,
+      "cuadChars": 15103,
+      "markdownChars": 14742,
+      "hiddenCharsRemoved": 0,
+      "pages": 5,
+      "wordPrecision": 0.9942,
+      "wordRecall": 0.9913,
+      "ngramRecall": 0.9703,
+      "clauses": {
+        "exact": 10,
+        "fuzzy": 2,
+        "missing": 1
+      },
+      "chunks": 6,
+      "chunksOnCuadText": 6,
+      "sections": 1,
+      "sectionsOnCuadText": 3,
+      "repeatedLines": {
+        "lines": 0,
+        "chars": 0,
+        "top": []
+      },
+      "start": "925 West Georgia StreetSuite 1820Vancouver, British ColumbiaCanada V6C 3L2Facsimile: 604-632-1730PROMOTION AGREEMENT(the “Agreement”)\nThis agreement (the “Agreement”) is made between Charity Tunes Inc., a British Columbia corporation with registered office located at\nSuite 1800, 925 West Georgia Str"
+    },
+    {
+      "title": "SUNTRONCORP_05_17_2006-EX-10.22-MAINTENANCE AGREEMENT",
+      "pdfBytes": 65732,
+      "status": "ready",
+      "error": null,
+      "uploadMs": 552,
+      "readyMs": 1570,
+      "cuadChars": 32263,
+      "markdownChars": 30224,
+      "hiddenCharsRemoved": 0,
+      "pages": 7,
+      "wordPrecision": 1,
+      "wordRecall": 1,
+      "ngramRecall": 1,
+      "clauses": {
+        "exact": 27,
+        "fuzzy": 0,
+        "missing": 0
+      },
+      "chunks": 20,
+      "chunksOnCuadText": 20,
+      "sections": 25,
+      "sectionsOnCuadText": 25,
+      "repeatedLines": {
+        "lines": 23,
+        "chars": 486,
+        "top": [
+          {
+            "line": "By: /s/ James A. Doran",
+            "count": 7
+          },
+          {
+            "line": "Name: James A. Doran",
+            "count": 7
+          },
+          {
+            "line": "Title: Vice President",
+            "count": 6
+          },
+          {
+            "line": "a Delaware corporation",
+            "count": 3
+          }
+        ]
+      },
+      "start": "Exhibit 10.22\nMAINTENANCE AGREEMENT\nTHIS MAINTENANCE AGREEMENT (this \"Agreement\") is made and entered into\nas of the 28th day of March 2006 by THAYER EQUITY INVESTORS IV, L.P. (the\n\"Investor\"), in favor of U.S. BANK NATIONAL ASSOCIATION, a national banking\nassociation in its capacity as administrati"
+    },
+    {
+      "title": "OMINTO,INC_03_29_2004-EX-10-RESELLER AGREEMENT",
+      "pdfBytes": 66579,
+      "status": "ready",
+      "error": null,
+      "uploadMs": 365,
+      "readyMs": 1386,
+      "cuadChars": 28463,
+      "markdownChars": 26355,
+      "hiddenCharsRemoved": 0,
+      "pages": 7,
+      "wordPrecision": 1,
+      "wordRecall": 1,
+      "ngramRecall": 1,
+      "clauses": {
+        "exact": 22,
+        "fuzzy": 0,
+        "missing": 0
+      },
+      "chunks": 22,
+      "chunksOnCuadText": 21,
+      "sections": 44,
+      "sectionsOnCuadText": 40,
+      "repeatedLines": {
+        "lines": 15,
+        "chars": 609,
+        "top": [
+          {
+            "line": "Reseller Agreement Initials ______ _______",
+            "count": 9
+          },
+          {
+            "line": "Monthly Hosting/Maintenance/Updates",
+            "count": 3
+          },
+          {
+            "line": "(quarterly maintenance fee due in advance)",
+            "count": 3
+          }
+        ]
+      },
+      "start": "EXHIBIT 10.25\nRESELLER AGREEMENT\nTHIS AGREEMENT (the \"AGREEMENT\") entered into as of the 19 day of March, 2004\n(the \"EFFECTIVE DATE\") provides the terms and conditions under which MediaNet\nGroup Technologies, Inc., a Nevada corporation having an address at 5100 W.\nCopans Road Suite 710 Margate, FL 3"
+    },
+    {
+      "title": "DRKOOPCOMINC_04_21_1999-EX-10.28-SPONSORSHIP AGREEMENT",
+      "pdfBytes": 73417,
+      "status": "ready",
+      "error": null,
+      "uploadMs": 538,
+      "readyMs": 1577,
+      "cuadChars": 39177,
+      "markdownChars": 35679,
+      "hiddenCharsRemoved": 0,
+      "pages": 8,
+      "wordPrecision": 1,
+      "wordRecall": 1,
+      "ngramRecall": 1,
+      "clauses": {
+        "exact": 18,
+        "fuzzy": 0,
+        "missing": 0
+      },
+      "chunks": 29,
+      "chunksOnCuadText": 30,
+      "sections": 66,
+      "sectionsOnCuadText": 64,
+      "repeatedLines": {
+        "lines": 39,
+        "chars": 1991,
+        "top": [
+          {
+            "line": "* * * Certain information on this page has been omitted and filed",
+            "count": 9
+          },
+          {
+            "line": "separately with the Securities and Exchange Commission. Confidential",
+            "count": 9
+          },
+          {
+            "line": "treatment has been requested with respect to the omitted portions.",
+            "count": 9
+          },
+          {
+            "line": "____________________",
+            "count": 8
+          },
+          {
+            "line": "Agreement.",
+            "count": 4
+          }
+        ]
+      },
+      "start": "EXHIBIT 10.28\nSPONSORSHIP AGREEMENT\nThis Sponsorship Agreement (the \"Agreement\") is entered into as of the\n11th day of March, 1999 by and between drkoop.com, inc., a Delaware corporation,\nlocated at 8920 Business Park Drive, Longhorn Suite, Austin, Texas 78759\n(\"drkoop.com\"), and Vitamin Shoppe Indu"
+    },
+    {
+      "title": "HYPERIONSOFTWARECORP_09_28_1994-EX-10.47-EXCLUSIVE DISTRIBUTOR AGREEMENT",
+      "pdfBytes": 74135,
+      "status": "ready",
+      "error": null,
+      "uploadMs": 463,
+      "readyMs": 1486,
+      "cuadChars": 37682,
+      "markdownChars": 35238,
+      "hiddenCharsRemoved": 0,
+      "pages": 9,
+      "wordPrecision": 1,
+      "wordRecall": 1,
+      "ngramRecall": 1,
+      "clauses": {
+        "exact": 30,
+        "fuzzy": 0,
+        "missing": 0
+      },
+      "chunks": 23,
+      "chunksOnCuadText": 24,
+      "sections": 46,
+      "sectionsOnCuadText": 46,
+      "repeatedLines": {
+        "lines": 0,
+        "chars": 0,
+        "top": []
+      },
+      "start": "1\nEXCLUSIVE DISTRIBUTOR AGREEMENT\nEXCLUSIVE DISTRIBUTOR AGREEMENT (\"Agreement\") dated as April 15, 1994\nby and between IMRS OPERATIONS INC. d/b/a IMRS INC., a Delaware corporation\nwith its principal place of business at 777 Long Ridge Road, Stamford,\nConnecticut 06902, U.S.A. (hereinafter referred t"
+    },
+    {
+      "title": "LinkPlusCorp_20050802_8-K_EX-10_3240252_EX-10_Affiliate Agreement",
+      "pdfBytes": 88121,
+      "status": "ready",
+      "error": null,
+      "uploadMs": 365,
+      "readyMs": 1396,
+      "cuadChars": 25619,
+      "markdownChars": 18480,
+      "hiddenCharsRemoved": 0,
+      "pages": 7,
+      "wordPrecision": 0.9987,
+      "wordRecall": 0.9974,
+      "ngramRecall": 0.9893,
+      "clauses": {
+        "exact": 31,
+        "fuzzy": 1,
+        "missing": 0
+      },
+      "chunks": 15,
+      "chunksOnCuadText": 17,
+      "sections": 45,
+      "sectionsOnCuadText": 45,
+      "repeatedLines": {
+        "lines": 0,
+        "chars": 0,
+        "top": []
+      },
+      "start": "EXHIBIT 10.1\nAFFLIATE AGREEMENT DATED JULY 15, 2005\nAFFILIATE AGREEMENT\nThis Agreement entered into as of the Effective Date by and between\nLink Plus Corporation and Axiometric, LLC.\nRECITALS\nWHEREAS, Axiometric has developed certain computer software including\nwireless mesh networking technology an"
+    },
+    {
+      "title": "ENTERPRISEPRODUCTSPARTNERSLP_07_08_1998-EX-10.3-TRANSPORTATION CONTRACT",
+      "pdfBytes": 103509,
+      "status": "ready",
+      "error": null,
+      "uploadMs": 820,
+      "readyMs": 1847,
+      "cuadChars": 74915,
+      "markdownChars": 68913,
+      "hiddenCharsRemoved": 0,
+      "pages": 16,
+      "wordPrecision": 1,
+      "wordRecall": 1,
+      "ngramRecall": 1,
+      "clauses": {
+        "exact": 36,
+        "fuzzy": 0,
+        "missing": 0
+      },
+      "chunks": 64,
+      "chunksOnCuadText": 71,
+      "sections": 95,
+      "sectionsOnCuadText": 97,
+      "repeatedLines": {
+        "lines": 3,
+        "chars": 99,
+        "top": [
+          {
+            "line": "ENTERPRISE TRANSPORTATION COMPANY",
+            "count": 3
+          }
+        ]
+      },
+      "start": "EXHIBIT 10.3\n[ENTERPRISE LOGO APPEARS HERE]\nENTERPRISE TRANSPORTATION COMPANY\na division of Enterprise Products Company\nP.O. BOX 4324 . PHONE 713 / 880-6500 Contract No. 017\nHOUSTON, TX 77210 ______\nDate: June 1, 1998\nTRANSPORTATION CONTRACT\nTHIS CONTRACT is entered into by and between ENTERPRISE TR"
+    },
+    {
+      "title": "SoupmanInc_20150814_8-K_EX-10.1_9230148_EX-10.1_Franchise Agreement4",
+      "pdfBytes": 116033,
+      "status": "ready",
+      "error": null,
+      "uploadMs": 269,
+      "readyMs": 1302,
+      "cuadChars": 3314,
+      "markdownChars": 3162,
+      "hiddenCharsRemoved": 0,
+      "pages": 2,
+      "wordPrecision": 0.994,
+      "wordRecall": 0.988,
+      "ngramRecall": 0.9453,
+      "clauses": {
+        "exact": 3,
+        "fuzzy": 0,
+        "missing": 1
+      },
+      "chunks": 1,
+      "chunksOnCuadText": 1,
+      "sections": 1,
+      "sectionsOnCuadText": 1,
+      "repeatedLines": {
+        "lines": 0,
+        "chars": 0,
+        "top": []
+      },
+      "start": "ADDENDUM REQUIRED BY THE DEPARTMENT OF LAW OF THE STATE OF NEW YORKThe following Items are required to be included within the Disclosure Document and shall be deemed to supersede the language in the\nDisclosure Document itself:\n3. LITIGATION\nNeither the Franchisor, its Predecessor nor any person list"
+    },
+    {
+      "title": "VEONEER,INC_02_21_2020-EX-10.11-JOINT VENTURE AGREEMENT",
+      "pdfBytes": 119848,
+      "status": "ready",
+      "error": null,
+      "uploadMs": 304,
+      "readyMs": 1332,
+      "cuadChars": 8257,
+      "markdownChars": 8186,
+      "hiddenCharsRemoved": 0,
+      "pages": 4,
+      "wordPrecision": 0.9919,
+      "wordRecall": 0.984,
+      "ngramRecall": 0.9242,
+      "clauses": {
+        "exact": 13,
+        "fuzzy": 2,
+        "missing": 1
+      },
+      "chunks": 3,
+      "chunksOnCuadText": 3,
+      "sections": 1,
+      "sectionsOnCuadText": 1,
+      "repeatedLines": {
+        "lines": 0,
+        "chars": 0,
+        "top": []
+      },
+      "start": "Exhibit 10.11\nAMENDMENT AND TERMINATION\nOF\nJOINT VENTURE AGREEMENTThis AMENDMENT AND TERMINATION OF JOINT VENTURE AGREEMENT (this “Amendment”) is made and entered\ninto effective as of October 30, 2019 (the “Effective Date”) by and among (1) Veoneer AB, a Swedish corporation (“Veoneer\nAB”) and Veonee"
+    },
+    {
+      "title": "ALLISONTRANSMISSIONHOLDINGSINC_12_15_2014-EX-99.1-COOPERATION AGREEMENT",
+      "pdfBytes": 139128,
+      "status": "ready",
+      "error": null,
+      "uploadMs": 422,
+      "readyMs": 1454,
+      "cuadChars": 32826,
+      "markdownChars": 32598,
+      "hiddenCharsRemoved": 0,
+      "pages": 10,
+      "wordPrecision": 0.9964,
+      "wordRecall": 0.9928,
+      "ngramRecall": 0.9758,
+      "clauses": {
+        "exact": 15,
+        "fuzzy": 1,
+        "missing": 2
+      },
+      "chunks": 20,
+      "chunksOnCuadText": 19,
+      "sections": 17,
+      "sectionsOnCuadText": 19,
+      "repeatedLines": {
+        "lines": 6,
+        "chars": 156,
+        "top": [
+          {
+            "line": "Name: George F. Hamel, Jr.",
+            "count": 6
+          }
+        ]
+      },
+      "start": "Exhibit 99.1\nCOOPERATION AGREEMENT\nThis Cooperation Agreement (this “Agreement”) dated December 12, 2014, is by and among the persons and entities listed on Schedule A\n(collectively, the “ValueAct Group”, and individually a “member” of the ValueAct Group), Allison Transmission Holdings, Inc. (the “C"
+    },
+    {
+      "title": "HPILHOLDING_01_07_2015-EX-99.1-COOPERATION AGREEMENT",
+      "pdfBytes": 141479,
+      "status": "ready",
+      "error": null,
+      "uploadMs": 377,
+      "readyMs": 1418,
+      "cuadChars": 20008,
+      "markdownChars": 19597,
+      "hiddenCharsRemoved": 0,
+      "pages": 9,
+      "wordPrecision": 0.9832,
+      "wordRecall": 0.967,
+      "ngramRecall": 0.8602,
+      "clauses": {
+        "exact": 10,
+        "fuzzy": 3,
+        "missing": 1
+      },
+      "chunks": 13,
+      "chunksOnCuadText": 15,
+      "sections": 22,
+      "sectionsOnCuadText": 33,
+      "repeatedLines": {
+        "lines": 0,
+        "chars": 0,
+        "top": []
+      },
+      "start": "COOPERATION AGREEMENTmade by and betweenHPIL ENERGYTECH Inc.andGINARES GROUP AGJanuary 5, 2015\nTable of Contents1. Term........................................................................................................................................... 2\n2. Goals And Objectives................"
+    },
+    {
+      "title": "WASTE2ENERGYHOLDINGS,INC_06_03_2010-EX-10.2-STRATEGIC ALLIANCE AGREEMENT",
+      "pdfBytes": 143705,
+      "status": "ready",
+      "error": null,
+      "uploadMs": 633,
+      "readyMs": 1663,
+      "cuadChars": 40442,
+      "markdownChars": 38802,
+      "hiddenCharsRemoved": 0,
+      "pages": 19,
+      "wordPrecision": 0.9887,
+      "wordRecall": 0.9775,
+      "ngramRecall": 0.9039,
+      "clauses": {
+        "exact": 12,
+        "fuzzy": 1,
+        "missing": 3
+      },
+      "chunks": 18,
+      "chunksOnCuadText": 28,
+      "sections": 1,
+      "sectionsOnCuadText": 79,
+      "repeatedLines": {
+        "lines": 0,
+        "chars": 0,
+        "top": []
+      },
+      "start": "Exhibit 10.2SHBV (HONG KONG) LTD.andWASTE2ENERGY GROUP HOLDINGS PLCSTRATEGIC ALLIANCE AGREEMENT1\nTHIS AGREEMENT IS MADE ON THE 19 DAY OF MAY , 2010PARTIES(1) SHBV (HONG KONG) LTD, a company incorporated in Hong Kong whose registered office is at Unit 3208, 32/F Office Tower (“SHBV”); and\nConvention "
+    },
+    {
+      "title": "INTERNATIONALFASTFOODCORP_04_04_1997-EX-99-FRANCHISE AGREEMENT",
+      "pdfBytes": 144849,
+      "status": "ready",
+      "error": null,
+      "uploadMs": 826,
+      "readyMs": 1861,
+      "cuadChars": 116873,
+      "markdownChars": 102851,
+      "hiddenCharsRemoved": 0,
+      "pages": 27,
+      "wordPrecision": 0.9999,
+      "wordRecall": 0.9999,
+      "ngramRecall": 0.9995,
+      "clauses": {
+        "exact": 65,
+        "fuzzy": 0,
+        "missing": 0
+      },
+      "chunks": 74,
+      "chunksOnCuadText": 78,
+      "sections": 305,
+      "sectionsOnCuadText": 201,
+      "repeatedLines": {
+        "lines": 3,
+        "chars": 27,
+        "top": [
+          {
+            "line": "transfer;",
+            "count": 3
+          }
+        ]
+      },
+      "start": "FRANCHISE AGREEMENT\nTABLE OF CONTENTS\nI. INTRODUCTION\nII. AGREEMENT\n1. Definitions\n2. Franchise Grant; Term\n2.1 Grant\n2.2 Term\n2.3 No Renewal Right: No Exclusivity\n2.4 Continuous Operation\n2.5 Best Efforts\n3. Consideration for Franchise Grant\n4. Management, Control and Corporate Documents of Franchi"
+    },
+    {
+      "title": "ArconicRolledProductsCorp_20191217_10-12B_EX-2.7_11923804_EX-2.7_Trademark License Agreement",
+      "pdfBytes": 152678,
+      "status": "ready",
+      "error": null,
+      "uploadMs": 403,
+      "readyMs": 1434,
+      "cuadChars": 18069,
+      "markdownChars": 18003,
+      "hiddenCharsRemoved": 0,
+      "pages": 6,
+      "wordPrecision": 0.9979,
+      "wordRecall": 0.9959,
+      "ngramRecall": 0.9826,
+      "clauses": {
+        "exact": 20,
+        "fuzzy": 0,
+        "missing": 0
+      },
+      "chunks": 10,
+      "chunksOnCuadText": 11,
+      "sections": 20,
+      "sectionsOnCuadText": 30,
+      "repeatedLines": {
+        "lines": 0,
+        "chars": 0,
+        "top": []
+      },
+      "start": "Exhibit 2.7\nFORM OF\nTRADEMARK LICENSE AGREEMENT\nTHIS TRADEMARK LICENSE AGREEMENT (this “Agreement”), made and entered into as of the [ ] day of [ ], 2020 (the “Effective\nDate”), by and between ARCONIC INC., a corporation organized under the laws of Delaware (“Licensee”) and ARCONIC ROLLED PRODUCTS\nC"
+    },
+    {
+      "title": "ArcGroupInc_20171211_8-K_EX-10.1_10976103_EX-10.1_Sponsorship Agreement",
+      "pdfBytes": 159195,
+      "status": "ready",
+      "error": null,
+      "uploadMs": 379,
+      "readyMs": 1412,
+      "cuadChars": 16773,
+      "markdownChars": 16547,
+      "hiddenCharsRemoved": 0,
+      "pages": 4,
+      "wordPrecision": 0.9966,
+      "wordRecall": 0.9933,
+      "ngramRecall": 0.9741,
+      "clauses": {
+        "exact": 8,
+        "fuzzy": 0,
+        "missing": 1
+      },
+      "chunks": 10,
+      "chunksOnCuadText": 12,
+      "sections": 10,
+      "sectionsOnCuadText": 15,
+      "repeatedLines": {
+        "lines": 0,
+        "chars": 0,
+        "top": []
+      },
+      "start": "Exhibit 10.1\nJACKSONVILLE JAGUARS\nSPONSORSHIP AGREEMENTThis Sponsorship Agreement (this “Agreement”) is entered into as of November 27, 2017 (the “Execution Date”) by and between\nJacksonville Jaguars, LLC, a Delaware limited liability company (“Club”), and The ARC Group, Inc., a Florida corporation "
+    },
+    {
+      "title": "GridironBionutrientsInc_20171206_8-K_EX-10.2_10972556_EX-10.2_Endorsement Agreement",
+      "pdfBytes": 160922,
+      "status": "ready",
+      "error": null,
+      "uploadMs": 339,
+      "readyMs": 1369,
+      "cuadChars": 3456,
+      "markdownChars": 3335,
+      "hiddenCharsRemoved": 0,
+      "pages": 2,
+      "wordPrecision": 0.9574,
+      "wordRecall": 0.934,
+      "ngramRecall": 0.7548,
+      "clauses": {
+        "exact": 12,
+        "fuzzy": 0,
+        "missing": 0
+      },
+      "chunks": 1,
+      "chunksOnCuadText": 1,
+      "sections": 1,
+      "sectionsOnCuadText": 1,
+      "repeatedLines": {
+        "lines": 0,
+        "chars": 0,
+        "top": []
+      },
+      "start": "EXHIBIT 10.2ENDORSEMENT AGREEMENT ADDENDUM IThis Endorsement Agreement Addendum I (the “Addendum”) is made and effective November 7, 2017,BETWEEN: National Football League Alumni - Northern California Chapter (“NFLA-NC”), a charitable corporation\norganized under the laws of California, having its pr"
+    },
+    {
+      "title": "AgapeAtpCorp_20191202_10-KA_EX-10.1_11911128_EX-10.1_Supply Agreement",
+      "pdfBytes": 178486,
+      "status": "ready",
+      "error": null,
+      "uploadMs": 437,
+      "readyMs": 1511,
+      "cuadChars": 20693,
+      "markdownChars": 20509,
+      "hiddenCharsRemoved": 0,
+      "pages": 13,
+      "wordPrecision": 0.9822,
+      "wordRecall": 0.9651,
+      "ngramRecall": 0.872,
+      "clauses": {
+        "exact": 19,
+        "fuzzy": 9,
+        "missing": 3
+      },
+      "chunks": 15,
+      "chunksOnCuadText": 20,
+      "sections": 30,
+      "sectionsOnCuadText": 42,
+      "repeatedLines": {
+        "lines": 12,
+        "chars": 1296,
+        "top": [
+          {
+            "line": "Organic Preparations INC. & Agape ATP International Holding LimitedSource: AGAPE",
+            "count": 12
+          }
+        ]
+      },
+      "start": "ODM - SUPPLY AGREEMENTBETWEEN:\nORGANIC PREPARATIONS INC.\n2nd Floor, Transpacific Haus\nLini Highway, Port Vila. Vanuatu\n“the Manufacturer”\n-- AND --\nAGAPE ATP INTERNATIONAL HOLDING LIMITED\nUnit 05, 4F, Energy Plaza\nNo. 92, Granville Road\nTsim Sha Tsui East\nKowloon, Hong Kong\n“the Customer”Source: AGA"
+    },
+    {
+      "title": "DigitalCinemaDestinationsCorp_20111220_S-1_EX-10.10_7346719_EX-10.10_Affiliate Agreement",
+      "pdfBytes": 217908,
+      "status": "ready",
+      "error": null,
+      "uploadMs": 1164,
+      "readyMs": 2200,
+      "cuadChars": 109014,
+      "markdownChars": 106424,
+      "hiddenCharsRemoved": 0,
+      "pages": 37,
+      "wordPrecision": 0.9948,
+      "wordRecall": 0.9888,
+      "ngramRecall": 0.9612,
+      "clauses": {
+        "exact": 63,
+        "fuzzy": 0,
+        "missing": 0
+      },
+      "chunks": 46,
+      "chunksOnCuadText": 56,
+      "sections": 6,
+      "sectionsOnCuadText": 62,
+      "repeatedLines": {
+        "lines": 0,
+        "chars": 0,
+        "top": []
+      },
+      "start": "DIGITAL CINEMA DESTINATIONS CORP.NETWORK AFFILIATE AGREEMENTTHIS NETWORK AFFILIATE AGREEMENT (this “Agreement”) is made as of this 14th day of March, 2011 by and between National CineMedia,\nLLC, a Delaware limited liability company (“NCM”), and Digital Cinema Destinations Corp., a Delaware corporati"
+    },
+    {
+      "title": "MusclepharmCorp_20170208_10-KA_EX-10.38_9893581_EX-10.38_Co-Branding Agreement",
+      "pdfBytes": 275429,
+      "status": "ready",
+      "error": null,
+      "uploadMs": 723,
+      "readyMs": 1761,
+      "cuadChars": 87795,
+      "markdownChars": 86647,
+      "hiddenCharsRemoved": 0,
+      "pages": 34,
+      "wordPrecision": 0.999,
+      "wordRecall": 0.998,
+      "ngramRecall": 0.9918,
+      "clauses": {
+        "exact": 67,
+        "fuzzy": 5,
+        "missing": 0
+      },
+      "chunks": 42,
+      "chunksOnCuadText": 42,
+      "sections": 27,
+      "sectionsOnCuadText": 27,
+      "repeatedLines": {
+        "lines": 10,
+        "chars": 289,
+        "top": [
+          {
+            "line": "Santa Monica, CA 90405",
+            "count": 4
+          },
+          {
+            "line": "Dated: July 26, 2013",
+            "count": 3
+          },
+          {
+            "line": "Contract Year Minimum Royalty Timing of Payment",
+            "count": 3
+          }
+        ]
+      },
+      "start": "ENDORSEMENT LICENSING AND CO-BRANDING AGREEMENTThis ENDORSEMENT LICENSING AND CO-BRANDING AGREEMENT is entered into on July 26, 2013 (the \"Effective Date”) by and\nbetween Marine MP, LLC (“Lender”), for services of Arnold Schwarzenegger (“Endorser”), and Fitness Publications, Inc. (“Fitness”) (collec"
+    },
+    {
+      "title": "HOSPITALITYINVESTORSTRUST,INC_04_07_2014-EX-10.26-FRANCHISE AGREEMENT",
+      "pdfBytes": 302234,
+      "status": "ready",
+      "error": null,
+      "uploadMs": 1237,
+      "readyMs": 2283,
+      "cuadChars": 146992,
+      "markdownChars": 143327,
+      "hiddenCharsRemoved": 0,
+      "pages": 48,
+      "wordPrecision": 0.9972,
+      "wordRecall": 0.9945,
+      "ngramRecall": 0.9782,
+      "clauses": {
+        "exact": 43,
+        "fuzzy": 3,
+        "missing": 3
+      },
+      "chunks": 69,
+      "chunksOnCuadText": 73,
+      "sections": 93,
+      "sectionsOnCuadText": 175,
+      "repeatedLines": {
+        "lines": 58,
+        "chars": 522,
+        "top": [
+          {
+            "line": "12 Months",
+            "count": 48
+          },
+          {
+            "line": "Per Brand",
+            "count": 6
+          },
+          {
+            "line": "Standards",
+            "count": 4
+          }
+        ]
+      },
+      "start": "FRANCHISE AGREEMENTHOMEWOOD SUITES BY HILTON STRATFORD(Stratford, Connecticut)\nTABLE OF CONTENTS1.0 DEFINITIONS 1\n2.0 GRANT OF LICENSE 6\n2.1 Non-Exclusive License 6\n2.2 Reserved Rights 7\n3.0 TERM 7\n4.0 OUR RESPONSIBILITIES 7\n4.1 Training 7\n4.2 Reservation Service 7\n4.3 Consultation 7\n4.4 Marketing 7"
+    },
+    {
+      "title": "MANUFACTURERSSERVICESLTD_06_05_2000-EX-10.14-OUTSOURCING AGREEMENT",
+      "pdfBytes": 328203,
+      "status": "ready",
+      "error": null,
+      "uploadMs": 2113,
+      "readyMs": 3145,
+      "cuadChars": 338211,
+      "markdownChars": 272939,
+      "hiddenCharsRemoved": 0,
+      "pages": 75,
+      "wordPrecision": 0.9995,
+      "wordRecall": 1,
+      "ngramRecall": 0.9998,
+      "clauses": {
+        "exact": 65,
+        "fuzzy": 0,
+        "missing": 0
+      },
+      "chunks": 168,
+      "chunksOnCuadText": 197,
+      "sections": 261,
+      "sectionsOnCuadText": 260,
+      "repeatedLines": {
+        "lines": 682,
+        "chars": 22251,
+        "top": [
+          {
+            "line": "[*] [*] 1 verified Wayne Cato, 07/08/99",
+            "count": 58
+          },
+          {
+            "line": "ATTACHMENT 1",
+            "count": 39
+          },
+          {
+            "line": "IBM/MSL Outsourcing Base Agreement Statement of Work",
+            "count": 39
+          },
+          {
+            "line": "sow0501.lwp",
+            "count": 37
+          },
+          {
+            "line": "IBM Confidential",
+            "count": 24
+          }
+        ]
+      },
+      "start": "Exhibit 10.14\nOUTSOURCING AGREEMENT\nBETWEEN\nINTERNATIONAL BUSINESS MACHINES CORPORATION\nAND\nMANUFACTURERS' SERVICES WESTERN U.S. OPERATIONS, INC.\nEFFECTIVE DATE\nJUNE 1, 1998\n----------\n[*] = Information redacted pursuant to a confidential treatment request.\nAn unredacted version of this exhibit has "
+    },
+    {
+      "title": "PACIRA PHARMACEUTICALS, INC. - A_R STRATEGIC LICENSING, DISTRIBUTION AND MARKETING AGREEMENT ",
+      "pdfBytes": 335267,
+      "status": "ready",
+      "error": null,
+      "uploadMs": 2591,
+      "readyMs": 3629,
+      "cuadChars": 145168,
+      "markdownChars": 140716,
+      "hiddenCharsRemoved": 0,
+      "pages": 88,
+      "wordPrecision": 0.9955,
+      "wordRecall": 0.9903,
+      "ngramRecall": 0.9705,
+      "clauses": {
+        "exact": 83,
+        "fuzzy": 0,
+        "missing": 0
+      },
+      "chunks": 62,
+      "chunksOnCuadText": 93,
+      "sections": 13,
+      "sectionsOnCuadText": 205,
+      "repeatedLines": {
+        "lines": 20,
+        "chars": 325,
+        "top": [
+          {
+            "line": "Serial No.:",
+            "count": 4
+          },
+          {
+            "line": "International Class:",
+            "count": 4
+          },
+          {
+            "line": "First Use:",
+            "count": 3
+          },
+          {
+            "line": "First Use in Commerce:",
+            "count": 3
+          },
+          {
+            "line": "Registration Date:",
+            "count": 3
+          }
+        ]
+      },
+      "start": "Exhibit 10.13Confidential Materials omitted and filed separately with the Securities and Exchange Commission. Asterisks denote omissions.DATED: OCTOBER 15, 2009PACIRA PHARMACEUTICALS, INC.andEKR THERAPEUTICS, INC.AMENDED AND RESTATEDSTRATEGIC LICENSING, DISTRIBUTION AND MARKETING AGREEMENT\nTHIS AMEN"
+    },
+    {
+      "title": "BERKELEYLIGHTS,INC_06_26_2020-EX-10.12-COLLABORATION AGREEMENT",
+      "pdfBytes": 443021,
+      "status": "ready",
+      "error": null,
+      "uploadMs": 1344,
+      "readyMs": 2371,
+      "cuadChars": 209067,
+      "markdownChars": 208252,
+      "hiddenCharsRemoved": 0,
+      "pages": 85,
+      "wordPrecision": 0.9984,
+      "wordRecall": 0.9979,
+      "ngramRecall": 0.9901,
+      "clauses": {
+        "exact": 87,
+        "fuzzy": 1,
+        "missing": 1
+      },
+      "chunks": 161,
+      "chunksOnCuadText": 131,
+      "sections": 283,
+      "sectionsOnCuadText": 314,
+      "repeatedLines": {
+        "lines": 18,
+        "chars": 190,
+        "top": [
+          {
+            "line": "Purchase",
+            "count": 4
+          },
+          {
+            "line": "Attn: [***]",
+            "count": 4
+          },
+          {
+            "line": "With a copy to:",
+            "count": 4
+          },
+          {
+            "line": "[***]",
+            "count": 3
+          },
+          {
+            "line": "[***] $ [***]",
+            "count": 3
+          }
+        ]
+      },
+      "start": "Exhibit 10.12\n[***] Certain information in this document has been excluded pursuant to Regulation S-K, Item 601(b)(10). Such excluded information is not material\nand would likely cause competitive harm to the registrant if publicly disclosed.Execution VersionCOLLABORATION AGREEMENTThis COLLABORATION"
+    },
+    {
+      "title": "BONTONSTORESINC_04_20_2018-EX-99.3-AGENCY AGREEMENT",
+      "pdfBytes": 517264,
+      "status": "ready",
+      "error": null,
+      "uploadMs": 2074,
+      "readyMs": 3090,
+      "cuadChars": 161626,
+      "markdownChars": 160676,
+      "hiddenCharsRemoved": 0,
+      "pages": 61,
+      "wordPrecision": 0.9957,
+      "wordRecall": 0.9915,
+      "ngramRecall": 0.9698,
+      "clauses": {
+        "exact": 39,
+        "fuzzy": 4,
+        "missing": 0
+      },
+      "chunks": 107,
+      "chunksOnCuadText": 78,
+      "sections": 321,
+      "sectionsOnCuadText": 91,
+      "repeatedLines": {
+        "lines": 185,
+        "chars": 2400,
+        "top": [
+          {
+            "line": "Case 18-10248-",
+            "count": 54
+          },
+          {
+            "line": "INC.",
+            "count": 8
+          },
+          {
+            "line": "Furniture",
+            "count": 5
+          },
+          {
+            "line": "04/18/18",
+            "count": 4
+          },
+          {
+            "line": "Name:",
+            "count": 4
+          }
+        ]
+      },
+      "start": "EXHIBIT 99.3Case 18-10248-\nMFW Doc 632-1 Filed 04/18/18 Page 2 of 60AGENCY AGREEMENTThis Agency Agreement (“Agreement”) is made as of April 18, 2018, by and between The Bon-Ton Stores, Inc. and its associated chapter 11 debtors in\npossession (collectively, “Merchant”),1 on the one hand, and (a) a co"
+    },
+    {
+      "title": "PhasebioPharmaceuticalsInc_20200330_10-K_EX-10.21_12086810_EX-10.21_Development Agreement",
+      "pdfBytes": 529547,
+      "status": "ready",
+      "error": null,
+      "uploadMs": 1902,
+      "readyMs": 2935,
+      "cuadChars": 291873,
+      "markdownChars": 290626,
+      "hiddenCharsRemoved": 0,
+      "pages": 96,
+      "wordPrecision": 0.998,
+      "wordRecall": 0.997,
+      "ngramRecall": 0.9869,
+      "clauses": {
+        "exact": 81,
+        "fuzzy": 7,
+        "missing": 0
+      },
+      "chunks": 204,
+      "chunksOnCuadText": 174,
+      "sections": 531,
+      "sectionsOnCuadText": 572,
+      "repeatedLines": {
+        "lines": 14,
+        "chars": 502,
+        "top": [
+          {
+            "line": "Anniversary",
+            "count": 8
+          },
+          {
+            "line": "Agreement.",
+            "count": 3
+          },
+          {
+            "line": "Section 6.7), provided that such Approval Payments (or Buy-Out Payment, as appli",
+            "count": 3
+          }
+        ]
+      },
+      "start": "Exhibit 10.21Certain information has been excluded from this agreement (indicated by “[***]”) because such information (i) is not material and (ii)\nwould be competitively harmful if publicly disclosed.EXECUTION\nVERSIONCO-DEVELOPMENT AGREEMENTThis Co-Development Agreement (“Agreement”), made effectiv"
+    },
+    {
+      "title": "VerizonAbsLlc_20200123_8-K_EX-10.4_11952335_EX-10.4_Service Agreement",
+      "pdfBytes": 530998,
+      "status": "ready",
+      "error": null,
+      "uploadMs": 1807,
+      "readyMs": 2841,
+      "cuadChars": 289615,
+      "markdownChars": 287836,
+      "hiddenCharsRemoved": 0,
+      "pages": 106,
+      "wordPrecision": 0.9974,
+      "wordRecall": 0.9941,
+      "ngramRecall": 0.98,
+      "clauses": {
+        "exact": 25,
+        "fuzzy": 0,
+        "missing": 1
+      },
+      "chunks": 154,
+      "chunksOnCuadText": 152,
+      "sections": 179,
+      "sectionsOnCuadText": 119,
+      "repeatedLines": {
+        "lines": 65,
+        "chars": 1226,
+        "top": [
+          {
+            "line": "Agreement.",
+            "count": 10
+          },
+          {
+            "line": "By:Name:",
+            "count": 8
+          },
+          {
+            "line": "One Verizon Way",
+            "count": 7
+          },
+          {
+            "line": "Basking Ridge, New Jersey 07920",
+            "count": 7
+          },
+          {
+            "line": "Title:",
+            "count": 5
+          }
+        ]
+      },
+      "start": "Exhibit 10.4FORM OF TRANSFER AND SERVICING AGREEMENT\namong\nVERIZON OWNER TRUST 2020-A,\nas Issuer,\nVERIZON ABS LLC,\nas Depositor\nand\nCELLCO PARTNERSHIP d/b/a VERIZON WIRELESS,\nas Servicer, Marketing Agent and Custodian\nDated as of January 29, 2020Source: VERIZON ABS LLC, 8-K, 1/23/2020\nTABLE OF CONTE"
+    },
+    {
+      "title": "GOOSEHEADINSURANCE,INC_04_02_2018-EX-10.6-Franchise Agreement",
+      "pdfBytes": 654719,
+      "status": "ready",
+      "error": null,
+      "uploadMs": 1957,
+      "readyMs": 2981,
+      "cuadChars": 300768,
+      "markdownChars": 299687,
+      "hiddenCharsRemoved": 0,
+      "pages": 115,
+      "wordPrecision": 0.9975,
+      "wordRecall": 0.9959,
+      "ngramRecall": 0.9802,
+      "clauses": {
+        "exact": 87,
+        "fuzzy": 9,
+        "missing": 1
+      },
+      "chunks": 191,
+      "chunksOnCuadText": 195,
+      "sections": 512,
+      "sectionsOnCuadText": 528,
+      "repeatedLines": {
+        "lines": 204,
+        "chars": 8771,
+        "top": [
+          {
+            "line": "FRANCHISE AGREEMENT",
+            "count": 18
+          },
+          {
+            "line": "GOOSEHEAD INSURANCE AGENCY, LLC",
+            "count": 17
+          },
+          {
+            "line": "By: By:",
+            "count": 10
+          },
+          {
+            "line": "FRANCHISEE",
+            "count": 10
+          },
+          {
+            "line": "ADDENDUM TO GOOSEHEAD INSURANCE AGENCY, LLC",
+            "count": 10
+          }
+        ]
+      },
+      "start": "Exhibit 10.6Goosehead Insurance Agency, LLC\nFranchise AgreementExhibit A\nDeclarations Page\n1 1.2 The “Approved Location” under this Agreement will be:\n.\n2 4.1 You elect to pay the Initial Franchise Fee in one of the following ways:\n(check only one):☐ In its entirety at the time you enter into this A"
+    },
+    {
+      "title": "AzulSa_20170303_F-1A_EX-10.3_9943903_EX-10.3_Maintenance Agreement1",
+      "pdfBytes": 824876,
+      "status": "ready",
+      "error": null,
+      "uploadMs": 2637,
+      "readyMs": 3674,
+      "cuadChars": 233248,
+      "markdownChars": 223739,
+      "hiddenCharsRemoved": 0,
+      "pages": 111,
+      "wordPrecision": 0.9815,
+      "wordRecall": 0.9685,
+      "ngramRecall": 0.8898,
+      "clauses": {
+        "exact": 31,
+        "fuzzy": 8,
+        "missing": 2
+      },
+      "chunks": 105,
+      "chunksOnCuadText": 142,
+      "sections": 43,
+      "sectionsOnCuadText": 198,
+      "repeatedLines": {
+        "lines": 271,
+        "chars": 10490,
+        "top": [
+          {
+            "line": "[*****]",
+            "count": 18
+          },
+          {
+            "line": "CLAUSE 14 OF THE AGREEMENT.[*****] Confidential material redacted and filed sepa",
+            "count": 7
+          },
+          {
+            "line": "[*****] REMOTE CONTROL AUDIO UNIT [*****]",
+            "count": 7
+          },
+          {
+            "line": "ZA du Pont Yblon",
+            "count": 6
+          },
+          {
+            "line": "ALL ITEMS, PARTS, COMPONENTS, SERVICES, WARRANTIES AND GUARANTEES PROVIDED HEREU",
+            "count": 6
+          }
+        ]
+      },
+      "start": "Execution versionExhibit 10.3\nCONFIDENTIAL TREATMENT REQUESTED – REDACTED COPY\nConfidential Treatment has been requested for portions of this Exhibit. Confidential\nportions of this Exhibit are designated by [*****]. A complete version of this Exhibit has\nbeen filed separately with the Securities and"
+    },
+    {
+      "title": "CERES,INC_01_25_2012-EX-10.20-Collaboration Agreement",
+      "pdfBytes": 1557129,
+      "status": "ready",
+      "error": null,
+      "uploadMs": 23486,
+      "readyMs": 24515,
+      "cuadChars": 335282,
+      "markdownChars": 285246,
+      "hiddenCharsRemoved": 0,
+      "pages": 154,
+      "wordPrecision": 0.9854,
+      "wordRecall": 0.9715,
+      "ngramRecall": 0.8841,
+      "clauses": {
+        "exact": 60,
+        "fuzzy": 3,
+        "missing": 3
+      },
+      "chunks": 163,
+      "chunksOnCuadText": 264,
+      "sections": 243,
+      "sectionsOnCuadText": 726,
+      "repeatedLines": {
+        "lines": 158,
+        "chars": 5399,
+        "top": [
+          {
+            "line": "[***]",
+            "count": 20
+          },
+          {
+            "line": "[***][***] [***] no MTA [***] [***] No longer retained.",
+            "count": 12
+          },
+          {
+            "line": "Confidential Treatment Requested and the Redacted Material has been separately f",
+            "count": 6
+          },
+          {
+            "line": "NOW THEREFORE, in consideration of the premises and of the mutual covenants and ",
+            "count": 5
+          },
+          {
+            "line": "valuable consideration, the Parties have agreed and do hereby agree as follows:",
+            "count": 5
+          }
+        ]
+      },
+      "start": "Exhibit 10.20Pages where confidential treatment has been requested are stamped ‘Confidential Treatment Requested and the Redacted Material has been\nseparately filed with the Commission,’ and the confidential section has been marked as follows: [***].Collaboration AgreementbetweenInstitute of Grassla"
+    }
+  ],
+  "missingExamples": [
+    {
+      "contract": "ON4COMMUNICATIONSINC_07_02_2009-EX-10.1-PROMOTION AGREEMENT",
+      "clauseType": "Document Name",
+      "text": "PROMOTION AGREEMENT"
+    },
+    {
+      "contract": "SoupmanInc_20150814_8-K_EX-10.1_9230148_EX-10.1_Franchise Agreement4",
+      "clauseType": "Document Name",
+      "text": "ADDENDUM REQUIRED BY THE DEPARTMENT OF LAW OF THE STATE OF NEW YORK"
+    },
+    {
+      "contract": "ALLISONTRANSMISSIONHOLDINGSINC_12_15_2014-EX-99.1-COOPERATION AGREEMENT",
+      "clauseType": "Parties",
+      "text": "Schedule A\n\nMembers of ValueAct Group\n\nVA Partners I, LLC\n\nValueAct Capital Master Fund, L.P.\n\nValueAct Capital Management, L.P.\n\nValueAct Capital Management, LLC\n\nValueAct Holdings, L.P.\n\nValueAct Ho"
+    },
+    {
+      "contract": "ALLISONTRANSMISSIONHOLDINGSINC_12_15_2014-EX-99.1-COOPERATION AGREEMENT",
+      "clauseType": "Effective Date",
+      "text": "."
+    },
+    {
+      "contract": "WASTE2ENERGYHOLDINGS,INC_06_03_2010-EX-10.2-STRATEGIC ALLIANCE AGREEMENT",
+      "clauseType": "Document Name",
+      "text": "STRATEGIC ALLIANCE AGREEMENT"
+    },
+    {
+      "contract": "WASTE2ENERGYHOLDINGS,INC_06_03_2010-EX-10.2-STRATEGIC ALLIANCE AGREEMENT",
+      "clauseType": "Effective Date",
+      "text": "19  DAY OF MAY , 2010"
+    },
+    {
+      "contract": "ArcGroupInc_20171211_8-K_EX-10.1_10976103_EX-10.1_Sponsorship Agreement",
+      "clauseType": "Document Name",
+      "text": "JACKSONVILLE JAGUARS SPONSORSHIP AGREEMENT"
+    },
+    {
+      "contract": "AgapeAtpCorp_20191202_10-KA_EX-10.1_11911128_EX-10.1_Supply Agreement",
+      "clauseType": "Expiration Date",
+      "text": "This agreement is for a term of ten (10) years."
+    },
+    {
+      "contract": "AgapeAtpCorp_20191202_10-KA_EX-10.1_11911128_EX-10.1_Supply Agreement",
+      "clauseType": "Governing Law",
+      "text": "This agreement shall be governed by the Laws of England (English common and statutory Law)."
+    },
+    {
+      "contract": "HOSPITALITYINVESTORSTRUST,INC_04_07_2014-EX-10.26-FRANCHISE AGREEMENT",
+      "clauseType": "Change Of Control",
+      "text": "13.2.3.6 you, the Transferee and/or transferee Equity Owner(s) submit to us all information related to the Transfer that we require, including applications; and   13.2.3.7 the Transferee meets our the"
+    },
+    {
+      "contract": "BERKELEYLIGHTS,INC_06_26_2020-EX-10.12-COLLABORATION AGREEMENT",
+      "clauseType": "Minimum Commitment",
+      "text": "Minimum Cumulative Purchase Commitment Contract Year 1 $ [***] $ [***] $ [***] $ [***] Contract Year 2 $ [***] $ [***] $ [***] $ [***] Contract Year 3 $ [***] $ [***] $ [***] $ [***] Contract Year 4 $"
+    },
+    {
+      "contract": "VerizonAbsLlc_20200123_8-K_EX-10.4_11952335_EX-10.4_Service Agreement",
+      "clauseType": "Document Name",
+      "text": "TRANSFER AND SERVICING AGREEMENT, d"
+    },
+    {
+      "contract": "AzulSa_20170303_F-1A_EX-10.3_9943903_EX-10.3_Maintenance Agreement1",
+      "clauseType": "Agreement Date",
+      "text": "March 9th 2015"
+    },
+    {
+      "contract": "AzulSa_20170303_F-1A_EX-10.3_9943903_EX-10.3_Maintenance Agreement1",
+      "clauseType": "Audit Rights",
+      "text": "Company's audit: at any time during the Term, the Repairer may:     (i) audit the management and the performance of the Company's maintenance activities which are still under Company'sresponsibility; "
+    },
+    {
+      "contract": "CERES,INC_01_25_2012-EX-10.20-Collaboration Agreement",
+      "clauseType": "Rofr/Rofo/Rofn",
+      "text": "CERES is hereby granted a first option, to be exercised by written notice within thirty (30) days from         CERES-IGER Collaboration Agreement"
+    }
+  ],
+  "brokenExamples": [
+    {
+      "contract": "ON4COMMUNICATIONSINC_07_02_2009-EX-10.1-PROMOTION AGREEMENT",
+      "clauseType": "Volume Restriction",
+      "aroundCut": "The total\nnumber of Pin Codes to be distributed as prizes in the Promotion shall not exceed: ⟦|⟧(i) 277,760 Pin Codes containing three (3)\nmusic downloads per Pin Code ; (ii) 130,300 Pin Codes containing five (5) mus"
+    },
+    {
+      "contract": "AgapeAtpCorp_20191202_10-KA_EX-10.1_11911128_EX-10.1_Supply Agreement",
+      "clauseType": "Minimum Commitment",
+      "aroundCut": "Product Performance Requirements are listed below:\nProduct Name: Agreed Quantity of Units to be purchased per Annum:ATP ⟦|⟧1 S Survivor Select\n150gm packaged 15,000\nATP 2 Energized Mineral Concentrate\n29.5mL packaged 20,000\nATP 3 Ionized Cal-M"
+    },
+    {
+      "contract": "DigitalCinemaDestinationsCorp_20111220_S-1_EX-10.10_7346719_EX-10.10_Affiliate Agreement",
+      "clauseType": "Exclusivity",
+      "aroundCut": "ed Slots); those provisions of Part A of Exhibit A that permit Network Affiliate to engage in certain Lobby Promotions;\n⟦|⟧Section 3.11 (Grand Openings, Employee Uniforms), collectively, the “Exclusivity Exceptions”, Network Affiliate shall su"
+    },
+    {
+      "contract": "DigitalCinemaDestinationsCorp_20111220_S-1_EX-10.10_7346719_EX-10.10_Affiliate Agreement",
+      "clauseType": "Volume Restriction",
+      "aroundCut": "Notwithstanding anything herein to the contrary, Network Affiliate shall not be\nprohibited from: ⟦|⟧(i) promoting the grand opening of a Theatre or an Excluded Theatre, provided such promotional activity (x) may occur on"
+    },
+    {
+      "contract": "DigitalCinemaDestinationsCorp_20111220_S-1_EX-10.10_7346719_EX-10.10_Affiliate Agreement",
+      "clauseType": "Covenant Not To Sue",
+      "aroundCut": "Neither party will at any time, except to the extent necessary to assert or defend its rights under this Agreement: ⟦|⟧(i) challenge\nor otherwise do anything inconsistent with the other party’s right, title or interest in its property, (ii"
+    },
+    {
+      "contract": "HOSPITALITYINVESTORSTRUST,INC_04_07_2014-EX-10.26-FRANCHISE AGREEMENT",
+      "clauseType": "Change Of Control",
+      "aroundCut": " any such\nPermitted Transfer does not result in a change of Control of the Franchisee, the Hotel or the Hotel Site and: ⟦|⟧(a) the proposed transferee is not a\nSanctioned Person or a Competitor; (b) you give us at least sixty (60) days' advanc"
+    },
+    {
+      "contract": "PACIRA PHARMACEUTICALS, INC. - A_R STRATEGIC LICENSING, DISTRIBUTION AND MARKETING AGREEMENT ",
+      "clauseType": "Non-Compete",
+      "aroundCut": "During the Term, PPI and its Affiliates shall not: ⟦|⟧(i) file for Marketing Authorization with respect to any Competing Product in\nany country in the Territory, (ii) manufac"
+    },
+    {
+      "contract": "PACIRA PHARMACEUTICALS, INC. - A_R STRATEGIC LICENSING, DISTRIBUTION AND MARKETING AGREEMENT ",
+      "clauseType": "Change Of Control",
+      "aroundCut": "nt may not be assigned without the\nexpress consent of the other Party which consent shall not be unreasonably withheld. ⟦|⟧“Change of Control” shall mean (a) the sale, lease,\nexchange, license or disposition of all or substantially all of the "
+    },
+    {
+      "contract": "PACIRA PHARMACEUTICALS, INC. - A_R STRATEGIC LICENSING, DISTRIBUTION AND MARKETING AGREEMENT ",
+      "clauseType": "Revenue/Profit Sharing",
+      "aroundCut": "KR over the Current Base Price of $[**] for the [**] mg Vial and $[**] for the [**] mg Vial (the “Additional Royalty”);\n⟦|⟧provided, however, that Additional Royalty shall not be payable to the extent that the sum of (i) the Minimum Royalty an"
+    },
+    {
+      "contract": "PACIRA PHARMACEUTICALS, INC. - A_R STRATEGIC LICENSING, DISTRIBUTION AND MARKETING AGREEMENT ",
+      "clauseType": "Post-Termination Services",
+      "aroundCut": "b) the following provisions of this Agreement shall continue in full force and effect: ⟦|⟧Article 1 (“Definitions”), Section 3.20(k),\nSection 3.20(l), Article 9 (“Representations and Warranties”), Article 10 (“"
+    },
+    {
+      "contract": "PACIRA PHARMACEUTICALS, INC. - A_R STRATEGIC LICENSING, DISTRIBUTION AND MARKETING AGREEMENT ",
+      "clauseType": "Uncapped Liability",
+      "aroundCut": "d by the negligence of PPI or its employees while acting in the course of their employment) to [**] US Dollars ($[**]);\n⟦|⟧provided"
+    },
+    {
+      "contract": "PACIRA PHARMACEUTICALS, INC. - A_R STRATEGIC LICENSING, DISTRIBUTION AND MARKETING AGREEMENT ",
+      "clauseType": "Cap On Liability",
+      "aroundCut": "d by the negligence of PPI or its employees while acting in the course of their employment) to [**] US Dollars ($[**]);\n⟦|⟧provided"
+    },
+    {
+      "contract": "PhasebioPharmaceuticalsInc_20200330_10-K_EX-10.21_12086810_EX-10.21_Development Agreement",
+      "clauseType": "Competitive Restriction Exception",
+      "aroundCut": "the development or commercialization of pharmaceutical or\nbiotechnology products prior to the date of Program Transfer. ⟦|⟧For the avoidance of doubt the preceding sentence shall not apply\nafter the date of Program Transfer"
+    },
+    {
+      "contract": "GOOSEHEADINSURANCE,INC_04_02_2018-EX-10.6-Franchise Agreement",
+      "clauseType": "Change Of Control",
+      "aroundCut": " agree not to make a transfer (and not to permit any other party to make a transfer) without our\nprior written consent.\n⟦|⟧16.4.1.1 As used in this Agreement, the term “transfer” is agreed to mean any sale, assignment,\nconveyance, pledge, encu"
+    },
+    {
+      "contract": "AzulSa_20170303_F-1A_EX-10.3_9943903_EX-10.3_Maintenance Agreement1",
+      "clauseType": "Change Of Control",
+      "aroundCut": " the Repairer will remain\nresponsible for the provision of the Services in accordance with the terms of this Agreement.\n⟦|⟧provided such assignment or transfer, change in shareholding or control has no material adverse effect on any of the Com"
+    }
+  ]
+}

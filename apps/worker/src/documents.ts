@@ -14,6 +14,8 @@ export interface DocumentSummary {
   status: DocumentStatus;
   chars: number | null;
   hiddenCharsRemoved: number | null;
+  /** Number of PDF pages, when the page map is known. */
+  pages: number | null;
   error: string | null;
   createdAt: string;
   updatedAt: string | null;
@@ -21,7 +23,7 @@ export interface DocumentSummary {
 
 const SUMMARY_COLUMNS = `id, filename, mime_type AS mimeType, size_bytes AS sizeBytes, sha256, status,
   chars, hidden_chars_removed AS hiddenCharsRemoved, error, created_at AS createdAt,
-  updated_at AS updatedAt`;
+  updated_at AS updatedAt, json_array_length(page_starts) AS pages`;
 
 export interface NewDocument {
   id: string;
@@ -112,6 +114,8 @@ export async function claimForRetry(
 export interface ConvertedText {
   markdown: string;
   hiddenCharsRemoved: number;
+  /** Offset of each PDF page in `markdown` (src/pages.ts), or null when unknown. */
+  pageStarts: number[] | null;
 }
 
 /**
@@ -129,10 +133,20 @@ export async function markConverted(
   await db
     .prepare(
       `UPDATE documents SET status = 'chunking', markdown = ?, chars = ?, hidden_chars_removed = ?,
+         page_starts = ?,
          error = NULL, chunk_job = ?, updated_at = ?
        WHERE tenant_id = ? AND id = ?`,
     )
-    .bind(text.markdown, text.markdown.length, text.hiddenCharsRemoved, chunkJob, now, tenantId, id)
+    .bind(
+      text.markdown,
+      text.markdown.length,
+      text.hiddenCharsRemoved,
+      text.pageStarts === null ? null : JSON.stringify(text.pageStarts),
+      chunkJob,
+      now,
+      tenantId,
+      id,
+    )
     .run();
 }
 

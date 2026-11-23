@@ -110,6 +110,19 @@ describe("chunkDocument", () => {
     expectValid(text, chunks, 400);
   });
 
+  it("prefers a sentence end over a line break inside a sentence (wrapped PDF lines)", () => {
+    // toMarkdown output: every wrapped line ends in "\n", no blank lines. Each "sentence"
+    // spans three wrapped lines; cuts must fall after a full stop, never mid-sentence.
+    const sentence =
+      "The Supplier shall deliver the goods\nto the Buyer at the agreed place\nand on the agreed date. ";
+    const text = sentence.repeat(30);
+    const { chunks } = chunkDocument(text, { targetChars: 300, maxChars: 600 });
+
+    expect(chunks.length).toBeGreaterThan(1);
+    for (const chunk of chunks.slice(1)) expect(chunk.text).toMatch(/^The Supplier/);
+    expectValid(text, chunks, 600);
+  });
+
   it("falls back to sentences, then whitespace, then a hard cut", () => {
     const sentences = "This is one sentence of the clause. ".repeat(40);
     const words = "word ".repeat(300);

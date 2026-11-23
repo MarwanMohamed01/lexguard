@@ -104,6 +104,8 @@ describe("POST /v1/documents", () => {
     expect(document).not.toHaveProperty("markdown"); // the full text is never returned
     // The converter is told the format we detected, not the name the client sent.
     expect(convert.mock.calls[0]?.[0].name).toBe("document.pdf");
+    // The real toMarkdown rejects a Blob without a type (every upload failed until step 6).
+    expect(convert.mock.calls[0]?.[0].blob.type).toBe("application/pdf");
     expect(await storedMarkdown("acme", document.id)).toBe(
       "# Agreement\n\n1. Definitions\n\nText.",
     );
@@ -152,6 +154,7 @@ describe("POST /v1/documents", () => {
     expect(response.status).toBe(201);
     expect((await body(response)).document.mimeType).toMatch(/wordprocessingml/);
     expect(convert.mock.calls[0]?.[0].name).toBe("document.docx");
+    expect(convert.mock.calls[0]?.[0].blob.type).toMatch(/wordprocessingml/);
   });
 
   it("removes hidden characters before storing, and counts them", async () => {
@@ -163,6 +166,27 @@ describe("POST /v1/documents", () => {
     expect(document.hiddenCharsRemoved).toBe(3);
     expect(await storedMarkdown("acme", document.id)).toBe("Pay 10 days.");
     expect(document.chars).toBe("Pay 10 days.".length);
+  });
+
+  it("turns toMarkdown's page markers into a page map, keeping clauses whole", async () => {
+    const converted =
+      "# document.pdf\n## Contents\n### Page 1\n1. Term\nThe Licensee shall have the right to\n\n\n\n" +
+      "### Page 2\nrenew this Agreement.\n\n\n\n";
+    const response = await upload(makePdf(), fakeConverter(converted));
+    const { document } = await body(response);
+
+    expect(document.pages).toBe(2);
+    expect(await storedMarkdown("acme", document.id)).toBe(
+      "1. Term\nThe Licensee shall have the right to\nrenew this Agreement.",
+    );
+  });
+
+  it("fails a PDF whose conversion has pages but no text (a scan)", async () => {
+    const scan = "# document.pdf\n## Contents\n### Page 1\n\n\n\n\n### Page 2\n\n\n\n\n";
+    const response = await upload(makePdf(), fakeConverter(scan));
+
+    expect(response.status).toBe(422);
+    expect((await body(response)).error).toBe("no_text");
   });
 
   it("returns the existing document for the same file, without converting again", async () => {

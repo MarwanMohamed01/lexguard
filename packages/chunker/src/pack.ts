@@ -97,6 +97,9 @@ function splitSection(
 
 // Boundary kinds, best first. Each pattern's match END is where the next piece starts.
 const PARAGRAPH = /\r?\n[ \t]*\r?\n\s*/g;
+// A line break right after a sentence or clause end: a real boundary even in text where
+// every wrapped PDF line ends in a line break (toMarkdown output has no blank lines at all).
+const LINE_AFTER_SENTENCE = /[.;:!?]["”')]?[ \t]*\r?\n\s*/g;
 const LINE = /\n/g;
 const SENTENCE = /[.;:!?]["”')]?\s+/g;
 const WHITESPACE = /\s+/g;
@@ -104,8 +107,10 @@ const WHITESPACE = /\s+/g;
 /**
  * Where to end a piece that starts at `from`: somewhere in the window
  * (from + targetChars/2, from + maxChars]. Prefers, in order: a list item or definition,
- * a paragraph break, a line break, a sentence end, any whitespace; within the best kind
- * found, the boundary closest to from + targetChars. Hard cut only as a last resort.
+ * a paragraph break, a line break after a sentence end, a sentence end, any line break, any
+ * whitespace; within the best kind found, the boundary closest to from + targetChars. Hard
+ * cut only as a last resort. A sentence end ranks above a bare line break because in
+ * converted PDFs most line breaks are just wrapped lines, mid-sentence (M2 step 6, D21).
  * Only called when more than maxChars remain, so the window never reaches the section end.
  */
 function chooseCut(
@@ -124,8 +129,9 @@ function chooseCut(
   const kinds: (() => number[])[] = [
     () => softBoundaries.filter((p) => p > low && p <= high),
     () => ends(PARAGRAPH),
-    () => ends(LINE),
+    () => ends(LINE_AFTER_SENTENCE),
     () => ends(SENTENCE),
+    () => ends(LINE),
     () => ends(WHITESPACE),
   ];
   for (const kind of kinds) {
