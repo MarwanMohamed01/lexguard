@@ -361,3 +361,22 @@ They change, so re-check before relying on them.
 - **Local-only eval:** CI has neither the PDFs nor a Cloudflare login. The run is recorded
   (`evals/results/cuad-conversion.json`), the gates (clause recall ≥ 0.975, integrity
   ≥ 0.98, stored chunks = chunker output) run whenever the converted files exist.
+
+## D22. M2 security pass before the first deploy (M2 step 7, 2026-11-24)
+
+- **Per-tenant daily upload quota instead of the Rate Limiting binding.** The binding's docs,
+  the Workers pricing page and the changelog do not say whether it is on the Free plan, so it
+  was not relied on (rule: verify free limits in the docs first). The real risk on Free is
+  the shared daily budgets (D1 writes, Workflow runs) that stop everything when spent, so the
+  quota counts each tenant's new documents since 00:00 UTC (when Cloudflare resets them):
+  50 per day (about a third of D1's 100,000 daily writes at ~700 rows per long contract),
+  then 429 with `Retry-After`. Counted through the primary key prefix, no new index.
+- **Hidden text (T2) measured, not assumed:** a synthetic PDF through the real Worker shows
+  white-on-white, 0.5 pt and render-mode-3 (invisible) text all reach the stored text; only
+  off-page text is dropped. Text extraction does not see appearance, so ingestion cannot
+  filter it; the defence is M7's dual-model design (the reader of document text has no tools)
+  and this fixture joins the red-team suite.
+- **Responses:** every `/v1/` response is `Cache-Control: no-store` and `nosniff`.
+- **Logs:** three log lines, all upstream error messages, now capped at 200 characters and
+  never a raw object. Workers Logs enabled (free: 200,000 events a day, 3 days).
+- Threat model statuses updated: T17 done, T11 done for D1, T2 / T13 / T15 partly done.

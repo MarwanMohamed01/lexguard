@@ -93,5 +93,5 @@ node apps/worker/scripts/new-tenant-key.mjs <tenant>  # new API key (run it your
 - Chunking on CUAD (510 contracts, 13,823 clauses): 99.41% of clauses kept whole vs 96.95%
   for LangChain-style recursive splitting at the same chunk count; 0 offset errors.
 - Real toMarkdown output (30 PDFs): 97.96% of clauses found, 98.63% kept whole.
-- Tests: 339 (worker 94, trace 24, guardrails 72, router 13, a2a 34, chunker 59, evals 43, of
+- Tests: 344 (worker 99, trace 24, guardrails 72, router 13, a2a 34, chunker 59, evals 43, of
   which 6 need the locally converted PDFs and skip in CI).

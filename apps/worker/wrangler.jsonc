@@ -5,6 +5,9 @@
   "main": "src/index.ts",
   // Pins runtime behaviour to this date so Cloudflare updates never change our Worker silently.
   "compatibility_date": "2026-11-01",
+  // Workers Logs (free: 200,000 events a day, kept 3 days): errors and CPU time per request.
+  // Logs carry error codes and upstream messages only, never document text or keys (T13).
+  "observability": { "enabled": true, "head_sampling_rate": 1 },
   // System of record: documents, chunks, definitions (schema in migrations/). The ID is not a
   // secret: only code deployed to this account can use the binding.
   "d1_databases": [

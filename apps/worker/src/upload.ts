@@ -53,6 +53,8 @@ export interface UploadDeps {
   convert: Converter;
   startChunking: StartChunking;
   now?: () => Date;
+  /** Overrides DAILY_UPLOADS_PER_TENANT (app.ts), for tests. */
+  uploadsPerDay?: number;
 }
 
 type UploadError =
@@ -147,7 +149,7 @@ export async function handleUpload(
     try {
       await deps.startChunking({ tenantId, documentId: id, jobId });
     } catch (cause) {
-      console.error("chunking job not started", cause instanceof Error ? cause.message : cause);
+      logError("chunking job not started", cause);
       error = "chunking_not_started";
     }
   }
@@ -158,6 +160,21 @@ export async function handleUpload(
   return error === null
     ? Response.json({ document }, { status: 201 })
     : fail(error === "chunking_not_started" ? 503 : 422, error, document);
+}
+
+/**
+ * Logs an upstream failure for Workers Logs (threat T13). Only the message of an Error or a
+ * string, cut at 200 characters: never document text, keys or a raw object that might echo
+ * its input.
+ */
+function logError(event: string, detail: unknown): void {
+  const message =
+    detail instanceof Error
+      ? detail.message
+      : typeof detail === "string"
+        ? detail
+        : "(non-error value)";
+  console.error(event, message.slice(0, 200));
 }
 
 /** The request body, or null as soon as it grows past `max` bytes. */
@@ -198,11 +215,11 @@ async function convertAndSanitize(
     const blob = new Blob([bytes], { type: MIME_TYPES[kind] });
     result = await convert({ name: `document.${kind}`, blob });
   } catch (error) {
-    console.error("toMarkdown threw", error instanceof Error ? error.message : error);
+    logError("toMarkdown threw", error);
     return { error: "conversion_failed" };
   }
   if (result.format === "error") {
-    console.error("toMarkdown error", result.error);
+    logError("toMarkdown error", result.error);
     return { error: "conversion_failed" };
   }
 

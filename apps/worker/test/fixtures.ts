@@ -3,4 +3,5 @@
 export const TEST_KEYS = {
   acme: `lg_${"A".repeat(43)}`,
   globex: `lg_${"B".repeat(43)}`,
+  quota: `lg_${"Q".repeat(43)}`,
 } as const;

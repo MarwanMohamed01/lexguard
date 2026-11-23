@@ -174,3 +174,19 @@ export async function markFailed(
     .run();
   return result.meta.changes === 1;
 }
+
+/**
+ * Documents this tenant created since `since` (ISO time). Reads the tenant's rows through
+ * the primary key prefix (no extra index, which would cost a write per row, D17).
+ */
+export async function countCreatedSince(
+  db: D1Database,
+  tenantId: string,
+  since: string,
+): Promise<number> {
+  const row = await db
+    .prepare("SELECT COUNT(*) AS n FROM documents WHERE tenant_id = ? AND created_at >= ?")
+    .bind(tenantId, since)
+    .first<{ n: number }>();
+  return row?.n ?? 0;
+}
