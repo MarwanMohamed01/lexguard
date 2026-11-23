@@ -36,7 +36,10 @@ function parseTenantKeys(raw: string | undefined): ReadonlyMap<string, string> |
   if (cache?.raw !== raw) {
     let parsed: unknown;
     try {
-      parsed = JSON.parse(raw);
+      // trim(): a value set by pasting or piping may carry a line break or a byte-order mark,
+      // which JSON.parse rejects (found at the first deploy). Same rule as
+      // scripts/check-tenant-keys.mjs, so a value it accepts always works here.
+      parsed = JSON.parse(raw.trim());
     } catch {
       parsed = undefined;
     }

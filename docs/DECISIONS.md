@@ -380,3 +380,27 @@ They change, so re-check before relying on them.
 - **Logs:** three log lines, all upstream error messages, now capped at 200 characters and
   never a raw object. Workers Logs enabled (free: 200,000 events a day, 3 days).
 - Threat model statuses updated: T17 done, T11 done for D1, T2 / T13 / T15 partly done.
+
+## D23. First production deploy and what it measured (M2 step 7, 2026-11-24)
+
+- **Deployed** to https://lexguard.marwan-dev.workers.dev with the D1 binding, the
+  `lexguard-chunk-document` Workflow, Workers AI and Workers Logs. `scripts/smoke.mjs` (run by
+  Marwan with his key in an environment variable) passed all 9 checks: health, 401 without a
+  key, no-store headers, key -> tenant, three CUAD PDFs (1, 4 and 154 pages) to `ready`
+  (5.4 s, 7.3 s, 21.1 s), same file again -> same document, unknown document -> 404.
+- **Setting the secret went wrong twice, and the fail-closed design held:** an unreadable
+  `TENANT_KEYS` made every `/v1/` request a 500, never an open door. Fixes: the Worker trims
+  the secret (a byte-order mark or line break from pasting); `scripts/check-tenant-keys.mjs`
+  validates a value without printing it; `new-tenant-key.mjs --set` pipes the hash straight
+  into `wrangler secret put`, so nothing is pasted; the smoke script trims the key (it was
+  copied with the indentation of the printed output) and explains a malformed one without
+  showing it.
+- **CPU measured by Cloudflare (`wrangler tail`):** requests 0-1 ms; uploads 4 ms (1 page),
+  5 ms (4 pages), **28 ms (154 pages, 1.56 MB)**; chunking Workflow per instance 10, 14 and
+  **29 ms** (tail reports one event per instance, not per step). All `ok`, but the large
+  upload exceeds the Free plan's nominal 10 ms and succeeded only through the undocumented
+  leniency D16 said not to rely on. Hashing is ~3 ms of it; the rest is most likely
+  sanitizing and page-extracting 285k characters inside the request. **Open:** move
+  sanitize + page extraction into a first Workflow step (one 10 ms budget per step) and
+  re-measure; until then, documents near 300 pages may be refused with error 1102 if
+  Cloudflare enforces the limit strictly.

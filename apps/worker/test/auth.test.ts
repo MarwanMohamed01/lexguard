@@ -67,6 +67,14 @@ describe("authenticate (configuration)", () => {
     });
   });
 
+  it("accepts a secret with a byte-order mark or a trailing line break", async () => {
+    const value = JSON.stringify({ [await sha256Hex(TEST_KEYS.acme)]: "acme" });
+
+    for (const variant of [`\uFEFF${value}`, `${value}\r\n`]) {
+      expect(await authenticate(request, variant)).toEqual({ ok: true, tenantId: "acme" });
+    }
+  });
+
   it("hashes like Node's crypto (same as scripts/new-tenant-key.mjs)", async () => {
     // SHA-256("abc") from FIPS 180-2, appendix B.1.
     expect(await sha256Hex("abc")).toBe(
