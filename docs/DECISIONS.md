@@ -404,3 +404,21 @@ They change, so re-check before relying on them.
   sanitize + page extraction into a first Workflow step (one 10 ms budget per step) and
   re-measure; until then, documents near 300 pages may be refused with error 1102 if
   Cloudflare enforces the limit strictly.
+
+## D24. Where the upload's CPU goes, and the fix (M2 step 7, 2026-11-24)
+
+- **Measured, not guessed** (`experiments/upload-probe/README.md`): a throwaway Worker ran
+  each piece of the upload path on the 154-page CUAD PDF (1.56 MB), CPU from `wrangler tail`.
+  `toMarkdown` 13 ms; the Worker's own body-reading loop 5 ms; sanitize + pages 2 ms; SHA-256
+  1 ms; D1 write 1 ms; total 25 ms. The first hypothesis (sanitizing in the request is
+  expensive) was wrong: measuring before changing code avoided a useless refactor.
+- **Fix:** the capped JavaScript stream loop from step 5e is replaced by the runtime's native
+  `FixedLengthStream`: the body must be exactly the declared `Content-Length` (at most
+  10 MB), else 400 `length_mismatch`; no more than the declared length is ever buffered.
+  Reading: 5 ms -> 1 ms; whole upload path: 25 ms -> 21 ms.
+- **Accepted limit:** conversion must run in the upload request (the only place the file
+  exists on the free setup: no R2, 1 MiB Workflow input, 2 MB D1 rows), and `toMarkdown`'s
+  cost grows with the file. PDFs above roughly 0.6 MB (3 of the 30 CUAD PDFs) exceed the
+  nominal 10 ms and rely on the platform's tolerance, as all uploads did successfully so
+  far. Signal: an `exceededCpu` outcome in Workers Logs. Responses then: a lower upload cap
+  (refuses long contracts) or the Paid plan (needs a card, against the project rules).

@@ -61,6 +61,7 @@ type UploadError =
   | "length_required"
   | "file_too_large"
   | "empty_file"
+  | "length_mismatch"
   | "invalid_filename"
   | "unsupported_file_type"
   | "conversion_failed"
@@ -104,11 +105,12 @@ export async function handleUpload(
   const filename = parseFilename(request.headers.get("X-Filename"));
   if (filename === null) return fail(400, "invalid_filename");
 
-  // The header can lie (the runtime does not enforce it), so the body is read as a stream
-  // and reading stops as soon as it passes the cap: never more than 10 MB in memory.
-  const bytes = await readCapped(request, MAX_UPLOAD_BYTES);
-  if (bytes === null) return fail(413, "file_too_large");
-  if (bytes.length === 0) return fail(400, "empty_file");
+  const length = Number(declared);
+  if (length === 0) return fail(400, "empty_file");
+  // The header can lie (the runtime does not enforce it), so the body must be exactly the
+  // declared length, itself at most 10 MB: never more than that in memory.
+  const bytes = await readExactly(request, length);
+  if (bytes === null) return fail(400, "length_mismatch");
 
   // 2. What the file really is, from its bytes.
   const kind = detectFileKind(bytes);
@@ -177,30 +179,24 @@ function logError(event: string, detail: unknown): void {
   console.error(event, message.slice(0, 200));
 }
 
-/** The request body, or null as soon as it grows past `max` bytes. */
-export async function readCapped(request: Request, max: number): Promise<Uint8Array | null> {
-  if (request.body === null) return new Uint8Array();
-  // A request body is always bytes; the runtime types its stream items loosely (any).
-  const reader = (request.body as ReadableStream<Uint8Array>).getReader();
-  const parts: Uint8Array[] = [];
-  let total = 0;
-  for (;;) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    total += value.length;
-    if (total > max) {
-      await reader.cancel();
-      return null;
-    }
-    parts.push(value);
+/**
+ * The request body if it is exactly `length` bytes, else null. Uses the runtime's native
+ * FixedLengthStream, which errors as soon as the body runs past `length` (so no more than
+ * `length` bytes are ever buffered) or ends short of it. Measured (D24): the JavaScript loop
+ * this replaces cost 5 ms of CPU on a 1.56 MB upload; native reading costs about 0.
+ */
+export async function readExactly(request: Request, length: number): Promise<Uint8Array | null> {
+  if (request.body === null) return null;
+  const { readable, writable } = new FixedLengthStream(length);
+  try {
+    const [bytes] = await Promise.all([
+      new Response(readable).arrayBuffer(),
+      request.body.pipeTo(writable),
+    ]);
+    return new Uint8Array(bytes);
+  } catch {
+    return null;
   }
-  const bytes = new Uint8Array(total);
-  let at = 0;
-  for (const part of parts) {
-    bytes.set(part, at);
-    at += part.length;
-  }
-  return bytes;
 }
 
 async function convertAndSanitize(

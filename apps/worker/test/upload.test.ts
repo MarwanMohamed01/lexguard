@@ -8,7 +8,7 @@ import type { DocumentSummary } from "../src/documents";
 import {
   MAX_MARKDOWN_BYTES,
   MAX_UPLOAD_BYTES,
-  readCapped,
+  readExactly,
   type Converter,
   type StartChunking,
 } from "../src/upload";
@@ -312,17 +312,21 @@ describe("POST /v1/documents", () => {
       expect(convert).not.toHaveBeenCalled();
     });
 
-    it("a body over the cap even when the header lies about its size", async () => {
-      // Measured: the runtime passes a Content-Length that understates the body.
-      const big = new Uint8Array(MAX_UPLOAD_BYTES + 1);
-      big.set(makePdf());
-      const response = await upload(big, fakeConverter(), { length: "1000" });
+    it.each([
+      ["understates", "1000", MAX_UPLOAD_BYTES + 1], // the runtime passes such a header (D20)
+      ["overstates", "5000", 100],
+    ])("a body whose header %s its size", async (_label, length, size) => {
+      const body = new Uint8Array(size);
+      body.set(makePdf().subarray(0, Math.min(size, 40)));
+      const convert = fakeConverter();
+      const response = await upload(body, convert, { length });
 
-      expect(response.status).toBe(413);
-      expect(await response.json()).toEqual({ error: "file_too_large" });
+      expect(response.status).toBe(400);
+      expect(await response.json()).toEqual({ error: "length_mismatch" });
+      expect(convert).not.toHaveBeenCalled();
     });
 
-    it("stops reading a stream as soon as it passes the cap", async () => {
+    it("never buffers more than the declared length, even from an endless stream", async () => {
       let pulled = 0;
       const endless = new ReadableStream<Uint8Array>({
         pull(controller) {
@@ -336,8 +340,15 @@ describe("POST /v1/documents", () => {
         duplex: "half",
       } as RequestInit);
 
-      expect(await readCapped(request, MAX_UPLOAD_BYTES)).toBeNull();
-      expect(pulled).toBeLessThanOrEqual(12); // ~11 MB read, not 100 MB or more
+      expect(await readExactly(request, MAX_UPLOAD_BYTES)).toBeNull();
+      expect(pulled).toBeLessThanOrEqual(13); // stops just past 10 MB, not 100 MB or more
+    });
+
+    it("reads a body of exactly the declared length", async () => {
+      const pdf = makePdf();
+      const request = new Request("http://example.com/", { method: "POST", body: pdf });
+
+      expect(await readExactly(request, pdf.length)).toEqual(pdf);
     });
 
     it("a declared size over the cap, without reading the body", async () => {

@@ -1,0 +1,17 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  // Throwaway Worker for the M2 upload CPU experiment (docs/DECISIONS.md D23). Deleted
+  // afterwards, together with its D1 database.
+  "name": "lexguard-upload-probe",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-11-01",
+  "observability": { "enabled": true },
+  "ai": { "binding": "AI", "remote": true },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "lexguard-upload-probe",
+      "database_id": "deleted-after-the-experiment",
+    },
+  ],
+}
