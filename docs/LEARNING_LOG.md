@@ -184,3 +184,99 @@ they are fast to test and can be reused (like Maven modules):
   by the router, not escalated. The router only escalates on objective signals (schema
   failure, failed checks, high risk known in advance); how often wrong answers slip through
   is measured by evals in M6.
+
+---
+
+## Milestone 2 — Ingestion & splitting
+
+### What was built
+
+The front door of Lexguard, live at https://lexguard.marwan-dev.workers.dev:
+
+**PDF/DOCX → checks → fingerprint → `toMarkdown` → sanitize + page map → D1 → chunking
+Workflow → chunks + definitions → `ready`**
+
+| Piece                    | Job                                                                 |
+| ------------------------ | ------------------------------------------------------------------- |
+| `packages/chunker`       | Split a contract along its structure (7 / 7.1 / (a)), exact offsets |
+| D1 schema (4 migrations) | Documents, chunks, definitions; `tenant_id` first in every key      |
+| `src/auth.ts`            | API key → tenant; only SHA-256 hashes stored; fails closed          |
+| `src/upload.ts`          | Type from bytes, 10 MB, exact length, convert, sanitize, page map   |
+| `ChunkDocument` Workflow | Detect in windows, plan, store in batches; retries; fencing ticket  |
+| Evals on CUAD            | Clause integrity, windowed = one pass, real conversion quality      |
+
+### Ideas worth remembering
+
+- **Offsets are the contract.** `chunk.text === text.slice(start, end)` is what makes every
+  future citation checkable. Everything that changes text (sanitizing, page markers) happens
+  once, before storing; offsets point into exactly the stored text.
+- **Measure the baseline you would otherwise use.** Our chunker keeps 99.41% of lawyer-labelled
+  clauses whole vs 96.95% for LangChain-style splitting at the same chunk count. Without the
+  baseline, "99%" would mean nothing.
+- **Isolation in the schema, not only in code.** Composite foreign keys make the database
+  itself refuse a chunk linked to another tenant's document. Duplicates are detected per
+  tenant, because a global check would tell tenant B what tenant A uploaded.
+- **Workflows = durable steps.** Each step is its own invocation (own CPU budget), its result
+  is saved, a failed step is retried alone. Retried writes must be safe to repeat
+  (`INSERT OR REPLACE`).
+- **Fencing token = optimistic locking (`@Version`).** Each chunking job holds a ticket; every
+  write checks it in the same SQL statement, so a slow, replaced job can no longer change
+  anything. That made "restart a stuck job" safe.
+- **Window the expensive part only.** 90% of chunking CPU was regex detection, which only
+  needs nearby text; windows start at line starts and read a margin ahead. Proven equal to
+  one pass on 510 contracts with 1,055 window edges.
+- **Fail closed.** A broken secret refused everyone (500), twice, during the first deploy.
+  Annoying, and exactly right.
+
+### Real runs found what tests could not
+
+- **Every upload would have failed in production:** `toMarkdown` rejects a file Blob without a
+  MIME type; the fake converter in tests accepted it. A fake must be checked against the real
+  thing at least once.
+- **`toMarkdown` inserts `### Page N` headings mid-sentence.** Turned into a page map (useful
+  for citations) instead of headings. Removing them exposed two more things: converted text
+  glues words (`RIGHTS10.1`) and has no blank lines, so cutting at line breaks split
+  sentences. Fixed the cut ranking; real-output integrity 98.63%.
+- **Two copies of Zod** doubled the bundle (1.57 MB): an npm `overrides` line fixed it.
+- **The runtime does not enforce `Content-Length`** (in a local test): body reading must
+  enforce it.
+- **Measure before refactoring.** I blamed sanitizing for the 28 ms upload; a probe showed it
+  costs 2 ms. The real costs: `toMarkdown` 13 ms (unavoidable) and my own body-reading loop
+  5 ms (fixed with the native `FixedLengthStream`: 1 ms).
+- **Hidden PDF text survives conversion** (white, tiny, invisible mode): measured, documented,
+  handed to M7. Some defences belong in a later layer; say so instead of pretending.
+
+### Debugging and process lessons
+
+- Invisible characters keep sneaking into test files (written literally instead of escaped);
+  the `check:hidden` guard caught every one before a commit.
+- PowerShell treats `{...}` as code: secrets are now set by a script that pipes the value, so
+  nothing is pasted. Keys printed with indentation got copied with the spaces: trim inputs.
+- Never let the assistant read a terminal where a secret is on screen.
+
+### Numbers
+
+- Chunking on CUAD text (510 contracts, 13,823 clauses): 99.41% kept whole; 0 offset errors.
+- Real `toMarkdown` on 30 PDFs (up to 154 pages): 97.96% of clauses found, 98.63% kept whole.
+- Production: 154-page upload 21 ms CPU (nominal Free limit 10 ms, tolerated), chunking job
+  29 ms in total; all smoke checks pass.
+
+### Tests at the end of M2
+
+347 tests: worker 102, trace 24, guardrails 72, router 13, a2a 34, chunker 59, evals 43 (6 of
+them need the locally converted PDFs and skip in CI).
+
+### Quiz score
+
+- End of M2: 4/8. All four design questions right (offsets for checkable citations, per-tenant
+  duplicates, fencing ticket, windows for CPU per step); all four "what real runs found"
+  questions missed:
+  - `### Page N` markers are **removed and kept as a page map**, not left as headings (they
+    cut clauses at page breaks).
+  - The biggest upload CPU cost is **`toMarkdown`** (13 ms), not the D1 write (1 ms).
+  - White-on-white PDF text **survives** conversion; nothing in M2 can see appearance. The
+    defence is M7's dual-model design.
+  - Uploads would have failed because the **fake converter accepted a Blob without a MIME
+    type**; the secret problem caused 500s on `/v1/`, later and separately.
+  - To revisit before M3: D21 (conversion findings), D24 (CPU probe), the T2 row of the
+    threat model.

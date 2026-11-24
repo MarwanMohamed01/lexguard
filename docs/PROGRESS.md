@@ -11,8 +11,8 @@ _Last updated: 2026-11-22._
 | ------------------------------------ | ----------------------------------------------- |
 | M0 Foundations                       | ✅ Done                                         |
 | M1 Core packages                     | ✅ Done (CI and full-history secret scan green) |
-| **M2 Ingestion & splitting**         | ⏳ **In progress: steps 1–6 done**              |
-| M3 Index & retrieval                 | Not started                                     |
+| M2 Ingestion & splitting             | ✅ Done (deployed, smoke test green)            |
+| **M3 Index & retrieval**             | ⏳ **Next**                                     |
 | M4 Extraction swarm                  | Not started                                     |
 | M5 Research, verification, synthesis | Not started                                     |
 | M6 Routing & caching                 | Not started                                     |
@@ -58,8 +58,8 @@ D1 (every row has `tenant_id`).
 6. ✅ Conversion-quality eval: 30 CUAD PDFs through the real Worker. 97.96% of labelled clauses
    found, 98.63% kept whole (99.74% on CUAD text). Fixed: uploads failing (Blob type), page
    markers turned into a page map, chunker cut ranking (D21).
-7. Security tests (oversized/malformed uploads, hidden text, tenant isolation), deploy,
-   learning log entry, end-of-milestone quiz.
+7. ✅ Security pass (daily quota, hidden PDF text measured, headers, logs; D22), deploy and
+   smoke test (D23), upload CPU probe and fix (D24), learning log, quiz.
 
 ## Working rules (agreed)
 
