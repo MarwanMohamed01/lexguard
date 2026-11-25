@@ -422,3 +422,581 @@ They change, so re-check before relying on them.
   nominal 10 ms and rely on the platform's tolerance, as all uploads did successfully so
   far. Signal: an `exceededCpu` outcome in Workers Logs. Responses then: a lower upload cap
   (refuses long contracts) or the Paid plan (needs a card, against the project rules).
+
+## D25. Embedding model and the M3 budgets (M3 step 1, 2026-11-24)
+
+- **Limits checked in the docs today:**
+  - **Vectorize Free:** 5M stored dimensions, 30M queried dimensions per month, 100 indexes,
+    1,000 namespaces per index, 1,536 dimensions max, topK 50 with metadata (100 without),
+    1,000 vectors per upsert from a Worker, 10 metadata indexes.
+  - **Not stated:** whether a namespace or metadata filter applies before or after the
+    nearest-neighbour search, and how queried dimensions are counted.
+  - **Workers AI:** 10,000 Neurons per day (reset 00:00 UTC), 3,000 requests per minute for
+    text embeddings.
+  - **D1:** supports FTS5. **Not stated:** how many rows FTS5 writes count, and whether any
+    tokenizer is restricted. To be measured in step 4.
+  - `embeddinggemma-300m` is marked deprecated as of 2026-11-20.
+- **Measured** with a probe Worker under `wrangler dev` on real stored chunks
+  (`experiments/embed-probe/README.md`, 64.9 Neurons):
+  - `@cf/baai/bge-m3` returns 1,024-dimension unit vectors.
+  - It accepted 500 texts per call and read the end of 32k-character inputs.
+  - Cost is 1,075 Neurons per million tokens, as priced, at about 3.2 characters per token.
+  - It is not bit-reproducible (cosine 0.999996 for the same text twice).
+- **Decision: `@cf/baai/bge-m3`.**
+  - `bge-base-en-v1.5` documents 512 input tokens, and an estimated 53.9% of our real
+    chunks are longer, so it would silently embed half a clause. It also costs 5.6× more
+    per token and is English-only.
+  - The model ID is a constant, versioned with the index (PROJECT.md: versioning).
+- **Consequences:**
+  - **Vectorize space is the tightest limit:** 5M / 1,024 ≈ 4,880 vectors for all tenants.
+    The 30 test PDFs alone take 37% (1,818 chunks; one contract has 204).
+  - The index needs a retention rule: vectors are deleted with their document, and indexing
+    refuses with a clear error when the space would run out. It must never half-index a
+    document.
+  - The full 510-contract CUAD text (~17,000 chunks, ~17M dimensions) cannot sit in
+    Vectorize. Retrieval evals on it must embed and search outside Vectorize (step 2).
+  - Neurons are second: about 97 to embed a 300k-character contract. That is small, but the
+    M4+ language models share the same 10,000 a day.
+  - Vectors differ in the last decimals between calls: tests and the M6 cache compare with a
+    tolerance, never for equality.
+  - Chunk sizes stay at 2,000 / 4,000 characters (D15). The model would accept more, but
+    longer inputs blur their parts (changing the last 300 characters moves a 2k input to
+    cosine 0.90, a 32k input only to 0.996). The step 2 eval can revisit this with data.
+
+## D26. Retrieval eval: how it is built, what the embedding API really costs (M3 step 2, 2026-11-24)
+
+- **Dataset, from CUAD only (D10):**
+  - Queries are CUAD's 41 questions, reduced to category + description, e.g. "Governing Law:
+    Which state/country's law governs the interpretation of the contract?".
+  - The correct answers for a (contract, clause type) case are the chunks overlapping a
+    lawyer-labelled span. The search runs inside one contract, like an agent searching one
+    document.
+  - Two corpora: CUAD's own text chunked by our chunker (510 contracts, 6,702 cases), and the
+    30 PDFs as the real Worker stored them (415 cases; 78 labelled clauses could not be
+    located in the converted text, D21).
+  - Metrics: hit@1, hit@5, recall@10, MRR@10, nDCG@10. A seeded random order is the floor.
+- **Keyword search is real SQLite FTS5** (`node:sqlite`, SQLite 3.53), not a reimplementation
+  of BM25. The vector search is exact cosine, Vectorize's best case (its approximate search is
+  measured in step 7).
+- **Embedding the corpus on Workers AI, not Ollama:**
+  - A laptop CPU (4-core i7, no GPU) embeds about 160 tokens/s with Ollama's bge-m3, about 15
+    hours per variant of the full corpus.
+  - Ollama Cloud was considered and rejected: no free allowance (pay per token), no embedding
+    model listed, and it needs another account and key.
+  - Workers AI's free 10,000 Neurons a day run the production model itself. The run stops at a
+    9,000-Neuron daily cap, counted from the Neurons each response reports and kept on disk per
+    UTC day. The rest continues the next day from the cache.
+- **Found by the real run: Workers AI pads each batch to its longest text.**
+  - The 60,000-token request limit applies to the padded batch: 50 chunks refused at 67,350
+    tokens = 50 × 1,347.
+  - Billing counts the padded size too. One 842-token text alone costs 842 tokens; the same
+    text with four 6-token texts costs 4,210 (5 × 842).
+  - So batches are sorted by length and capped at count × longest ≤ 100,000 characters (about
+    31k tokens). **The production indexing Workflow (step 5) must batch the same way.**
+- **Found: FTS5 must filter inside MATCH, with zero weight on the filter column.**
+  - With `WHERE doc = ?`, FTS5 scores every match in the table first: 28 ms per query on 17,000
+    chunks. With `doc : "d12" AND text : (...)` it takes 5.6 ms.
+  - But `bm25()` also scores the filter term, which is rare and scored by chunk length, and
+    pushes short chunks up: only 10 of 300 rankings stayed the same. With
+    `bm25(fts, 1.0, 0.0)` all 300 were identical.
+  - This is `scopedFtsQuery` in `@lexguard/retrieval`. Filter values must be a single token (an
+    ID made of letters and digits).
+- **Found: stemming helps.** Without it, "Which law governs?" does not match "governed by the
+  laws of". FTS5's `porter` tokenizer is better on both corpora (MRR 0.568 vs 0.546 on CUAD
+  text, 0.528 vs 0.498 on the converted PDFs).
+- **First results, 30 converted PDFs, production embeddings (415 cases):**
+
+  | Method                                      | hit@1 | hit@5 | MRR@10 |
+  | ------------------------------------------- | ----- | ----- | ------ |
+  | Random order                                | 0.055 | 0.222 | 0.125  |
+  | Keyword, FTS5 porter                        | 0.422 | 0.679 | 0.528  |
+  | Vector, bge-m3, chunk text only             | 0.345 | 0.641 | 0.466  |
+  | Vector, bge-m3, with contextual header      | 0.347 | 0.612 | 0.458  |
+  | Hybrid RRF, text-only vectors + FTS5 porter | 0.443 | 0.708 | 0.550  |
+  | Hybrid RRF, header vectors + FTS5 porter    | 0.451 | 0.706 | 0.551  |
+  - On these queries, keyword search alone beats vector search alone: CUAD's descriptions
+    share legal vocabulary with the clauses they describe. Hybrid is best, but by only about
+    0.02 MRR / 0.03 hit@5 over keyword, on 415 cases. That gap may be noise.
+  - The contextual header does not help vectors here (slightly worse); it may still help other
+    kinds of query.
+  - **Not decided yet:** these numbers come from 30 documents. The full 510-contract corpus
+    (6,702 cases, both variants) finishes embedding over the next days. The decision (hybrid or
+    not, header or not) and the CI gate wait for it, with a paired comparison per case instead
+    of comparing two averages.
+
+## D27. Hardening `@lexguard/retrieval` (M3 step 3, 2026-11-24)
+
+- **Fuzzed against real FTS5** (`evals/retrieval/fts-safety.test.ts`, `node:sqlite`, both
+  tokenizers):
+  - Inputs: 5,000 generated hostile inputs plus 6 targeted escapes such as
+    `x) OR tenant : t2 OR (x`.
+  - Two properties hold for every input: the query never fails, and no row outside the
+    requested tenant + document comes back.
+  - **Control:** the same inputs concatenated raw into `MATCH` cause over 1,000 syntax errors
+    and return other tenants' rows. That shows the test can see a broken builder.
+- **Fixed, found by review and the fuzz test:**
+  - `ftsQuery` turned "é" typed as `e` + combining accent (U+0301) into the word `e`. Words now
+    keep combining marks.
+  - The contextual header capped titles by UTF-16 unit, which could split an emoji and leave
+    half of it (a lone surrogate) in the embedding input. It now caps by code point.
+  - The header now also drops control and format characters (NUL, bidi overrides,
+    zero-width) and lone surrogates. The upload already sanitizes titles; the package does
+    not rely on its callers.
+- **Learned:** quoting each word is a second layer of defence, not the only one. After
+  lowercasing, `and`/`or`/`not`/`near` are not FTS5 operators (those are uppercase), so even
+  unquoted words stayed safe in the fuzz run. Both layers stay.
+- **Mutation check:**
+  - Method: 16 deliberate breakages (unquoted words, AND instead of OR, unchecked filter values
+    or column names, unscoped query, ranks from 0, no tie-break, header cut by UTF-16 unit,
+    control characters kept, and others), each run against the package tests and the fuzz
+    test.
+  - First run: two survived, both in the RRF tests. A score check too coarse to see 1/61 vs
+    1/62, and a tie case that ID order happened to resolve the same way.
+  - After strengthening those tests: **0 of 16 survive**.
+
+## D28. The FTS5 table in D1 and what it costs (M3 step 4, 2026-11-24)
+
+- **Migration 0005:** `chunks_fts(text, tenant, doc, idx UNINDEXED)`, tokenizer
+  `porter unicode61` (D26).
+  - **Scope columns:** `tenant` and `doc` hold `ftsScopeToken(id)` ("x" + hex of the ID's
+    bytes). Tenant IDs contain dashes and document IDs are UUIDs, and FTS5 splits on dashes;
+    hex is one token, and different IDs can never share one. Queries filter on them inside
+    MATCH with zero bm25 weight (D27).
+  - **Hits are read back** from `chunks` by its tenant-first primary key, never by FTS rowid
+    alone.
+- **Written by the indexing job (step 5), not by triggers.**
+  - The chunking job writes with `INSERT OR REPLACE`. In SQLite a replace does not fire DELETE
+    triggers unless `recursive_triggers` is on, so triggers would leave stale rows.
+  - A virtual table takes no part in ON DELETE CASCADE, so deleting a document must delete its
+    FTS rows explicitly. `ftsScopeMatch` selects exactly one document's rows for that (tested).
+- **Measured in local D1** (Workers runtime, `meta` counters; real stored chunks of 3 converted
+  CUAD PDFs, inserted in batches of 100):
+  - **Writes:** 1 row written per chunk for every `detail` level. A plain table with a
+    composite primary key costs 2 (table + index), as the docs describe. A 300-page contract
+    (~200 chunks) costs about 200 writes to index.
+  - **Reads:** about 2 per matching chunk _in the searched document_ (a 204-chunk contract
+    where most chunks match: 406; a rare word: 1). They do not grow with the tenant's other
+    documents. The free 5M a day allow about 12,500 searches of a large contract.
+  - **Storage:** `detail=full` ≈ `detail=column` (about 1.1 MB vs 1.0 MB for 590k characters,
+    including FTS5's own copy of the text). `full`, the default, is kept: word positions allow
+    phrase search later. `detail=none` is unusable: it refuses column filters, so it cannot
+    keep a search inside one tenant.
+  - **Trap:** `meta.changes` counts FTS5's internal shadow-table changes (6 for deleting 2
+    rows), while `rows_written` says 2. Code must not use `changes` to check FTS writes (the
+    chunking job's fencing check uses it on `chunks`, which is fine).
+  - **Not yet confirmed on the remote database:** these are the local engine's counters. The
+    remote migration (with Marwan's OK) and step 7's real run confirm or correct them.
+- **Applied locally only** (`wrangler d1 migrations apply lexguard --local`). Local D1 was also
+  missing 0004, now applied.
+
+## D29. The indexing job (M3 step 5, 2026-11-24)
+
+- **Vectorize facts from the docs that shaped it:**
+  - Upserts are asynchronous: vectors become searchable "typically" a few seconds later, so
+    `indexed` means written, not yet searchable.
+  - `upsert` replaces a vector with the same ID; `insert` keeps the first one. So upsert,
+    which is safe to retry.
+  - A query's namespace applies before the vector search, and a metadata filter applies
+    before the top-k selection.
+  - A metadata index must exist **before** vectors are inserted, or filtering ignores them.
+  - Vectors can only be deleted by ID.
+  - `describe()` is not documented to return a vector count.
+  - Local development is not documented (the page is a 404).
+- **State:** new `documents` columns (migration 0006): `index_status`, `index_job` (fencing
+  ticket), `index_version`, `indexed_chunks`, `index_error`. `status` stays the ingestion state,
+  so a failed or outdated index never makes the text unusable.
+- **Hand-over:** the chunking job's `finish` step sets `ready` and a new index ticket in the
+  same UPDATE, then starts `IndexDocument` with the ticket as instance ID.
+  - If the start fails, only the index is marked failed (`indexing_not_started`); the document
+    stays `ready` (tested).
+  - A retried start that finds the instance already exists counts as success.
+- **Steps:**
+  - `load`: check the ticket, reserve space, delete vectors beyond the new chunk count and the
+    old keyword rows.
+  - `embed i`: one step per request batch, sorted by length and capped by padded size (D26,
+    now `embeddingBatches` in `@lexguard/retrieval`, shared with the eval). It reads the chunks
+    under the ticket, embeds, and upserts. Vectors never leave the step: a result is capped at
+    1 MiB.
+  - `keywords`: delete and `INSERT … SELECT` from `chunks` in one batch, so the text never
+    passes through the Worker and a retry never duplicates rows.
+  - `finish`: set `indexed`, `INDEX_VERSION` and the vector count.
+- **Vectors:**
+  - ID `"<document id>:<chunk idx>"`, at most 41 bytes (the limit is 64).
+  - Namespace = tenant ID, so a query in one tenant's namespace never sees another's.
+  - Metadata `{ doc, idx }`, so a search can be limited to one document (needs a metadata index
+    on `doc`, created with the index).
+- **Space guard (D25), atomic:**
+  - Vectorize gives no count, so D1 keeps it. `load` reserves `max(old, new)` vectors with one
+    conditional UPDATE: other documents' `indexed_chunks` plus this one's must stay at or below
+    4,800 (5M dimensions / 1,024 = 4,882, with a margin).
+  - Concurrent jobs cannot both pass, because D1 runs statements one at a time. A full index
+    marks the document `index_full` without calling Workers AI.
+  - `finish` sets the real count.
+- **Fencing limit:** Vectorize cannot check a D1 ticket. A replaced job could still upsert
+  between its check and its write. That vector only carries an older embedding of the same
+  chunk ID, and step 6 reads every hit back from D1 under the caller's tenant, so it cannot
+  expose another document.
+- **Embedding input:** `INDEX_VERSION = "bge-m3/plain/1"`, the chunk text without the contextual
+  header. On the 30 converted PDFs the header did not help (D26); the full-corpus eval decides,
+  and a change means a new version and a re-index.
+- **Types:** `wrangler types` declares the binding as `VectorizeIndex`, which its own comment
+  calls the beta API. Current indexes use the asynchronous `Vectorize` API (mutations return a
+  `mutationId`), so the binding is typed as that in one commented place (`vectorIndex`).
+- **Tests:**
+  - The logic is `runIndexing(db, services, params, step)`. Tests run it against the migrated
+    local D1 with a direct step runner, a fake embedder and a fake Vectorize (11 tests).
+  - The pipeline test now runs upload → chunking → **real** indexing Workflow → `indexed` and
+    keyword-searchable, with only the `embed 1` step replaced.
+  - Mutation check: 11 deliberate breakages (ticket checks, space guard, surplus deletes,
+    namespace, metadata, vector IDs, finish). The first run let 4 through: a ticket revoked
+    _before_ embedding was never tested, the mid-job reservation was never inspected, and
+    single-batch tests could not tell a chunk's index from its position in the batch. After
+    new tests, **0 of 11 survive**.
+- **Created 2026-11-24, with Marwan's OK:**
+  - The Vectorize index `lexguard-chunks` (`--dimensions=1024 --metric=cosine`) and the
+    metadata index `doc` (string).
+  - The metadata index was queued (asynchronous) and appeared after about 40 seconds.
+    `wrangler vectorize info` then showed the queued change as processed, with 0 vectors, so
+    the filter covers every vector ever written.
+  - `wrangler vectorize info` reports a `vectorCount`. The Workers docs did not promise that
+    for `describe()`, so D1's count stays the space guard; Vectorize's count is a cross-check
+    in step 7.
+- **Not done yet:**
+  - Applying migrations 0005 and 0006 remotely (Marwan's OK).
+  - The real embedding and upsert run (step 7).
+  - A way to re-index or delete a document (retention, D25): later in M3 or M8.
+
+## D30. The search endpoint (M3 step 6, 2026-11-24)
+
+- **API:** `POST /v1/documents/:id/search` with `{ query (1-1,000 chars), limit? (1-20,
+default 10), mode? ("hybrid" | "keyword" | "vector") }`, validated with a strict Zod schema.
+  POST, not GET: a question can itself be confidential, and URLs end up in logs.
+- **Body read like uploads (D20, D24):** `Content-Length` required (411 without), at most
+  16 KB (413), read exactly with `FixedLengthStream` (400 on a mismatch), decoded as strict
+  UTF-8.
+- **Order of checks:**
+  - Another tenant's document answers 404, exactly like a missing one.
+  - A document that is not `ready` and `indexed` answers 409 with its state.
+  - `GET /v1/documents/:id` now reports `indexStatus`, `indexVersion` and `indexError`, so
+    clients can see when a document becomes searchable.
+- **Search:**
+  - Keyword (FTS5, tenant + document inside MATCH) and vector (Vectorize: tenant namespace,
+    `doc` filter, topK 50) run in parallel. RRF merges them (k = 60).
+  - Each result reports its rank on each side, so the merge can be audited.
+- **D1 stays the system of record:**
+  - Vector IDs are checked before fusion: they must be `"<this document>:<digits>"` with
+    `idx < indexed_chunks`.
+  - Then every hit is read back from `chunks` by `(tenant, document, idx)`, and a hit without
+    its row is skipped.
+  - **Found by the mutation check:** IDs that were only dropped at read-back still took places
+    in the fused top list. With `limit: 1`, one stale vector in first place returned **no
+    results**. Checking before fusion fixes it, and a test pins it.
+- **Results:**
+  - Exact offsets (`text === markdown.slice(start, end)`), the PDF page from the page map,
+    section path and heading.
+  - A `note` saying the text is untrusted document content (T1/T2: hidden or injected text
+    survives conversion, D22), to be treated as data, never as instructions.
+- **Degraded, not down:** if embedding or Vectorize fails (outage, daily Neurons spent), hybrid
+  search answers from keywords with `degraded: ["vector"]`. A vector-only request answers 503.
+- **Tests (14, real router, auth, D1 and FTS5; fake Vectorize and embedder):**
+  - RRF order, exact quotes and pages.
+  - 404 for another tenant.
+  - Foreign, stale and malformed vector IDs dropped.
+  - Identical text in other documents never returned.
+  - Degraded fallback, 409, strict validation, body limits.
+  - FTS5 syntax in the query treated as plain words.
+- **Mutation check:** 13 breakages; the first runs let through "malformed IDs kept" (which
+  exposed the bug above), "no length required" (untested) and "continue → break" on a missing
+  row. After fixes and tests, **0 of 13 survive**.
+- **Open:**
+  - Searches have no per-tenant daily cap yet. Each costs one tiny embedding (about 50 tokens)
+    and about 2 rows read per matching chunk (D28). To add with M8's rate limits (T15).
+  - ~~Vectors become searchable a few seconds after `indexed`~~: measured and fixed in D31.
+
+## D31. The real retrieval path: trial run and what it changed (M3 step 7, 2026-11-24)
+
+- **Setup:**
+  - `evals/retrieval/live-run.mjs` runs the Worker under `wrangler dev`: local D1 and
+    Workflows, with the **real** toMarkdown, bge-m3 and Vectorize. For that, the Vectorize
+    binding is marked `"remote": true`; tests never connect.
+  - It uploads the CUAD PDFs as tenant `eval` and waits for `indexed`. It runs all 41 queries
+    in all three modes through the real endpoint.
+  - It checks isolation with a second tenant `eval-b` holding the same PDF, and compares
+    Vectorize's own `vectorCount` (`wrangler vectorize info --json`) with the count D1 keeps.
+  - It deletes its vectors at the end (`KEEP_VECTORS=1` keeps them).
+  - `live.test.ts` scores the saved run with the offline eval's dataset and metrics code, and
+    checks that both used the same query strings.
+- **Trial on the smallest PDF (`LIMIT=1`, about 20 Neurons):** everything ran against the
+  real services. Keyword search took about 24 ms; vector and hybrid about 350 ms (embedding
+  plus the Vectorize round trip, measured from a laptop, not from Cloudflare). Vectorize's
+  count matched D1's (4 = 4). Deletes are asynchronous too: the count was back to 0 about 15 s
+  after `delete-vectors`.
+- **Found: vectors became searchable 53 seconds after `indexed`**, not "a few seconds".
+  - During that time a hybrid search silently returned keyword results only, and nothing in
+    the API said so.
+  - It also made the first isolation check fail falsely: the owner's own vector search came
+    back empty after a fixed 15 s wait.
+- **Fix: `indexed` now means searchable.**
+  - After the keyword step, the indexing job checks its last written vector with `queryById`,
+    inside the tenant's namespace and filtered to the document. An empty answer means not yet:
+    `step.sleep` 10 s (a durable Workflow sleep, no CPU) and check again, at most 30 times.
+    Vectorize applies writes in order, so the last vector answering means all of them do.
+  - After 5 minutes without confirmation the document is marked `indexed` anyway, with
+    `index_error = "vectors_not_confirmed"`: keywords still work, and the delay is recorded,
+    not hidden.
+  - A check that throws (vector not stored yet) counts as "not yet".
+  - Tested with a fake that answers "not yet" twice: the document stays `indexing` until the
+    third check. Also tested: a fake that never answers or always throws, and that the check
+    uses a written vector ID, the tenant namespace and the `doc` filter.
+- **Trial again with the fix:** upload to `indexed` 15.1 s (it now includes the wait). The
+  first search after `indexed` found vectors after 0.5 s (the first attempt). The other
+  tenant got 404; the owner's vector search returned results at once. 5 of 5 live checks
+  passed. The index was empty again afterwards.
+- **The full run (30 PDFs) waits for 00:00 UTC:**
+  - Today's free Neurons are almost spent by the corpus embedding (D26), and the full run
+    needs about 1,100.
+  - That day's corpus embedding runs after it with `NEURON_CAP=8000`, so both stay under the
+    10,000.
+- **Not measurable this way:** CPU per request and per Workflow step. `wrangler dev` does not
+  report Cloudflare's CPU time; it is measured after the deploy (step 8) with `wrangler tail`,
+  as in D23/D24.
+- **Full run, 30 PDFs (2026-11-25, 00:02-00:56 UTC, run by Marwan,
+  `evals/results/cuad-retrieval-live.json`):**
+  - All 30 indexed; 1,820 vectors. Vectorize's own count equalled D1's (1,820 = 1,820).
+    All deleted afterwards.
+  - Searchable right after `indexed` on every document: 0.31-0.57 s, the first check. The
+    D31 fix holds at scale.
+  - Upload to `indexed`: 25-140 s per document (median 96 s). Most of it is the wait for
+    Vectorize, which took longer during a burst of writes than for one document (12 s).
+  - Isolation: the other tenant got 404 on the copy; the owner's vector search answered.
+  - Latency measured from the laptop: keyword p50 20 ms / p95 34 ms; vector and hybrid
+    p50 326 ms / p95 about 450 ms.
+  - **Quality identical to the offline eval, to three decimals, in every mode** (415 cases):
+    keyword MRR 0.528, vector 0.466, hybrid 0.550; hit@5 0.679 / 0.641 / 0.708.
+    - Vectorize's approximate search lost nothing against exact cosine here: the `doc` filter
+      leaves at most 204 vectors per search.
+    - D1's FTS5 ranked exactly like `node:sqlite`.
+    - So the offline eval stands for the real system, and the full-corpus offline result
+      (D26, once embedded) can decide hybrid vs keyword and the header.
+  - **One failure in 3,690 searches:** a vector-only search answered 503 after one quick
+    (62 ms) failure on the vector side; hybrid searches never degraded. The upstream error was
+    not captured. **Fix:** the vector side is now tried twice before falling back (tested:
+    one failure is absorbed, two are not, never more than two attempts). The live gate allows
+    at most 1 such 503 per 1,000 searches and no other error.
+  - **Windows cleanup:** `wrangler dev` still held a Workflow SQLite file when the run deleted
+    its state folder (EBUSY), after results were saved and vectors deleted. `stop()` now
+    retries for 10 s and then warns instead of crashing.
+
+## D32. Preparing the M3 deploy (M3 step 8, 2026-11-25)
+
+- **Found while preparing: documents from before M3 would never be indexed.** The M2 deploy
+  left `ready` documents with no index, and the duplicate check on re-upload returned them
+  unchanged, so the smoke test's own documents would answer 409 on search forever.
+  - **Fix:** re-uploading a `ready` document whose index is missing or `failed` claims a new
+    index ticket with one atomic UPDATE (`claimForIndexing`) and starts `IndexDocument`, as
+    the chunking job does.
+  - If the job cannot start, the index is marked `indexing_not_started` and the document
+    stays `ready`.
+  - This backfills the M2 documents through the smoke test, and gives tenants a retry for a
+    failed index without a new endpoint.
+  - Tested end to end: a document reset to "before M3" is indexed again by the real Workflow
+    on re-upload. A further re-upload of an indexed document starts nothing. A failed start is
+    recorded.
+  - Not covered: an index stuck in `indexing` because its job never ran (no timestamp to tell
+    stale from slow yet). Open, as for chunking before D20.
+- **Smoke test (`scripts/smoke.mjs`) extended:**
+  - Each of the three documents must reach `indexed` with no `indexError`; the waiting time
+    is reported.
+  - A hybrid search on the largest contract must answer 200, not degraded, with results from
+    **both** keywords and vectors (proof the real vectors answer), offsets, page, and the
+    untrusted-text note.
+  - Search on an unknown document must be 404, a malformed search 400, and a search without a
+    key 401.
+- **CPU without handling the key:** `wrangler tail` events can include request headers, and the
+  smoke test sends the API key in one. `scripts/tail-cpu.mjs` sits in the pipe and keeps only
+  method, path (IDs replaced), status, outcome, CPU and wall time, so no raw tail output is
+  ever stored. It splits multi-line JSON correctly; tested on a fake event whose header,
+  quotes and braces never reach the output.
+- **Checked before asking:**
+  - The remote D1 has exactly 0005 and 0006 pending.
+  - The deploy dry run bundles 823.6 KiB (134.8 KiB gzip), under the 3 MB limit, with all
+    five bindings resolved (two Workflows, D1, Vectorize, AI).
+  - Order: migrations first. The old code ignores the new columns and table; the new code
+    needs them.
+- **Deployed 2026-11-25** (Marwan's OK): migrations 0005 and 0006 applied remotely, Worker
+  version `c659a26e` with the `lexguard-index-document` Workflow.
+  - **Smoke test (Marwan): 19 of 19 checks passed.** The three documents from the M2 deploy
+    were indexed by their re-upload, as designed above. Their indexed states were reported
+    after 55.8, 35.5 and 5.1 s; the checks run one after another while the jobs ran in
+    parallel, so the last wait looks short.
+  - A hybrid search on the 154-page contract answered in 438 ms (wall time from a laptop)
+    with results from both keywords and vectors; top hit chunk 45, page 26.
+  - The first CPU capture recorded nothing: the tail was started from the repo root with a
+    path meant for `apps/worker`. The command now uses `--cwd apps/worker` from the root, and
+    `scripts/cpu-load.mjs` makes one new upload so both Workflows run again under the tail.
+  - The API key appeared in clear text in a terminal shared with the assistant; it was not
+    used or repeated, and Marwan is asked to rotate it (`new-tenant-key.mjs --set`).
+
+## D33. CPU on the deployed Worker (M3 step 8, 2026-11-25)
+
+- **How:** `scripts/tail-cpu.mjs --record` starts `wrangler tail` and appends only method,
+  path, status, outcome, CPU and wall time for each event. Raw events, which can carry the API
+  key in a header, are never stored.
+  - The first two captures came out empty: in Windows PowerShell 5.1, `> file` writes only
+    when the pipeline ends, and Ctrl+C discards everything collected.
+  - The recorder now writes each event as it arrives (verified live with `/health`).
+- **Load:** `scripts/cpu-load.mjs` (Marwan, with his key), one new 115-page CUAD contract
+  (655 KB) and 20 hybrid searches. 31 events, all `ok`. Indexed in 93.6 s; search wall time
+  p50 341 ms from a laptop.
+
+  | Invocation                        | CPU (Cloudflare)   | Free budget           |
+  | --------------------------------- | ------------------ | --------------------- |
+  | `GET /v1/documents/:id` (18)      | 0 ms               | 10 ms per request     |
+  | `POST .../search` (10 sampled)    | p50 3 ms, max 5 ms | 10 ms per request     |
+  | `POST /v1/documents` (655 KB PDF) | 15 ms              | over: D24, toMarkdown |
+  | `ChunkDocument`, whole instance   | 35 ms              | 10 ms per **step**    |
+  | `IndexDocument`, whole instance   | 102 ms             | 10 ms per **step**    |
+
+- **Search fits** the 10 ms with room: embedding the query and querying Vectorize are waits,
+  not CPU.
+- **Workflows:** tail reports one event per instance, not per step (as in D23).
+  - The indexing job ran about 20 steps, about 5 ms each on average; every step succeeded.
+  - The heaviest step had to be estimated.
+- **Measured, not assumed, again:** the suspect was Zod validating the vectors, but it takes
+  0.5 ms for 50 vectors in Node. The real cost is the JSON: the response for 50 vectors is
+  about 1 MB, `JSON.parse` 5.9 ms in Node (2.9 ms for 25), plus serializing the vectors again
+  for the upsert. Workers ran about 2.5× faster than Node in D16, but that is still too close
+  to 10 ms.
+- **Fix:** `EMBED_BATCH` 100 → **32** texts per request and step, so at most about 0.66 MB of
+  JSON per step. Batches stay sorted by length, so smaller groups add no padding and no
+  Neurons. A 115-page contract takes about 5 embedding steps instead of 3, far below 1,024.
+  Tested (count cap and padded-size cap separately; the pipeline test expects
+  `ceil(chunks / 32)` batches).
+- **Open:** the upload request (15 ms for 655 KB, 21 ms for 1.56 MB) is still over the nominal
+  10 ms because `toMarkdown` runs in it (D24's accepted limit). No `exceededCpu` outcome so far.
+
+## D34. Model providers, data-use terms and fan-out limits for M4 (M4 step 1, 2026-11-25)
+
+- **Checked in the official docs today** (Workers AI pricing/limits/model pages, Gemini API
+  rate limits/pricing/terms, Groq rate limits and "your data", Workflows/Queues/Workers limits).
+- **Workers AI text generation:**
+  - Same 10,000 free Neurons a day as the embeddings (reset 00:00 UTC); 300 requests per minute.
+  - Neurons per million tokens, input / output: `granite-4.0-h-micro` 1,542 / 10,158;
+    `qwen3-30b-a3b-fp8` 4,625 / 30,475; `gemma-4-26b-a4b-it` 9,091 / 27,273; `gpt-oss-20b`
+    18,182 / 27,273; `llama-3.3-70b-instruct-fp8-fast` 26,668 / 204,805.
+  - Context: llama-3.3-70b 24k tokens, gpt-oss-120b and mistral-small-3.1 128k, gemma-4 256k.
+    A chunk is at most 4,000 characters (~1,250 tokens), so context is not the limit here.
+  - `llama-3.1-8b-instruct-fp8` is deprecated since 2026-11-20: not used.
+  - **Not stated:** whether `response_format` enforces a JSON schema (only mistral-small-3.1
+    names a schema parameter, `guided_json`). Output is validated with Zod either way, and the
+    eval counts invalid outputs.
+  - **Not stated:** any training or privacy terms on these pages. Some model pages show a
+    "Zero data retention: Yes" badge without defining it.
+- **Gemini free tier:** the terms say free-tier inputs and outputs are used to improve Google's
+  products and may be read by human reviewers, and ask users not to send confidential or
+  personal data. Free per-model limits are only on the account page, not in the docs.
+  **Decision: no document text goes to the Gemini free tier** (T12).
+- **Groq:** no retention of inference data by default, except up to 30 days for abuse
+  monitoring (can be opted out). Training on prompts is **not stated**; free-plan limits were
+  not in the fetched page. Not used for document text until both are known.
+- **Workflows (Free):** 1,024 steps per instance, 100 concurrent instances, 10 ms CPU per
+  step, 1 MiB per step result, 100 MB state per instance, 50 external / 1,000 Cloudflare
+  subrequests per invocation. **Not stated:** whether "per invocation" means per step.
+- **Queues (Free):** 10,000 operations a day, about 3 per message (write, read, delete), so
+  about 3,300 messages; 128 KB per message; 24 h retention. **Not stated:** what happens at
+  the daily cap. **Decision for now: fan out with parallel Workflow steps, no Queues**; step 5
+  measures whether that is enough.
+- **Budget (estimate, measured in step 4):** about 1,000 input + 300 output tokens per chunk
+  gives ~5 (granite), ~14 (qwen3-30b), ~17 (gemma-4), ~26 (gpt-oss-20b), ~88 (llama-3.3-70b)
+  Neurons per chunk. An average CUAD contract (~33 chunks) on gemma-4 costs ~560 Neurons, so
+  about 16 contracts a day on Free; a 200-chunk contract ~3,500. The 70B model cannot do one
+  large contract within a day: escalation only (M6).
+- **Candidates for the step 2/4 eval:** local `llama3.1:8b` (Ollama), then `gemma-4-26b-a4b-it`
+  and `qwen3-30b-a3b-fp8` on Workers AI. The eval chooses. Until the corpus embedding finishes
+  (about two days, 9,000 Neurons a day), M4 measurements run locally.
+
+## D35. Extraction eval: answer key, scoring and baselines (M4 step 2, 2026-11-25)
+
+- **Dataset, from CUAD only (D10)** (`evals/extraction/`): CUAD's text chunked as in
+  production (2,000 / 4,000, D15). The unit is one chunk, as one extractor call reads one
+  chunk. Its answer key is the set of clause types whose lawyer spans overlap it (end
+  exclusive). Chunks without labels stay in: false alarms happen there.
+  - 510 contracts, 17,026 chunks, 5,444 with at least one label, 9,052 (chunk, type) pairs,
+    up to 8 types in one chunk, 41 types (Parties 2,554 spans ... Price Restrictions 27).
+- **Scoring (`score.ts`):**
+  - A clause is accepted only if its quote is in the chunk **verbatim** (T3). Blank quotes,
+    invented quotes and unknown types are rejected and counted. Quotes that differ only in
+    whitespace are counted separately (diagnostic) but still rejected.
+  - Accepted types per chunk vs the key, per type: precision, recall, F1; micro (all types
+    summed) and macro (mean F1 of the types that occur in the sample).
+  - **Grounded:** an accepted quote that overlaps a lawyer span of the same type (right type,
+    wrong sentence is visible).
+  - **Known limit:** CUAD's labels may miss real clauses; a correct answer there counts as a
+    false alarm, so precision is a lower bound.
+- **Baselines (`baselines.ts`, results in `evals/results/cuad-extraction-baselines.json`):**
+
+  | Baseline (all 510 contracts)                       | Precision | Recall | Micro F1 | Macro F1 |
+  | -------------------------------------------------- | --------- | ------ | -------- | -------- |
+  | All 41 types on every chunk                        | 0.013     | 1.000  | 0.026    | 0.025    |
+  | Guess each type at its frequency (seeded)          | 0.021     | 0.021  | 0.021    | 0.013    |
+  | M3 keyword search, top chunk per type and contract | 0.145     | 0.336  | 0.203    | 0.185    |
+  - Keyword search is good where CUAD's question shares the clause's words (Governing Law F1
+    0.71, Anti-Assignment 0.66) and poor where it does not (Price Restrictions 0.02, Parties
+    0.07).
+  - **Subsets** for the model runs, chosen by SHA-256(title) like the PDFs: 10 contracts = 473
+    chunks (140 labelled), keyword micro F1 0.174; 20 contracts = 924 chunks (276 labelled),
+    0.202. The size is fixed after timing Ollama (step 4).
+
+- **Tests:** 19 (quote check, one-chunk scoring with the example from the explanation, tally,
+  dataset edges, subset rule, baselines; the corpus run skips without CUAD). Mutation check:
+  14 breakages, 3 survived the first tests (macro averaging over empty types hidden by the
+  empty-case convention, a span touching a chunk edge, a prior that ignores frequency); after
+  three new tests **0 of 14 survive**.
+- **Cost:** the corpus run takes about 3.3 minutes (20,910 keyword searches), and runs in CI
+  because CI already downloads CUAD.
+
+## D36. The extractor and the nightly embedding task (M4 step 3, 2026-11-25)
+
+- **`packages/extraction`** (runs in Workers, Node and tests; the model is a parameter, so
+  Ollama, Workers AI and fakes share one code path):
+  - `types.ts`: CUAD's 41 clause types and descriptions, generated from `CUAD_v1.json` (CC BY
+    4.0, credited); a CUAD eval test checks they match the dataset verbatim.
+  - `schema.ts`: the form. Type is one of the 41 names; quote 1-2,000 characters, not
+    trimmed; parties, obligations (`{party, action}`), dates as short capped lists; risk
+    flags from a closed list of 5. At most 20 clauses per chunk. Unknown fields are dropped.
+    The envelope is checked first, then each clause on its own, so one bad clause costs only
+    itself and is counted.
+  - `prompt.ts` (`PROMPT_VERSION = "extract/1"`): the chunk is wrapped in
+    `<document id=NONCE> … </document id=NONCE>` with a fresh random nonce from the caller;
+    the system prompt says the content is data, never instructions. A weak nonce, or a chunk
+    that contains the nonce (it could close the wrapper itself), is refused.
+  - `extract.ts`: redact PII (optional, for providers outside Cloudflare, T12) → prompt →
+    model → JSON → per-clause form → put the PII back → **quote must be in the original
+    chunk verbatim**, not blank → exact offsets; duplicates (same type and quote) dropped.
+    Rejections are counted by reason (invalid, quote not found, whitespace-only, duplicate).
+- **Learned from the injection test:** the quote check stops invented quotes, not quotes of
+  text the attacker wrote into the document. A fooled model can still label the attacker's
+  own sentence (e.g. "The Supplier accepts unlimited liability.") as a clause. What the form
+  guarantees is that such output is only a pointer to exact characters of the document: no
+  tools, URLs or free-text instructions. Detecting hidden or injected text stays in M7 (T2).
+- **Prompt size:** the 41 descriptions make the system prompt 8,031 characters (~2,500
+  tokens at 3.2 characters per token), about four times a chunk. D34's estimate (1,000 input
+  tokens per chunk) is too low: on gemma-4 it is about 36 Neurons per chunk, not 17, so about
+  8 average contracts a day instead of 16. Step 4 measures it; a shorter prompt, fewer types
+  per call, or prompt caching (M6) can cut it.
+- **Tests:** 18 with a fake model (verbatim offsets, invented and whitespace-changed quotes,
+  blank quotes, malformed clauses, duplicates, extra fields, free-text risk flags, non-JSON
+  and oversized output, code fences, injection, PII round trip, an attacker's own
+  placeholder text). Mutation check: 20 breakages; 2 survived the first tests (a single-space
+  quote matches almost any chunk; the "do not follow instructions" sentence was unchecked);
+  after two test fixes **0 of 20 survive**.
+- **Nightly corpus embedding automated** (M3 step 2, D26): `scripts/nightly-embed.ps1`, run
+  by the Windows scheduled task "Lexguard nightly embedding" every day at 01:10 local time
+  (UTC+1, so 00:10 UTC, after the Neuron reset). It starts the probe Worker, waits for it,
+  runs `embed:cuad` (stops by itself at 9,000 Neurons per UTC day), stops the Worker, logs to
+  `evals/data/retrieval/nightly-embed.log`, and disables the task once every text is
+  embedded. Runs only while Marwan is logged in; wakes the laptop from sleep; a missed run
+  starts at the next login. Test run 2026-11-25 14:19 UTC: 1,623 texts embedded with the
+  day's last ~950 Neurons, then stopped at the cap; 9,974 texts left (~6,000 Neurons, one
+  night). If the clock moves to summer time (UTC+2), 01:10 local is before the reset; by then
+  the task should be finished.

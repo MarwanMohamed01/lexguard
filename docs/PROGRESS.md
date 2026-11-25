@@ -3,7 +3,7 @@
 Where the project stands and how to resume. Read together with `PROJECT.md` (the spec),
 `docs/DECISIONS.md` (deviations and their reasons) and `docs/LEARNING_LOG.md`.
 
-_Last updated: 2026-11-22._
+_Last updated: 2026-11-25._
 
 ## Status
 
@@ -12,17 +12,61 @@ _Last updated: 2026-11-22._
 | M0 Foundations                       | ✅ Done                                         |
 | M1 Core packages                     | ✅ Done (CI and full-history secret scan green) |
 | M2 Ingestion & splitting             | ✅ Done (deployed, smoke test green)            |
-| **M3 Index & retrieval**             | ⏳ **Next**                                     |
-| M4 Extraction swarm                  | Not started                                     |
+| M3 Index & retrieval                 | ✅ Done (deployed; full-corpus eval finishing)  |
+| **M4 Extraction swarm**              | ⏳ **Next**                                     |
 | M5 Research, verification, synthesis | Not started                                     |
 | M6 Routing & caching                 | Not started                                     |
 | M7 Guardrails & red team             | Not started                                     |
 | M8 A2A & observability               | Not started                                     |
 | M9 Evals in CI & write-up            | Not started                                     |
 
-Deployed Worker: https://lexguard.marwan-dev.workers.dev (M2 ingestion: upload, status, chunking
-Workflow; smoke test `scripts/smoke.mjs`, D23). Repo:
+Deployed Worker: https://lexguard.marwan-dev.workers.dev, version `201237a6` (M2 ingestion +
+M3 indexing and search: upload, status, chunking and indexing Workflows,
+`POST /v1/documents/:id/search`; smoke test `scripts/smoke.mjs`, D23/D32). Cloudflare
+resources: D1 `lexguard` (migrations 0001-0006 applied remotely), Vectorize index
+`lexguard-chunks` (1,024 dims, cosine, metadata index `doc`), Workers AI, Workflows
+`lexguard-chunk-document` and `lexguard-index-document`, secret `TENANT_KEYS`. Repo:
 https://github.com/MarwanMohamed01/lexguard (public).
+
+## Open items (carry into M4)
+
+- **Full-corpus retrieval eval (M3 step 2):** 9,974 of 37,675 texts left to embed (about one
+  more night). **Automated** (D36): the scheduled task "Lexguard nightly embedding" runs
+  `scripts/nightly-embed.ps1` at 01:10 local (00:10 UTC); log in
+  `evals/data/retrieval/nightly-embed.log`; it disables itself when done. Then decide hybrid vs keyword and the contextual
+  header with a per-case paired comparison, and set the CI gate (D26). Live = offline (D31),
+  so the offline result stands for production.
+- **Rotate the API key** (it appeared in a terminal shared with the assistant on 2026-11-25):
+  `node apps/worker/scripts/new-tenant-key.mjs marwan --set`.
+- Not built yet: deleting a document (its vectors and FTS rows; retention, D25); an index
+  stuck in `indexing` whose job never ran (D32); a per-tenant daily search cap (T15, D30).
+- Threat model open question 3 (T12): data-use terms of each free model provider, to answer in
+  M4 step 1 before any document text goes to one.
+
+## M4 plan (draft, explained to Marwan on 2026-11-25; explain each step again before starting)
+
+Goal: extractor agents read every chunk and return a filled-in, Zod-validated form per clause
+(type, verbatim quote, parties, obligations, dates, risk flags); map (parallel, per chunk
+batch) then reduce (merge, deduplicate, join clauses split across chunks); cross-references
+resolved with M2's definitions. Extractors are quarantined readers (no tools, schema output
+only, document text marked as data, T1/T2); every quote is checked by code against the chunk.
+
+1. ✅ Verify limits and data-use terms (D34): no document text to Gemini free (trains, human
+   review) or Groq (training not stated); candidates llama3.1:8b (local), gemma-4-26b-a4b-it,
+   qwen3-30b-a3b-fp8 (Workers AI); fan-out with Workflow steps, no Queues for now; ~16
+   average contracts a day on gemma-4 (estimate).
+2. ✅ Extraction eval first (D35): CUAD labels as the answer key per chunk, verbatim-quote
+   rule, precision / recall / F1 per type, "grounded" quotes. Baselines on 510 contracts:
+   all types F1 0.026, frequency guess 0.021, M3 keyword top-1 **0.203** (the bar to beat).
+   Pinned subsets: 10 contracts / 473 chunks, 20 / 924.
+3. ✅ The extractor (D36): `packages/extraction`, Zod form with closed type and risk lists,
+   nonce-wrapped untrusted text, optional PII redaction with restore, verbatim-quote check
+   with exact offsets; 18 tests with a fake model, 0 of 20 mutations survive.
+4. Measure locally on Ollama (llama3.1:8b installed) on a pinned CUAD subset, answers cached.
+5. Extraction Workflow in the Worker: fan-out, per-document budget, clauses in D1 (migration).
+6. Reduce / merge.
+7. Cross-reference resolution (definitions).
+8. Security tests (injected instructions in a chunk), real run, deploy, learning log, quiz.
 
 ## M2 plan
 
@@ -61,6 +105,58 @@ D1 (every row has `tenant_id`).
 7. ✅ Security pass (daily quota, hidden PDF text measured, headers, logs; D22), deploy and
    smoke test (D23), upload CPU probe and fix (D24), learning log, quiz.
 
+## M3 plan
+
+Goal: hybrid search over a tenant's chunks (Vectorize + D1 FTS5, merged by reciprocal rank
+fusion), each hit with exact offsets and page, measured against keyword-only and vector-only.
+
+1. ✅ Limits checked; embedding model chosen and probed: `@cf/baai/bge-m3`, 1,024 dimensions;
+   Vectorize space (~4,880 vectors) is the tightest limit (D25).
+2. ⏳ Retrieval eval first: CUAD's clause-category questions as queries, the chunk holding the
+   lawyer-labelled span as the answer; recall@k, MRR, nDCG; keyword / vector / hybrid (D26).
+   Built; keyword measured on all 510 contracts, vector and hybrid on the 30 converted PDFs.
+   **Open:** embed the rest of the corpus on Workers AI (9,000 Neurons a day, about 3 more
+   days: start the probe Worker, then `npm run embed:cuad -w @lexguard/evals`), then decide
+   hybrid / header with a paired comparison and set the CI gate.
+3. ✅ `packages/retrieval`: contextual header, RRF, safe FTS5 query builder (`ftsQuery`,
+   `scopedFtsQuery`, `reciprocalRankFusion`, `contextualHeader`). Fuzzed against real FTS5
+   (never fails, never leaves tenant + document scope), two bugs fixed, 0 of 16 mutations
+   survive (D27).
+4. ✅ D1 migration 0005 `chunks_fts` (porter, tenant/doc scope tokens), applied locally;
+   measured 1 write per chunk, reads ~2 per matching chunk of the searched document (D28).
+   **Remote apply still to do, with Marwan's OK** (before step 7's real run).
+5. ✅ `IndexDocument` Workflow after chunking (D29): migration 0006 (index state), embed in
+   padded-size batches, upsert into the tenant's namespace, keyword rows, fenced, atomic space
+   guard; tested with fakes plus a real end-to-end run with only the embedding step replaced;
+   0 of 11 mutations survive. Vectorize index `lexguard-chunks` (1,024 dims, cosine) and its
+   `doc` metadata index created 2026-11-24 with Marwan's OK, verified before any vector was
+   written. **Still to do, with Marwan's OK:** apply 0005/0006 remotely.
+6. ✅ `POST /v1/documents/:id/search` (D30): keyword + vector in parallel, RRF, vector IDs
+   checked before fusion, every hit read back from D1 under the caller's tenant, exact
+   offsets + page, untrusted-text note, keyword fallback when the vector side fails;
+   0 of 13 mutations survive.
+7. ✅ Real run on the 30 PDFs (D31): real toMarkdown, bge-m3 and Vectorize. Quality identical
+   to the offline eval in every mode (hybrid MRR 0.550, keyword 0.528, vector 0.466); vectors
+   searchable right after `indexed`; tenants isolated (404); Vectorize count = D1 count
+   (1,820). Found and fixed: vectors searchable 53 s after `indexed` (indexing now waits),
+   1 transient vector failure in 3,690 searches (now retried once), Windows cleanup EBUSY.
+   CPU is measured after the deploy (step 8). Corpus embedding continues daily (step 2).
+8. ⏳ Deploy and measure (D32). Prepared: re-upload indexes pre-M3 documents, smoke test
+   checks indexing and search, `scripts/tail-cpu.mjs` filters tail output to CPU facts only.
+   **Order (each Cloudflare action with Marwan's OK):**
+   1. ✅ migrations 0005 + 0006 applied to the remote D1 (2026-11-25, Marwan's OK);
+   2. ✅ deployed, version `c659a26e` (Workflow `lexguard-index-document` created); health
+      200, search without a key 401;
+   3. ✅ smoke test (Marwan): all 19 checks passed; the three pre-M3 documents were indexed by
+      the re-upload (D32); hybrid search 438 ms, results from keywords and vectors.
+      **Rotate the API key** (it appeared in a terminal shared with the assistant):
+      `node apps/worker/scripts/new-tenant-key.mjs marwan --set`.
+   4. ✅ CPU measured (D33): search 3-5 ms, status 0 ms, upload 15 ms (known, D24), chunking
+      35 ms and indexing 102 ms per whole instance (~20 steps, all ok). The embedding step's
+      CPU is mostly JSON, so batches are now 32 texts (was 100); redeployed as `201237a6`.
+   5. ✅ `tail-cpu.mjs --record` (writes each event at once; PowerShell's `>` lost two captures).
+   6. docs, learning log, quiz.
+
 ## Working rules (agreed)
 
 - One milestone at a time; explain what and why before each step, then file by file after.
@@ -71,7 +167,12 @@ D1 (every row has `tenant_id`).
 - Commits are authored by Marwan only, with no co-author trailers.
 - Commit only after `npm run check` passes. Never quote a flagged secret, even in comments.
 - Quizzes are multiple choice.
-- Marwan reviews the code; explanations in plain language with examples.
+- Marwan reviews the code; explanations in plain language with examples. Keep them very
+  simple (everyday analogies, small worked examples): the M3 quiz was 3/8 even after a full
+  walkthrough.
+- Ask before creating, deleting or deploying Cloudflare resources and before applying remote
+  migrations. Marwan runs anything that needs his API key, entered with a hidden prompt; never
+  read a terminal where a key may be on screen.
 
 ## Useful commands
 
@@ -85,6 +186,14 @@ npm run eval:watch -w @lexguard/evals      # Evalite case-by-case view
 npm run deploy -w @lexguard/worker         # deploy (after `npx wrangler login`)
 LEXGUARD_API_KEY=... node scripts/smoke.mjs <worker-url>   # production smoke test (your key)
 node apps/worker/scripts/new-tenant-key.mjs <tenant> --set  # new API key, stored as the secret (run it yourself)
+# M3
+npx wrangler dev -c experiments/embed-probe/wrangler.jsonc  # probe Worker for corpus embedding (keep running)
+npm run embed:cuad -w @lexguard/evals      # corpus embedding, 9,000 Neurons/day cap (NEURON_CAP=n), resumes
+node evals/retrieval/live-run.mjs          # real retrieval path on the 30 PDFs (~1,100 Neurons; LIMIT=n)
+npx vitest run --root evals retrieval/live.test.ts   # scores the live run
+node scripts/tail-cpu.mjs --record tail-cpu.jsonl    # CPU facts from wrangler tail (Ctrl+C to stop)
+node scripts/tail-cpu.mjs --summary tail-cpu.jsonl
+PICK=3 node scripts/cpu-load.mjs <worker-url>        # one new upload + 20 searches (your key)
 ```
 
 ## Key numbers so far
@@ -95,5 +204,10 @@ node apps/worker/scripts/new-tenant-key.mjs <tenant> --set  # new API key, store
 - Chunking on CUAD (510 contracts, 13,823 clauses): 99.41% of clauses kept whole vs 96.95%
   for LangChain-style recursive splitting at the same chunk count; 0 offset errors.
 - Real toMarkdown output (30 PDFs): 97.96% of clauses found, 98.63% kept whole.
-- Tests: 347 (worker 102, trace 24, guardrails 72, router 13, a2a 34, chunker 59, evals 43, of
-  which 6 need the locally converted PDFs and skip in CI).
+- Retrieval on the 30 real PDFs (415 cases, live = offline, D31): hybrid MRR 0.550 / hit@5
+  0.708; keyword 0.528 / 0.679; vector 0.466 / 0.641; random 0.125 / 0.222. Keyword on 510
+  CUAD contracts: MRR 0.568 with stemming.
+- Production CPU (D33): search 3-5 ms, status 0 ms, upload 15 ms (655 KB, known since D24),
+  indexing ~5 ms per step.
+- Tests: 478 (worker 138, a2a 34, chunker 59, extraction 18, guardrails 72, retrieval 26,
+  router 13, trace 24, evals 94; the live-run and converted-PDF evals skip in CI).

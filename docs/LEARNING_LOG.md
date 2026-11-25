@@ -280,3 +280,119 @@ them need the locally converted PDFs and skip in CI).
     type**; the secret problem caused 500s on `/v1/`, later and separately.
   - To revisit before M3: D21 (conversion findings), D24 (CPU probe), the T2 row of the
     threat model.
+
+---
+
+## Milestone 3 — Index & retrieval
+
+### What was built
+
+Search inside a contract, live at https://lexguard.marwan-dev.workers.dev:
+
+**ready document → indexing Workflow (embed → Vectorize, copy → FTS5, wait until searchable)
+→ `POST /v1/documents/:id/search` → keyword + vector in parallel → RRF → read back from D1**
+
+| Piece                       | Job                                                                |
+| --------------------------- | ------------------------------------------------------------------ |
+| `packages/retrieval`        | Safe FTS5 queries, scope tokens, RRF, contextual header, batching  |
+| Migration 0005 `chunks_fts` | Keyword index, tenant + document as filter columns                 |
+| Migration 0006              | Index state: status, ticket, version, vector count, error          |
+| `IndexDocument` Workflow    | Embed in size-capped batches, upsert, keywords, wait, finish       |
+| `src/search.ts`             | The search endpoint: checks, both searches, fusion, read-back      |
+| Retrieval eval              | CUAD's questions as queries, lawyer labels as answers, 3 methods   |
+| Live run + smoke + CPU      | The same eval through the real services; production checks and CPU |
+
+### Ideas worth remembering
+
+- **Two kinds of search, one ranking.** Keywords (FTS5, bm25) find the exact words; vectors
+  (bge-m3) find the meaning. Reciprocal rank fusion merges them using only positions,
+  because a bm25 score and a cosine similarity cannot be compared.
+- **The eval comes first.** CUAD's own questions and lawyer labels, no hand-made queries. On
+  the 30 real PDFs: random MRR 0.125, vector 0.466, keyword 0.528, hybrid 0.550. Keyword search
+  beats vector search here because CUAD's descriptions use the clauses' own legal words.
+- **Choose the embedding model by the data.** bge-base reads only 512 tokens, and more than
+  half of our chunks are longer: it would have embedded half a clause without saying so.
+  bge-m3 reads them whole and costs 5.6× less.
+- **Free-tier limits decide the design.** The tightest limit is Vectorize space (about 4,880
+  vectors for everyone), not Neurons. So a space guard reserves room atomically in D1 before a
+  single embedding is made.
+- **Filters belong inside the query language, with zero weight.** Filtering by document after
+  FTS5's MATCH made it score the whole table (28 ms → 5.6 ms when moved inside). But bm25 also
+  scored the filter term, which reordered results, until the filter column got weight 0.
+- **Treat user text as data in every language.** FTS5 has its own syntax (`OR`, `NEAR(`,
+  `col:`). Pasting a question into MATCH let a fuzz test reach another tenant's rows; quoting
+  each word never did, over 5,006 hostile inputs.
+- **The system of record decides.** Vectorize is an index, not the truth: every hit is read
+  back from D1 under the caller's tenant, and a vector ID that is not this document's chunk is
+  dropped before it can take a place in the results.
+- **Mutation checks keep finding real gaps.** In every step, some deliberate breakage first
+  survived the tests: a ticket check before embedding, a stale vector emptying a `limit: 1`
+  search, a tie-break nobody tested.
+
+### What the real runs found (the part I missed in the M2 quiz)
+
+M3 built on three M2 findings:
+
+- **D21:** converted PDFs glue words (`RIGHTS10.1`) and have no blank lines. In M3 this
+  showed up again: FTS5 cannot find `RIGHTS` in `RIGHTS10`, and the converted PDFs score
+  lower than CUAD's clean text.
+- **D24:** measure before refactoring. M3 repeated the lesson: I blamed Zod for the embedding
+  step's CPU (0.5 ms); the cost was parsing about 1 MB of JSON (5.9 ms). Fix: 32 texts per
+  batch instead of 100.
+- **T2:** hidden PDF text survives conversion, so it is indexed and searchable too. Search
+  results therefore carry a note: the text is untrusted data, never instructions (defence in
+  M7).
+
+New in M3, found only by running the real services:
+
+- **Workers AI pads every batch to its longest text and bills the padding.** One 842-token
+  text costs 842 tokens alone, 4,210 with four 6-token texts. So batches are sorted by length.
+  The 60,000-token "context" is per request, not per text.
+- **Vectorize is asynchronous: vectors answered 53 s after "indexed".** Hybrid search quietly
+  fell back to keywords meanwhile. Now indexing waits until its last vector answers a query,
+  so "indexed" means searchable (0.5 s after, measured on 30 documents).
+- **The real path matched the offline eval to three decimals.** Vectorize's approximate search
+  lost nothing on 200-vector documents, and D1's FTS5 ranked exactly like local SQLite. The
+  offline eval can be trusted for the real system.
+- **Old documents would never have been indexed.** Re-uploading a ready but unindexed document
+  now starts indexing; the smoke test backfilled the M2 documents that way.
+- **PowerShell's `>` writes only at the end, and Ctrl+C discards it.** Two CPU captures came
+  out empty before the recorder wrote each event itself.
+
+### Debugging and process lessons
+
+- Free daily limits are a schedule: the corpus embedding runs 9,000 Neurons a day, capped
+  from the Neurons each response reports, and resumes the next day from a cache.
+- A fixed wait in a test hides timing bugs; poll with a deadline instead.
+- An API key typed into a shared terminal is exposed: rotate it, and read keys with a hidden
+  prompt (`Read-Host -AsSecureString`).
+
+### Numbers
+
+- 30 real PDFs, 415 cases (live = offline): hybrid MRR 0.550, hit@5 0.708; keyword 0.528 /
+  0.679; vector 0.466 / 0.641; random 0.125 / 0.222.
+- Keyword search on 510 CUAD contracts (6,702 cases): MRR 0.568 with stemming, 0.546 without.
+- Production CPU: search 3-5 ms, indexing about 5 ms per step; 1 transient vector failure in
+  3,690 searches (now retried once).
+
+### Tests at the end of M3
+
+440 tests: worker 138, a2a 34, chunker 59, guardrails 72, retrieval 26, router 13, trace 24,
+evals 74.
+
+### Quiz score
+
+- End of M3: 3/8 (after a full plain-language walkthrough). Right: why RRF (scores on
+  different scales), the 53 s Vectorize delay, live = offline. Missed:
+  - Workers AI bills the **padded** batch: 842 + four 6-token texts costs 5 x 842 = 4,210
+    tokens, not 866. That is why batches are sorted by length.
+  - The FTS5 ranking was fixed by **zero bm25 weight on the filter column**
+    (`bm25(fts, 1.0, 0.0)`), not by an index: an index cannot change how bm25 scores.
+  - The embedding step's CPU was **parsing ~1 MB of JSON** (5.9 ms), not Zod (0.5 ms), and
+    waiting for the model is not CPU at all. Fix: 32 texts per batch.
+  - bge-m3 was chosen because bge-base reads only **512 tokens** and would silently cut 54% of
+    our chunks; bge-m3 actually has **more** dimensions (1,024 vs 768).
+  - Hidden white text (T2) is **not removed**: it is chunked, indexed and searchable, and
+    results are labelled untrusted. The real defence is M7's quarantined reader.
+  - To revisit before M4: D26 (padding), D27/D28 (zero-weight filter), D33 (JSON CPU), D25
+    (512 tokens), T2.
