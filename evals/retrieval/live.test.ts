@@ -116,7 +116,7 @@ describe.skipIf(!cuadAvailable() || !existsSync(RUN))("M3 step 7: real retrieval
       new URL("../results/cuad-retrieval-live.json", import.meta.url),
       `${JSON.stringify(report, null, 2)}\n`,
     );
-  });
+  }, 600_000);
 
   it("used exactly the eval's queries", () => {
     expect(run.queries).toEqual(Object.fromEntries(loadQueries()));
