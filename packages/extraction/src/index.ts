@@ -22,3 +22,4 @@ export {
   workersAiChatInput,
   type ChatAnswer,
 } from "./workers-ai";
+export { mergeClauses, type ClausePiece, type MergedClause } from "./merge";

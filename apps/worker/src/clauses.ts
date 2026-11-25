@@ -6,7 +6,12 @@
 //
 // Extraction is started on request, not after every upload: it spends the shared daily
 // Neurons (T15), so only a tenant who asks pays for it.
-import { CLAUSE_TYPE_NAMES } from "@lexguard/extraction";
+import {
+  CLAUSE_TYPE_NAMES,
+  mergeClauses,
+  type ClausePiece,
+  type MergedClause,
+} from "@lexguard/extraction";
 import { claimForExtraction, getDocument, markExtractNotStarted } from "./documents";
 import { EXTRACT_VERSION, type ExtractParams } from "./extraction";
 import { pageOf, UNTRUSTED_NOTE } from "./search";
@@ -95,6 +100,9 @@ export async function handleClauses(
     );
   }
 
+  // merged=true: document-level clauses (M4 step 6, D39), computed on read from every stored
+  // piece; otherwise the stored per-chunk clauses as they are.
+  const merged = url.searchParams.get("merged") === "true";
   const { results: rows } = await db
     .prepare(
       `SELECT chunk_idx AS chunk, clause_type AS type, start_offset AS start,
@@ -102,50 +110,105 @@ export async function handleClauses(
        FROM clauses WHERE tenant_id = ? AND document_id = ? AND (? IS NULL OR clause_type = ?)
        ORDER BY start_offset, chunk_idx, n LIMIT ?`,
     )
-    .bind(tenantId, id, type, type, MAX_CLAUSES_RETURNED + 1)
+    .bind(tenantId, id, type, type, merged ? MAX_PIECES : MAX_CLAUSES_RETURNED + 1)
     .all<{ chunk: number; type: string; start: number; end: number; details: string }>();
-  const truncated = rows.length > MAX_CLAUSES_RETURNED;
-  const kept = rows.slice(0, MAX_CLAUSES_RETURNED);
 
   // Quotes come from the stored chunks (offsets are UTF-16 units: sliced in JavaScript, not
   // with SQLite's substr, which counts characters), read once per chunk.
-  const chunkIds = [...new Set(kept.map((r) => r.chunk))];
+  const chunkIds = [...new Set(rows.map((r) => r.chunk))];
   const { results: chunks } = await db
     .prepare(
       `SELECT idx, start_offset AS start, text FROM chunks
-       WHERE tenant_id = ? AND document_id = ? AND idx IN (SELECT value FROM json_each(?))`,
+       WHERE tenant_id = ? AND document_id = ? AND idx IN (SELECT value FROM json_each(?))
+       ORDER BY start_offset`,
     )
     .bind(tenantId, id, JSON.stringify(chunkIds))
     .all<{ idx: number; start: number; text: string }>();
-  const byIdx = new Map(chunks.map((c) => [c.idx, c]));
+  const textOf = documentText(chunks);
   const pageStarts = doc.pageStarts === null ? null : (JSON.parse(doc.pageStarts) as number[]);
-
-  const clauses: ClauseResult[] = [];
-  for (const row of kept) {
-    const chunk = byIdx.get(row.chunk);
-    // A chunk re-made since extraction no longer matches: skip rather than show wrong text.
-    if (chunk === undefined) continue;
-    const from = row.start - chunk.start;
-    const to = row.end - chunk.start;
-    if (from < 0 || to > chunk.text.length) continue;
-    const details = JSON.parse(row.details) as Pick<
-      ClauseResult,
+  const pieces: ClausePiece[] = rows.map((row) => ({
+    type: row.type,
+    start: row.start,
+    end: row.end,
+    chunk: row.chunk,
+    ...(JSON.parse(row.details) as Pick<
+      ClausePiece,
       "parties" | "obligations" | "dates" | "riskFlags"
-    >;
-    clauses.push({
-      type: row.type,
-      quote: chunk.text.slice(from, to),
-      start: row.start,
-      end: row.end,
-      page: pageOf(pageStarts, row.start),
-      chunk: row.chunk,
-      ...details,
+    >),
+  }));
+
+  if (!merged) {
+    const clauses: ClauseResult[] = [];
+    for (const p of pieces.slice(0, MAX_CLAUSES_RETURNED)) {
+      const quote = textOf(p.start, p.end);
+      // A chunk re-made since extraction no longer matches: skip rather than show wrong text.
+      if (quote === null) continue;
+      clauses.push({
+        type: p.type,
+        quote,
+        start: p.start,
+        end: p.end,
+        page: pageOf(pageStarts, p.start),
+        chunk: p.chunk,
+        parties: [...p.parties],
+        obligations: [...p.obligations],
+        dates: [...p.dates],
+        riskFlags: [...p.riskFlags],
+      });
+    }
+    return Response.json({
+      extractVersion: doc.version,
+      clauses,
+      truncated: pieces.length > MAX_CLAUSES_RETURNED,
+      note: UNTRUSTED_NOTE,
     });
+  }
+
+  const whitespaceGap = (from: number, to: number) => {
+    const gap = textOf(from, to);
+    return gap !== null && /^\s*$/u.test(gap);
+  };
+  const all = mergeClauses(pieces, whitespaceGap);
+  const clauses: MergedResult[] = [];
+  for (const m of all.slice(0, MAX_CLAUSES_RETURNED)) {
+    const quote = textOf(m.start, m.end);
+    if (quote === null) continue;
+    clauses.push({ ...m, quote, page: pageOf(pageStarts, m.start) });
   }
   return Response.json({
     extractVersion: doc.version,
+    merged: true,
     clauses,
-    truncated,
+    truncated: all.length > MAX_CLAUSES_RETURNED,
     note: UNTRUSTED_NOTE,
   });
+}
+
+/** Every stored piece of a document: 400 chunks x 20 clauses at most (D37). */
+const MAX_PIECES = 8_000;
+
+export type MergedResult = MergedClause & { quote: string; page: number | null };
+
+/**
+ * Text of the document between two offsets, from chunk rows sorted by start. Null when the
+ * loaded chunks do not cover the whole range without a gap (then no quote is shown).
+ */
+export function documentText(
+  chunks: readonly { start: number; text: string }[],
+): (from: number, to: number) => string | null {
+  return (from, to) => {
+    if (!(to >= from)) return null;
+    let out = "";
+    let at = from;
+    for (const c of chunks) {
+      if (at === to) break;
+      const end = c.start + c.text.length;
+      if (end <= at) continue; // entirely before the range
+      if (c.start > at) return null; // a gap the loaded chunks do not cover
+      const stop = Math.min(to, end);
+      out += c.text.slice(at - c.start, stop - c.start);
+      at = stop;
+    }
+    return at === to ? out : null;
+  };
 }

@@ -70,7 +70,8 @@ only, document text marked as data, T1/T2); every quote is checked by code again
 5. ✅ Extraction Workflow in the Worker (D37): `POST .../extract`, `GET .../clauses`, parallel
    chunk steps (4), atomic daily Neuron budget, fencing, migration 0007 (not applied remotely
    yet); 20 tests, 0 of 19 mutations survive.
-6. Reduce / merge.
+6. ✅ Reduce / merge (D39): `mergeClauses` (same type, overlapping or whitespace-separated),
+   computed on read by `GET .../clauses?merged=true`; 14 tests, mutation-checked.
 7. Cross-reference resolution (definitions).
 8. Security tests (injected instructions in a chunk), real run, deploy, learning log, quiz.
 
@@ -215,5 +216,5 @@ PICK=3 node scripts/cpu-load.mjs <worker-url>        # one new upload + 20 searc
   CUAD contracts: MRR 0.568 with stemming.
 - Production CPU (D33): search 3-5 ms, status 0 ms, upload 15 ms (655 KB, known since D24),
   indexing ~5 ms per step.
-- Tests: 513 (worker 158, a2a 34, chunker 59, extraction 32, guardrails 72, retrieval 26,
+- Tests: 527 (worker 161, a2a 34, chunker 59, extraction 43, guardrails 72, retrieval 26,
   router 13, trace 24, evals 95; the live-run and converted-PDF evals skip in CI).

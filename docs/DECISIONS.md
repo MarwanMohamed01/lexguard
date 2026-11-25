@@ -1099,3 +1099,32 @@ extract_error`; `clauses` (tenant-first key, document offsets, details JSON, **n
 - **CI failure found after the push:** `evals/retrieval/live.test.ts` read a local-only file
   in a `describe` body; Vitest runs describe bodies even for skipped suites. Fixed by reading
   in `beforeAll`, checked by running the evals with the local-only data hidden.
+
+## D39. The reduce step: document-level clauses (M4 step 6, 2026-11-25)
+
+- **Problem:** each extractor sees one chunk. A clause cut by a chunk boundary comes back as
+  two quotes of the same type that touch at the boundary (chunks are contiguous, D15; about
+  0.6% of CUAD's labelled clauses are cut, D15/D21), and one passage may be quoted twice in
+  overlapping ways.
+- **`mergeClauses`** (`@lexguard/extraction`, pure): clauses of the **same type** whose spans
+  overlap or are separated only by whitespace become one clause covering both; different
+  types never merge; same-type clauses with real text between them stay separate (Parties in
+  the preamble and in the signature block are two pieces of evidence). Details are combined
+  without duplicates (parties, dates and obligations compared case-insensitively; risk flags
+  sorted). Each merged clause lists its chunks and how many pieces it joined. Whether a gap is
+  whitespace is answered by the caller from the document text, so the function holds no text.
+- **Computed on read, not stored:** `GET /v1/documents/:id/clauses?merged=true`. No table, no
+  migration; the per-chunk clauses stay as the audit record, and a better merge rule needs no
+  re-extraction. Reads every stored piece of the document (at most 400 x 20 = 8,000) and
+  returns at most 1,000 merged clauses (`truncated` otherwise). The merged quote is cut from
+  the stored chunk texts across the boundary (`documentText`, null when the loaded chunks
+  leave a gap), never assembled from model output (T3).
+- **Tests:** 11 for the merge (boundary join, overlap, duplicates, separation by real text,
+  type isolation, details, chaining, empty input, idempotence, coverage, a span contained in
+  another), 1 endpoint test (a clause split over two chunks comes back as one quote equal to
+  the document slice, while a same-type quote after real text stays separate), 2 for
+  `documentText`. Mutation check: 13 breakages; 3 survived the first tests, one of them
+  equivalent (touching spans: the empty gap counts as whitespace either way); the other two
+  (group end not kept at the longest span; any loaded gap merging) are now caught.
+- **Not measured yet:** how often real model output needs merging. The step 4 answers (cached)
+  can show it once the Workers AI run is complete.

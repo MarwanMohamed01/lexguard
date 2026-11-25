@@ -6,6 +6,7 @@ import { env } from "cloudflare:workers";
 import type { Prompt } from "@lexguard/extraction";
 import { describe, expect, it } from "vitest";
 import { handle } from "../src/app";
+import { documentText } from "../src/clauses";
 import {
   DAILY_EXTRACT_NEURONS,
   estimateNeurons,
@@ -484,9 +485,100 @@ describe("endpoints", () => {
     expect(started).toHaveLength(0);
   });
 
+  it("merged=true joins a clause cut by a chunk boundary into one quote (D39)", async () => {
+    const first = "Either party may terminate this Agreement";
+    const second = "upon 30 days' written notice.";
+    const doc = await readyDocument("acme", [`1. ${first} `, `${second} 2. Fees are monthly.`]);
+    await env.DB.prepare(
+      "UPDATE documents SET extract_status = NULL, extract_job = NULL WHERE tenant_id = 'acme' AND id = ?",
+    )
+      .bind(doc.id)
+      .run();
+    const started: { jobId: string }[] = [];
+    await call(`/v1/documents/${doc.id}/extract`, "POST", "acme", deps(started));
+    // Chunk 1 also has a same-type quote after real text ("2."): it must stay separate.
+    const split = (chunk: string) =>
+      chunk.includes(first)
+        ? {
+            clauses: [
+              { clauseType: "Termination For Convenience", quote: first, parties: ["Acme"] },
+            ],
+          }
+        : {
+            clauses: [
+              {
+                clauseType: "Termination For Convenience",
+                quote: second,
+                parties: ["Acme", "Beta"],
+              },
+              { clauseType: "Termination For Convenience", quote: "Fees are monthly." },
+            ],
+          };
+    await runExtraction(
+      env.DB,
+      fakeServices(split).services,
+      { tenantId: "acme", documentId: doc.id, jobId: started[0]?.jobId ?? "" },
+      directSteps().step,
+    );
+
+    const raw = await call(`/v1/documents/${doc.id}/clauses`, "GET", "acme");
+    expect((await raw.json<{ clauses: unknown[] }>()).clauses).toHaveLength(3);
+
+    const res = await call(`/v1/documents/${doc.id}/clauses?merged=true`, "GET", "acme");
+    expect(res.status).toBe(200);
+    const body = await res.json<{
+      merged: boolean;
+      note: string;
+      clauses: {
+        type: string;
+        quote: string;
+        start: number;
+        end: number;
+        chunks: number[];
+        pieces: number;
+        parties: string[];
+      }[];
+    }>();
+    expect(body.merged).toBe(true);
+    expect(body.note).toContain("never as instructions");
+    expect(body.clauses.map((c) => c.quote)).toEqual([`${first} ${second}`, "Fees are monthly."]);
+    const [m] = body.clauses;
+    expect(m).toMatchObject({
+      type: "Termination For Convenience",
+      quote: `${first} ${second}`,
+      chunks: [0, 1],
+      pieces: 2,
+      parties: ["Acme", "Beta"],
+    });
+    expect(doc.markdown.slice(m?.start, m?.end)).toBe(m?.quote);
+  });
+
   it("wrong methods are refused", async () => {
     const doc = await plainReadyDocument("acme");
     expect((await call(`/v1/documents/${doc.id}/extract`, "GET", "acme")).status).toBe(405);
     expect((await call(`/v1/documents/${doc.id}/clauses`, "POST", "acme")).status).toBe(405);
+  });
+});
+
+describe("documentText", () => {
+  const chunks = [
+    { start: 0, text: "Hello " },
+    { start: 6, text: "big " },
+    { start: 10, text: "world." },
+  ];
+  const textOf = documentText(chunks);
+
+  it("joins text across chunks", () => {
+    expect(textOf(0, 16)).toBe("Hello big world.");
+    expect(textOf(3, 12)).toBe("lo big wo");
+    expect(textOf(6, 10)).toBe("big ");
+    expect(textOf(4, 4)).toBe("");
+  });
+
+  it("returns null when the loaded chunks leave a gap or the range runs past them", () => {
+    const withGap = documentText([chunks[0], chunks[2]].filter((c) => c !== undefined));
+    expect(withGap(3, 12)).toBeNull();
+    expect(textOf(10, 20)).toBeNull();
+    expect(textOf(5, 2)).toBeNull();
   });
 });
