@@ -32,10 +32,8 @@ export interface AcceptedClause extends ExtractedClause {
 export interface Rejections {
   /** Did not match the form (unknown type, missing quote, too long...). */
   invalid: number;
-  /** Quote not in the chunk. */
+  /** Quote not in the chunk, even ignoring whitespace. */
   quoteNotFound: number;
-  /** ...of which only whitespace differs (diagnostic: still rejected). */
-  whitespaceOnly: number;
   /** Same type and quote as an earlier entry. */
   duplicate: number;
 }
@@ -46,13 +44,39 @@ export type ExtractionResult =
       promptVersion: string;
       clauses: AcceptedClause[];
       rejected: Rejections;
+      /** Accepted clauses whose quote matched only with whitespace ignored (see locateQuote). */
+      relocated: number;
       redacted: number;
     }
   | { ok: false; promptVersion: string; reason: ParseFailureReason; message: string };
 
 const MAX_OUTPUT_CHARS = 60_000;
 
-const collapse = (s: string) => s.replace(/\s+/gu, " ").trim();
+const escapeRegExp = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/gu, "\\$&");
+
+/**
+ * Where `quote` is in `text`: verbatim first; otherwise the first passage that matches it
+ * when every run of whitespace may differ (a line break for a space, two spaces for one...).
+ * Found in step 4: 9 of gpt-oss-20b's 13 unfound quotes differed from the contract only in
+ * whitespace. The returned span is the CONTRACT's text, never the model's: the model's quote
+ * only finds the passage, so what is stored and cited is still exactly the document (T3).
+ * Every other difference (a word, a letter, a comma, letter case) still fails. A blank quote
+ * fails: it would match anywhere. The pattern is literal words joined by \s+, so matching is
+ * linear (no nested quantifiers to backtrack on).
+ */
+export function locateQuote(
+  text: string,
+  quote: string,
+): { start: number; end: number; exact: boolean } | null {
+  const words = quote.split(/\s+/u).filter((w) => w.length > 0);
+  if (words.length === 0) return null;
+  const at = text.indexOf(quote);
+  if (at !== -1) return { start: at, end: at + quote.length, exact: true };
+  const match = new RegExp(words.map(escapeRegExp).join("\\s+"), "u").exec(text);
+  return match === null
+    ? null
+    : { start: match.index, end: match.index + match[0].length, exact: false };
+}
 
 export async function extractClauses(
   chunkText: string,
@@ -74,9 +98,10 @@ export async function extractClauses(
   }
 
   const restore = (s: string) => (redaction === null ? s : restorePii(s, redaction.mapping));
-  const rejected: Rejections = { invalid: 0, quoteNotFound: 0, whitespaceOnly: 0, duplicate: 0 };
+  const rejected: Rejections = { invalid: 0, quoteNotFound: 0, duplicate: 0 };
   const clauses: AcceptedClause[] = [];
   const seen = new Set<string>();
+  let relocated = 0;
 
   for (const entry of envelope.data.clauses) {
     const parsed = ExtractedClause.safeParse(entry);
@@ -96,21 +121,21 @@ export async function extractClauses(
       dates: c.dates.map(restore),
     };
     // The check is against the original chunk, never the text the model saw (T3).
-    const start = chunkText.indexOf(clause.quote);
-    if (clause.quote.trim().length === 0 || start === -1) {
+    const found = locateQuote(chunkText, clause.quote);
+    if (found === null) {
       rejected.quoteNotFound++;
-      if (clause.quote.trim().length > 0 && collapse(chunkText).includes(collapse(clause.quote))) {
-        rejected.whitespaceOnly++;
-      }
       continue;
     }
-    const key = `${clause.clauseType}\u0000${clause.quote}`;
+    // From here on the quote IS the document's text at that position.
+    const quote = chunkText.slice(found.start, found.end);
+    const key = `${clause.clauseType}\u0000${quote}`;
     if (seen.has(key)) {
       rejected.duplicate++;
       continue;
     }
     seen.add(key);
-    clauses.push({ ...clause, start, end: start + clause.quote.length });
+    if (!found.exact) relocated++;
+    clauses.push({ ...clause, quote, start: found.start, end: found.end });
   }
 
   return {
@@ -118,6 +143,7 @@ export async function extractClauses(
     promptVersion: PROMPT_VERSION,
     clauses,
     rejected,
+    relocated,
     redacted: redaction === null ? 0 : redaction.mapping.size,
   };
 }

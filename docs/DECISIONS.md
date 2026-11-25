@@ -1049,3 +1049,53 @@ extract_error`; `clauses` (tenant-first key, document offsets, details JSON, **n
 - **Open:** a per-tenant daily extraction cap (T15, with M8's rate limits); a job stuck in
   `extracting` whose instance never ran (as for indexing, D32); deleting a document's clauses
   with the document (cascade covers `clauses` and `extraction_chunks`).
+
+## D38. Running the extraction eval: Groq, Workers AI, whitespace and thinking (M4 step 4, 2026-11-25)
+
+- **The laptop cannot run it:** llama3.1:8b wrote 1.5 tokens/s (1.5 GB of 15.6 GB RAM free,
+  so the model swapped); llama3.2 3B took 336 s per chunk and got 0 of 3 chunks right (30 of
+  its 39 entries had an empty quote). Node's `fetch` also gives up after 300 s without
+  response headers, so the Ollama adapter uses `node:http`.
+- **Groq free tier, gpt-oss-20b** (public CUAD contracts only, D34; key in the git-ignored
+  `evals/.env`, entered by Marwan with a hidden prompt): limits 30 requests/min, 1,000/day,
+  8,000 tokens/min, **200,000 tokens/day**. Measured about 2,100 input + 300 output tokens per
+  chunk, no discount for the repeated prompt start, so about 75 chunks a day: too slow for the
+  whole subset, used for an early signal. 0.8-2 s per answer; the rest is rate-limit waiting.
+- **Early signal, first 68 chunks of the 10-contract subset (about 1.5 contracts):**
+
+  | Same 68 chunks                        | Precision | Recall | F1   |
+  | ------------------------------------- | --------- | ------ | ---- |
+  | gpt-oss-20b, strict quotes            | 0.53      | 0.39   | 0.45 |
+  | gpt-oss-20b, whitespace-tolerant      | 0.57      | 0.52   | 0.54 |
+  | M3 keyword search, top chunk per type | 0.13      | 0.41   | 0.20 |
+
+  Strong on Governing Law, License Grant, Cap On Liability; weak on dates (Expiration Date
+  0 of 5). Too few chunks to decide anything; the full subset runs on Workers AI.
+
+- **Whitespace-tolerant quote locating (`locateQuote`):** 9 of gpt-oss-20b's 13 unfound quotes
+  differed from the contract only in whitespace (a space for a line break). Now the verbatim
+  position is tried first, then a passage matching with every whitespace run allowed to
+  differ. **The stored and returned quote is the contract's text at that position, never the
+  model's**, so T3 holds: the model only locates the passage. A letter, letter case, a comma
+  or a missing word still fails; a blank quote fails; regular-expression characters in a
+  quote are literal; the pattern (literal words joined by `\s+`) cannot backtrack
+  exponentially. Counted as `relocated`. 0 of 9 mutations survive.
+- **Workers AI gemma-4 returned an empty answer at first,** for two reasons found on the model
+  page (sync input/output schemas): thinking is on by default
+  (`chat_template_kwargs.enable_thinking`, default true) and used all 2,048 output tokens
+  (about 115 Neurons for nothing); and the model answers in the OpenAI shape
+  (`choices[0].message.content`), while the code read the older `response` field. The
+  production Workflow had the same bug. **Fix:** `workersAiChatInput` (thinking off,
+  `max_completion_tokens`, JSON mode) and `parseWorkersAiChat` (OpenAI shape first, then
+  `response`, validated, reports `finish_reason`) in `@lexguard/extraction`, used by both the
+  Workflow and the eval, so the eval measures exactly what production runs. After the fix: 5.3
+  s and 391 output tokens for a chunk with clauses (about 32 Neurons), 0.6 s for one without.
+- **The full subset runs on Workers AI, automatically:** the probe Worker got a `/chat` route
+  (allowlist: the three candidates); the eval's Workers AI adapter shares the embedding run's
+  daily Neuron ledger (9,000 cap, D26), checking the worst case before each call. The nightly
+  task now runs the extraction eval after the embedding, and disables itself only when both
+  are complete. At about 31 Neurons per chunk, the 473 chunks need about 15,000 Neurons:
+  about 3 nights alongside the last embedding night.
+- **CI failure found after the push:** `evals/retrieval/live.test.ts` read a local-only file
+  in a `describe` body; Vitest runs describe bodies even for skipped suites. Fixed by reading
+  in `beforeAll`, checked by running the evals with the local-only data hidden.

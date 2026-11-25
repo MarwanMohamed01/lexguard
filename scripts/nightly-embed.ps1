@@ -5,8 +5,10 @@
 #   2. waits until it answers on 127.0.0.1:8787,
 #   3. runs `npm run embed:cuad`, which stops by itself at 9,000 Neurons for the UTC day and
 #      resumes from the cache next time,
-#   4. stops the probe Worker,
-#   5. when every text is embedded, disables its own scheduled task.
+#   4. runs the M4 extraction eval on Workers AI (`npm run extract:cuad`, PROVIDER=workers-ai,
+#      D38) with whatever is left of the same 9,000-Neuron daily ledger, resuming from its cache,
+#   5. stops the probe Worker,
+#   6. when every text is embedded AND every chunk answered, disables its own scheduled task.
 #
 # Output is shown in the window and appended to evals/data/retrieval/nightly-embed.log
 # (git-ignored). Run by hand: powershell -NoProfile -File scripts\nightly-embed.ps1
@@ -26,7 +28,8 @@ Write-Log ''
 Write-Log "=== $((Get-Date).ToUniversalTime().ToString('yyyy-MM-dd HH:mm:ss')) UTC: nightly embedding starts"
 
 $probe = $null
-$finished = $false
+$embedded = $false
+$extracted = $false
 try {
   $probe = Start-Process -FilePath 'cmd.exe' -PassThru -WindowStyle Minimized `
     -ArgumentList '/c', 'npx wrangler dev -c experiments/embed-probe/wrangler.jsonc --port 8787'
@@ -49,9 +52,18 @@ try {
   cmd.exe /c 'npm run embed:cuad -w @lexguard/evals 2>&1' | ForEach-Object {
     $line = "$_"
     Write-Log $line
-    if ($line -like '*done: every text is embedded*') { $finished = $true }
+    if ($line -like '*done: every text is embedded*') { $embedded = $true }
   }
   Write-Log "embedding run exited with code $LASTEXITCODE"
+
+  # Extraction eval after the embedding, on the Neurons left today (same ledger and cap).
+  $env:PROVIDER = 'workers-ai'
+  cmd.exe /c 'npm run extract:cuad -w @lexguard/evals 2>&1' | ForEach-Object {
+    $line = "$_"
+    Write-Log $line
+    if ($line -like '*extraction: every chunk answered*') { $extracted = $true }
+  }
+  Write-Log "extraction run exited with code $LASTEXITCODE"
 } catch {
   Write-Log "FAILED: $($_.Exception.Message)"
 } finally {
@@ -62,8 +74,8 @@ try {
   }
 }
 
-if ($finished) {
+if ($embedded -and $extracted) {
   Disable-ScheduledTask -TaskName $TaskName -ErrorAction SilentlyContinue | Out-Null
-  Write-Log "corpus fully embedded: scheduled task '$TaskName' disabled"
+  Write-Log "corpus embedded and extraction subset answered: scheduled task '$TaskName' disabled"
 }
 Write-Log "=== $((Get-Date).ToUniversalTime().ToString('yyyy-MM-dd HH:mm:ss')) UTC: done"

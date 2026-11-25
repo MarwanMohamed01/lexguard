@@ -3,6 +3,10 @@ import {
   buildPrompt,
   CLAUSE_TYPE_NAMES,
   extractClauses,
+  locateQuote,
+  MAX_OUTPUT_TOKENS,
+  parseWorkersAiChat,
+  workersAiChatInput,
   MAX_CLAUSES,
   PROMPT_VERSION,
   type Model,
@@ -66,6 +70,48 @@ describe("prompt", () => {
   });
 });
 
+describe("locateQuote", () => {
+  it("prefers the verbatim position, then whitespace-tolerant, and returns document offsets", () => {
+    expect(locateQuote("a b  c d", "b  c")).toEqual({ start: 2, end: 6, exact: true });
+    expect(locateQuote("a b  c d", "b c")).toEqual({ start: 2, end: 6, exact: false });
+    expect(locateQuote("x\n\tFees  due.", "  Fees due.  ")).toEqual({
+      start: 3,
+      end: 13,
+      exact: false,
+    });
+  });
+
+  it("takes the first occurrence", () => {
+    expect(locateQuote("pay\nnow; pay now", "pay now")?.start).toBe(9); // verbatim wins
+    expect(locateQuote("pay\nnow; pay\tnow", "pay now")?.start).toBe(0);
+  });
+
+  it("treats regular-expression characters in the quote as plain text", () => {
+    const text = "Fee: $5.00 (USD) * 2 [net] + tax? a|b \\ end";
+    expect(locateQuote(text, "$5.00  (USD) * 2 [net] + tax? a|b \\")?.exact).toBe(false);
+    expect(locateQuote(text, "$5X00")).toBeNull(); // "." is not a wildcard
+    expect(locateQuote("aaaa", "a.*")).toBeNull();
+  });
+
+  it("refuses a blank quote", () => {
+    expect(locateQuote("some text", "")).toBeNull();
+    expect(locateQuote("some text", " \n\t ")).toBeNull();
+  });
+
+  it("does not let whitespace stand for missing text", () => {
+    expect(locateQuote("ab", "a b")).toBeNull();
+    expect(locateQuote("a-b", "a b")).toBeNull();
+  });
+
+  it("stays fast on a long quote that almost matches (no backtracking blow-up)", () => {
+    const text = "a ".repeat(2_000);
+    const quote = `${"a ".repeat(999)}b`;
+    const started = Date.now();
+    expect(locateQuote(text, quote)).toBeNull();
+    expect(Date.now() - started).toBeLessThan(500);
+  });
+});
+
 describe("extractClauses", () => {
   it("accepts verbatim quotes with their exact position in the chunk", async () => {
     const quote = "governed by the laws of\nNew York";
@@ -92,13 +138,31 @@ describe("extractClauses", () => {
       ],
     });
     expect(r.clauses.map((c) => c.clauseType)).toEqual(["Anti-Assignment"]);
-    expect(r.rejected).toMatchObject({ quoteNotFound: 1, whitespaceOnly: 0 });
+    expect(r.rejected).toMatchObject({ quoteNotFound: 1 });
+    expect(r.relocated).toBe(0);
   });
 
-  it("rejects a quote whose line breaks were changed, and counts it as whitespace-only", async () => {
+  it("accepts a quote whose line breaks were changed, citing the CONTRACT's text", async () => {
+    // The chunk has "laws of\nNew York"; the model wrote a space.
     const r = await run({ clauses: [clause("Governing Law", "governed by the laws of New York")] });
+    expect(r.clauses).toHaveLength(1);
+    expect(r.relocated).toBe(1);
+    const [c] = r.clauses;
+    expect(c?.quote).toBe("governed by the laws of\nNew York");
+    expect(CHUNK.slice(c?.start, c?.end)).toBe(c?.quote);
+  });
+
+  it("still rejects a quote that differs in anything but whitespace", async () => {
+    const r = await run({
+      clauses: [
+        clause("Governing Law", "governed by the law of New York"), // one letter
+        clause("Governing Law", "Governed by the laws of New York"), // letter case
+        clause("Governing Law", "governed by the laws, of New York"), // a comma
+        clause("Governing Law", "governed by laws of New York"), // a missing word
+      ],
+    });
     expect(r.clauses).toHaveLength(0);
-    expect(r.rejected).toMatchObject({ quoteNotFound: 1, whitespaceOnly: 1 });
+    expect(r.rejected.quoteNotFound).toBe(4);
   });
 
   it("rejects a blank quote, which would otherwise match anywhere", async () => {
@@ -259,5 +323,51 @@ describe("PII redaction before the model (T12)", () => {
     const r = await extractClauses(chunk, model, { nonce: NONCE, redact: true });
     expect(model.seen[0]?.user).toContain("[EMAIL_2]");
     expect(r.ok && r.clauses[0]?.quote).toBe("Send to [EMAIL_1]");
+  });
+});
+
+describe("Workers AI chat shape (D38)", () => {
+  it("turns thinking off and caps output", () => {
+    const input = workersAiChatInput({ system: "s", user: "u" });
+    expect(input.chat_template_kwargs).toEqual({ enable_thinking: false });
+    expect(input.max_completion_tokens).toBe(MAX_OUTPUT_TOKENS);
+    expect(input.response_format).toEqual({ type: "json_object" });
+    expect(input.messages).toEqual([
+      { role: "system", content: "s" },
+      { role: "user", content: "u" },
+    ]);
+  });
+
+  it("reads the OpenAI shape first", () => {
+    expect(
+      parseWorkersAiChat({
+        choices: [{ message: { content: '{"clauses":[]}' }, finish_reason: "stop" }],
+        usage: { prompt_tokens: 10, completion_tokens: 3 },
+        response: "ignored",
+      }),
+    ).toEqual({ text: '{"clauses":[]}', inputTokens: 10, outputTokens: 3, finishReason: "stop" });
+  });
+
+  it("falls back to the older response field, and stringifies a parsed object", () => {
+    expect(parseWorkersAiChat({ response: { clauses: [] } }).text).toBe('{"clauses":[]}');
+    expect(parseWorkersAiChat({ response: "x" })).toMatchObject({
+      text: "x",
+      inputTokens: null,
+      finishReason: null,
+    });
+  });
+
+  it("reports an empty answer cut off by the output cap", () => {
+    expect(
+      parseWorkersAiChat({
+        choices: [{ message: { content: null }, finish_reason: "length" }],
+        usage: { prompt_tokens: 2_376, completion_tokens: 2_048 },
+      }),
+    ).toMatchObject({ text: "", finishReason: "length", outputTokens: 2_048 });
+  });
+
+  it("rejects a result of the wrong shape", () => {
+    expect(() => parseWorkersAiChat("not an object")).toThrow();
+    expect(() => parseWorkersAiChat({ usage: { prompt_tokens: "many" } })).toThrow();
   });
 });

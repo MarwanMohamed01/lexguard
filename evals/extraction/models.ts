@@ -2,7 +2,7 @@
 import { createHash } from "node:crypto";
 import { appendFileSync, existsSync, mkdirSync, readFileSync } from "node:fs";
 import { request } from "node:http";
-import type { Prompt } from "@lexguard/extraction";
+import { parseWorkersAiChat, workersAiChatInput, type Prompt } from "@lexguard/extraction";
 
 export interface ModelAnswer {
   text: string;
@@ -143,6 +143,67 @@ export function groqChat(
           text: typeof content === "string" ? content : "",
           inputTokens: count(body.usage?.prompt_tokens),
           outputTokens: count(body.usage?.completion_tokens),
+          ms: Date.now() - started,
+        };
+      }
+    },
+  };
+}
+
+/** Neurons per million tokens, input / output (Workers AI pricing, checked 2026-11-25, D34). */
+const WORKERS_AI_PRICES: Record<string, { input: number; output: number }> = {
+  "@cf/google/gemma-4-26b-a4b-it": { input: 9_091, output: 27_273 },
+  "@cf/qwen/qwen3-30b-a3b-fp8": { input: 4_625, output: 30_475 },
+  "@cf/openai/gpt-oss-20b": { input: 18_182, output: 27_273 },
+};
+
+const workersAiModel = (name: string) =>
+  name.replace(/^workers-ai-/u, "").replace(/-json-t0$/u, "");
+
+/** Neurons for a call to a Workers AI model (by ChatModel name or model ID). */
+export function neuronsFor(model: string, inputTokens: number, outputTokens: number): number {
+  const price = WORKERS_AI_PRICES[workersAiModel(model)];
+  if (price === undefined) throw new Error(`no Workers AI price for ${model}`);
+  return (inputTokens * price.input + outputTokens * price.output) / 1_000_000;
+}
+
+/**
+ * Workers AI through the local probe Worker's /chat route (experiments/embed-probe, under
+ * `wrangler dev`: the real model, billed in Neurons, nothing deployed). Same request as the
+ * production Workflow (apps/worker/src/extraction.ts): JSON mode, temperature 0, 2,048 tokens.
+ */
+export function workersAiChat(
+  model = "@cf/google/gemma-4-26b-a4b-it",
+  url = "http://127.0.0.1:8787",
+): ChatModel {
+  if (WORKERS_AI_PRICES[model] === undefined) throw new Error(`no Workers AI price for ${model}`);
+  return {
+    name: `workers-ai-${model}-json-t0`,
+    async answer(prompt) {
+      const started = Date.now();
+      for (let attempt = 1; ; attempt++) {
+        const { status, text } = await post(
+          `${url}/chat`,
+          // Exactly the production request (shared code, D38).
+          JSON.stringify({ model, input: workersAiChatInput(prompt) }),
+        );
+        // The probe answers 502 with the upstream error (e.g. a capacity error): retry a few
+        // times, then stop the run rather than record a failure that was not the model's.
+        if (status === 502 && attempt < 4) {
+          console.log(`workers ai 502: ${text.slice(0, 200)}; retrying`);
+          await sleep(5_000 * attempt);
+          continue;
+        }
+        if (status !== 200) throw new Error(`workers ai ${String(status)}: ${text.slice(0, 300)}`);
+        // Exactly the production parsing (shared code, D38).
+        const answer = parseWorkersAiChat(JSON.parse(text));
+        if (answer.finishReason === "length") {
+          console.log("workers ai: answer cut off at the output cap (finish_reason length)");
+        }
+        return {
+          text: answer.text,
+          inputTokens: answer.inputTokens,
+          outputTokens: answer.outputTokens,
           ms: Date.now() - started,
         };
       }

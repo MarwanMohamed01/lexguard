@@ -15,10 +15,17 @@
 // statement, so a replaced job can no longer change anything.
 // Budget (T15): if a chunk cannot reserve its Neurons, the job stops, keeps what it has, and
 // marks the document failed with 'daily_budget'. Running it again re-extracts everything.
-import { buildPrompt, extractClauses, PROMPT_VERSION, type Prompt } from "@lexguard/extraction";
+import {
+  buildPrompt,
+  extractClauses,
+  MAX_OUTPUT_TOKENS,
+  parseWorkersAiChat,
+  PROMPT_VERSION,
+  workersAiChatInput,
+  type Prompt,
+} from "@lexguard/extraction";
 import { WorkflowEntrypoint, type WorkflowEvent, type WorkflowStep } from "cloudflare:workers";
 import { NonRetryableError } from "cloudflare:workflows";
-import { z } from "zod";
 
 /**
  * Provisional until the step 4 eval decides (D34: the cheapest capable candidate). A change
@@ -28,8 +35,8 @@ export const EXTRACT_MODEL = "@cf/google/gemma-4-26b-a4b-it";
 /** Neurons per million tokens, input / output (Workers AI pricing, checked 2026-11-25, D34). */
 export const MODEL_PRICE = { input: 9_091, output: 27_273 };
 export const EXTRACT_VERSION = `${EXTRACT_MODEL}/${PROMPT_VERSION}`;
-/** Output cap per call; also the reservation's worst case. */
-export const MAX_OUTPUT_TOKENS = 2_048;
+/** Output cap per call (shared with the eval); also the reservation's worst case. */
+export { MAX_OUTPUT_TOKENS };
 /** Of the free 10,000 Neurons a day, the rest stays for uploads' embeddings and searches. */
 export const DAILY_EXTRACT_NEURONS = 6_000;
 /** About 400 pages; also keeps an instance far below the 1,024-step limit. */
@@ -85,35 +92,17 @@ export function actualNeurons(c: Completion, estimate: number): number {
   return (c.inputTokens * MODEL_PRICE.input + c.outputTokens * MODEL_PRICE.output) / 1_000_000;
 }
 
-/** Workers AI chat result, validated: data from outside this Worker. */
-const ChatResult = z.object({
-  response: z.union([z.string(), z.record(z.string(), z.unknown())]).optional(),
-  usage: z
-    .object({ prompt_tokens: z.number().optional(), completion_tokens: z.number().optional() })
-    .optional(),
-});
-
 export function workersAiCompletion(ai: Ai): ExtractServices["complete"] {
   // The model ID is not in the binding's generated model list, so `run` is called untyped.
   const run = ai.run.bind(ai) as unknown as (model: string, input: unknown) => Promise<unknown>;
   return async (prompt) => {
-    const raw = await run(EXTRACT_MODEL, {
-      messages: [
-        { role: "system", content: prompt.system },
-        { role: "user", content: prompt.user },
-      ],
-      max_tokens: MAX_OUTPUT_TOKENS,
-      temperature: 0,
-      response_format: { type: "json_object" },
-    });
-    const result = ChatResult.parse(raw);
-    // In JSON mode some models return the object already parsed.
-    const text =
-      typeof result.response === "string" ? result.response : JSON.stringify(result.response ?? "");
+    // Request and parsing shared with the eval (@lexguard/extraction, D38): thinking off,
+    // answer read from choices[0].message.content, validated.
+    const answer = parseWorkersAiChat(await run(EXTRACT_MODEL, workersAiChatInput(prompt)));
     return {
-      text,
-      inputTokens: result.usage?.prompt_tokens ?? null,
-      outputTokens: result.usage?.completion_tokens ?? null,
+      text: answer.text,
+      inputTokens: answer.inputTokens,
+      outputTokens: answer.outputTokens,
     };
   };
 }
