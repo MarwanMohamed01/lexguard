@@ -1128,3 +1128,46 @@ extract_error`; `clauses` (tenant-first key, document offsets, details JSON, **n
   (group end not kept at the longest span; any loaded gap merging) are now caught.
 - **Not measured yet:** how often real model output needs merging. The step 4 answers (cached)
   can show it once the Workers AI run is complete.
+
+## D40. Cross-references: defined terms and their definitions (M4 step 7, 2026-11-25)
+
+- **Measured first (CUAD, 510 contracts):** M2 found only `"X" means ...` definitions (308
+  contracts). Inline definitions such as `(the "Effective Date")` or `("Supplier")` appear in 478. Of 10,748 lawyer-labelled clauses (Parties and Document Name left out: that is where
+  terms are defined, not used), 35% use a `means`-defined term and **77%** use a term defined
+  either way.
+- **Chunker (`findDefinitions`):** also records inline definitions: every quoted, capitalised
+  term inside a parenthesis of at most 240 characters, at the parenthesis; a parenthesis that
+  only points elsewhere ("as defined in", "see", "referred to in") is skipped. Same
+  `definitions` table, no migration. Documents chunked before this change get inline
+  definitions when re-uploaded (in production: the three smoke-test contracts).
+- **Definition text (`definitionSpan`, chunker):** for `"X" means`, from the opening quote to
+  the end of the paragraph or the next `means` definition; for an inline definition, its
+  sentence up to the closing parenthesis. Capped at 1,200 characters (cut after the last
+  sentence end inside the cap). Always the document's own text (T3).
+  - **Found by the Worker test:** the sentence search stopped at "Acme Inc." and cited only
+    `("Supplier")`. A sentence now ends at ". " / "; " / ": " only before a capital, digit or
+    quote, or at a line break.
+- **Matching (`termMatcher`, `@lexguard/extraction`):** case-sensitive whole words (any
+  script), one combined pattern per document, longest term first ("Product Warranty" wins
+  over "Product"); terms under 2 characters ignored. 500 terms over a 5,600-character text in
+  well under 200 ms in Node.
+- **Endpoint:** every clause from `GET /v1/documents/:id/clauses` (raw and `merged=true`) has
+  `definitions`: term, quote, offsets, page, at most 10 per clause, the first definition of a
+  term in the document, none for a clause that contains the definition itself. Definitions
+  are read from D1 with only the chunks that hold the needed ones.
+- **Measured on all 510 CUAD contracts (`evals/extraction/definitions.test.ts`,
+  `results/cuad-definitions.json`):** 15,291 definitions (8,323 inline); a cited text for
+  100% of them, 0 missing their own term, 0 over the cap, median 196 characters; 8,260 of
+  10,748 lawyer clauses (77%) use a term that can now be explained (3,727 with `means` only).
+  This checks properties, not correctness against labels: CUAD has no labels for
+  definitions, and none are hand-made (D10).
+- **Tests:** chunker +9, terms 8, Worker endpoint 1 (inline and `means` definitions, quote =
+  document slice, page, first definition wins, no self-definition, both views), CUAD 3.
+  Mutation check: 16 breakages, 3 survived the first tests (a definition looked up at the
+  wrong position returning the next one; shorter term listed first winning; a later
+  definition of the same term replacing the first); all caught after new tests.
+- **Flaky timeout found:** the M2 end-to-end chunking test took 8.3 s once during a full
+  `npm run check` (0.8 s alone; the laptop was heavily loaded), over Vitest's 5 s default. Its
+  suite now allows 60 s, like the other evals' long hooks.
+- **Open:** section cross-references ("as set out in Section 5.3") are not resolved yet;
+  the chunks' section paths make it possible later (M5 needs them for the verifier).

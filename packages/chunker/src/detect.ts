@@ -138,6 +138,86 @@ export function findSoftBoundaries(text: string): number[] {
   return [...new Set(positions)].sort((a, b) => a - b);
 }
 
+// Inline definitions (M4 step 7, D40): a parenthesis holding a quoted, capitalised term, e.g.
+//   (the "Effective Date")   ("Licensee")   (hereinafter "Supplier")
+//   (each, a "Party" and collectively, the "Parties")   -> both terms
+// Measured on CUAD: 478 of 510 contracts use them (308 use "X" means), and lawyer-labelled
+// clauses that use a defined term rise from 35% to 73% when they are counted. A parenthesis
+// that only points elsewhere ("as defined in", "see") defines nothing and is skipped.
+const PARENTHESIS = /\(([^()\r\n]{1,240})\)/g;
+const QUOTED_TERM = /["“]([A-Z][^"”\r\n]{0,60})["”]/g;
+const REFERENCE_ONLY = /\b(?:as\s+defined|defined\s+in|see|referred\s+to\s+in)\b/i;
+
+/**
+ * Defined terms with where their definition starts: at the opening quote for "X" means, at
+ * the opening parenthesis for inline ones. Sorted by position; a term may appear twice.
+ */
 export function findDefinitions(text: string): { term: string; start: number }[] {
-  return [...text.matchAll(DEFINITION)].map((m) => ({ term: m[1] ?? "", start: m.index }));
+  const found = [...text.matchAll(DEFINITION)].map((m) => ({ term: m[1] ?? "", start: m.index }));
+  for (const p of text.matchAll(PARENTHESIS)) {
+    const inside = p[1] ?? "";
+    if (REFERENCE_ONLY.test(inside)) continue;
+    for (const q of inside.matchAll(QUOTED_TERM)) {
+      const term = (q[1] ?? "").trim();
+      if (term.length > 0) found.push({ term, start: p.index });
+    }
+  }
+  return found.sort((a, b) => a.start - b.start);
+}
+
+/** At most this many characters of definition text are cited. */
+export const MAX_DEFINITION_CHARS = 1_200;
+
+/**
+ * The definition's text in `text`, for a definition found at `start` (see findDefinitions):
+ *   "X" means ...  -> from the opening quote to the end of that paragraph (blank line), or to
+ *                     the next "Y" means definition, whichever comes first;
+ *   (the "X")      -> the sentence the parenthesis belongs to, up to the closing parenthesis.
+ * Capped at MAX_DEFINITION_CHARS (cut after the last sentence end inside the cap when there
+ * is one). Offsets in `text`; null when nothing definition-like is at `start`. The caller
+ * cites text.slice(start, end): always the document's own words (T3).
+ */
+export function definitionSpan(text: string, start: number): { start: number; end: number } | null {
+  if (text[start] === "(") {
+    const close = text.indexOf(")", start);
+    if (close === -1 || close - start > 242) return null;
+    // Back to the sentence start (at most 600 chars): a line break, or ". " / "; " / ": "
+    // followed by a capital, digit or quote. "Acme Inc. (" is not a sentence end: found by
+    // the worker test, where "(the ...) by Acme Inc. ("Supplier")" was cut after "Inc.".
+    const floor = Math.max(0, start - 600);
+    let from = start;
+    while (from > floor) {
+      const prev = text[from - 1] ?? "";
+      if (prev === "\n") break;
+      if (
+        /\s/.test(prev) &&
+        /[.;:]/.test(text[from - 2] ?? "") &&
+        /[A-Z0-9"“]/.test(text[from] ?? "")
+      ) {
+        break;
+      }
+      from--;
+    }
+    while (from < start && /\s/.test(text[from] ?? "")) from++;
+    return { start: from, end: close + 1 };
+  }
+  DEFINITION.lastIndex = start;
+  const m = DEFINITION.exec(text);
+  DEFINITION.lastIndex = 0;
+  if (m?.index !== start) return null;
+  const after = start + m[0].length;
+  const limit = Math.min(text.length, start + MAX_DEFINITION_CHARS);
+  let end = limit;
+  const blank = text.slice(after, limit).search(/\n\s*\n/);
+  if (blank !== -1) end = after + blank;
+  DEFINITION.lastIndex = after;
+  const next = DEFINITION.exec(text);
+  DEFINITION.lastIndex = 0;
+  if (next !== null && next.index < end) end = next.index;
+  if (end === limit && limit < text.length) {
+    const lastStop = text.slice(after, end).search(/[.;](?=[^.;]*$)/);
+    if (lastStop !== -1) end = after + lastStop + 1;
+  }
+  while (end > after && /\s/.test(text[end - 1] ?? "")) end--;
+  return { start, end };
 }

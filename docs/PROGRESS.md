@@ -72,7 +72,9 @@ only, document text marked as data, T1/T2); every quote is checked by code again
    yet); 20 tests, 0 of 19 mutations survive.
 6. ✅ Reduce / merge (D39): `mergeClauses` (same type, overlapping or whitespace-separated),
    computed on read by `GET .../clauses?merged=true`; 14 tests, mutation-checked.
-7. Cross-reference resolution (definitions).
+7. ✅ Cross-references (D40): inline definitions found too (35% -> 77% of CUAD clauses use an
+   explainable term), definition text cut from the contract, `definitions` on every clause
+   from `GET .../clauses`; checked on all 510 contracts; 16 mutations caught.
 8. Security tests (injected instructions in a chunk), real run, deploy, learning log, quiz.
 
 ## M2 plan
@@ -216,5 +218,5 @@ PICK=3 node scripts/cpu-load.mjs <worker-url>        # one new upload + 20 searc
   CUAD contracts: MRR 0.568 with stemming.
 - Production CPU (D33): search 3-5 ms, status 0 ms, upload 15 ms (655 KB, known since D24),
   indexing ~5 ms per step.
-- Tests: 527 (worker 161, a2a 34, chunker 59, extraction 43, guardrails 72, retrieval 26,
-  router 13, trace 24, evals 95; the live-run and converted-PDF evals skip in CI).
+- Tests: 548 (worker 162, a2a 34, chunker 68, extraction 51, guardrails 72, retrieval 26,
+  router 13, trace 24, evals 98; the live-run and converted-PDF evals skip in CI).

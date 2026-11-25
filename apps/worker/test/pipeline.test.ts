@@ -136,7 +136,8 @@ async function stored(id: string) {
   return { markdown: doc?.markdown ?? "", chunkJob: doc?.chunk_job ?? null, chunks };
 }
 
-describe("ingestion end to end", () => {
+// Real Workflows on a loaded laptop: 0.8 s alone, 8.3 s once during a full `npm run check` (D40).
+describe("ingestion end to end", { timeout: 60_000 }, () => {
   it("upload -> chunking Workflow -> ready, with exact offsets into the sanitized text", async () => {
     // What a hostile or messy conversion could return: hidden characters (zero-width space,
     // right-to-left override, an invisible tag character), emoji and Windows line endings.

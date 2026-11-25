@@ -1,0 +1,12 @@
+{
+  "contracts": 510,
+  "definitions": 15291,
+  "inline": 8323,
+  "withSpan": 15291,
+  "spanMissesTerm": 0,
+  "spanTooLong": 0,
+  "medianSpanChars": 196,
+  "clauses": 10748,
+  "clausesUsingDefinedTerm": 8260,
+  "meansOnlyClausesUsingDefinedTerm": 3727
+}

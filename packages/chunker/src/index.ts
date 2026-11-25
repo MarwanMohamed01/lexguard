@@ -37,6 +37,7 @@ export function planChunks(
   return { chunks, sections, definitions: found.definitions };
 }
 
+export { definitionSpan, findDefinitions, MAX_DEFINITION_CHARS } from "./detect";
 export { isPlausibleNext, parseClauseNumber, type ClauseNumber } from "./sequence";
 export type { Chunk, ChunkOptions, ChunkResult, Definition, Section } from "./types";
 export { detectWindow, planWindows, type Detections, type TextWindow } from "./windows";

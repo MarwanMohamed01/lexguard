@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
+  definitionSpan,
+  MAX_DEFINITION_CHARS,
   findDefinitions,
   findHeadingCandidates,
   findSoftBoundaries,
@@ -97,5 +99,88 @@ describe("findSoftBoundaries and findDefinitions", () => {
   it("accepts curly quotes and 'shall mean' / 'has the meaning'", () => {
     const text = '“Affiliate” shall mean any entity. "Term" has the meaning in 2.1.';
     expect(findDefinitions(text).map((d) => d.term)).toEqual(["Affiliate", "Term"]);
+  });
+});
+
+describe("inline definitions and definition spans (D40)", () => {
+  it("finds inline definitions, every term in a parenthesis, and skips references", () => {
+    const text =
+      'This Agreement is made as of March 1, 2020 (the "Effective Date") by Acme Inc. ("Supplier") ' +
+      'and Beta LLC (each, a "Party" and collectively, the "Parties"). Fees (as defined in "Schedule A") apply.';
+    expect(findDefinitions(text).map((d) => d.term)).toEqual([
+      "Effective Date",
+      "Supplier",
+      "Party",
+      "Parties",
+    ]);
+    const effective = findDefinitions(text)[0];
+    expect(text[effective?.start ?? -1]).toBe("(");
+  });
+
+  it("keeps 'X' means definitions and sorts everything by position", () => {
+    const text = 'Acme ("Seller").\n"Month" means a calendar month.';
+    expect(findDefinitions(text)).toEqual([
+      { term: "Seller", start: 5 },
+      { term: "Month", start: 17 },
+    ]);
+  });
+
+  it("an inline definition's text is its sentence up to the closing parenthesis", () => {
+    const text =
+      'Recitals. This Agreement is made as of March 1, 2020 (the "Effective Date") by the parties.';
+    const [d] = findDefinitions(text);
+    const span = definitionSpan(text, d?.start ?? 0);
+    expect(text.slice(span?.start, span?.end)).toBe(
+      'This Agreement is made as of March 1, 2020 (the "Effective Date")',
+    );
+  });
+
+  it("a 'means' definition runs to the next definition or the end of its paragraph", () => {
+    const text =
+      '"Month" means a calendar month. "Year" means twelve Months.\n\n2. Term. This lasts one Year.';
+    const defs = findDefinitions(text);
+    const month = definitionSpan(text, defs[0]?.start ?? 0);
+    const year = definitionSpan(text, defs[1]?.start ?? 0);
+    expect(text.slice(month?.start, month?.end)).toBe('"Month" means a calendar month.');
+    expect(text.slice(year?.start, year?.end)).toBe('"Year" means twelve Months.');
+  });
+
+  it("caps a long definition after its last sentence inside the cap", () => {
+    const body = "It includes items. ".repeat(100);
+    const text = `"Product" means the goods. ${body}`;
+    const span = definitionSpan(text, 0);
+    expect((span?.end ?? 0) - (span?.start ?? 0)).toBeLessThanOrEqual(MAX_DEFINITION_CHARS);
+    expect(text.slice(span?.start, span?.end).endsWith(".")).toBe(true);
+  });
+
+  it("returns null where no definition starts", () => {
+    expect(definitionSpan("plain text here", 3)).toBeNull();
+    expect(definitionSpan('a (b "C" never closed', 2)).toBeNull();
+  });
+});
+
+describe("definition spans and abbreviations (D40)", () => {
+  it("does not end a sentence at 'Inc.' before a parenthesis", () => {
+    const text = 'Recitals. This Agreement is made by Acme Inc. ("Supplier") and Beta.';
+    const [d] = findDefinitions(text);
+    const span = definitionSpan(text, d?.start ?? 0);
+    expect(text.slice(span?.start, span?.end)).toBe(
+      'This Agreement is made by Acme Inc. ("Supplier")',
+    );
+  });
+
+  it("starts at a line break, and after '; ' before a capital", () => {
+    const text = 'Background\nAcme ("Seller") sells; Beta ("Buyer") buys.';
+    const defs = findDefinitions(text);
+    expect(text.slice(definitionSpan(text, defs[0]?.start ?? 0)?.start)).toMatch(/^Acme/);
+    expect(text.slice(definitionSpan(text, defs[1]?.start ?? 0)?.start)).toMatch(/^Beta/);
+  });
+});
+
+describe("definitionSpan only at a definition's own start", () => {
+  it("returns null at a position where no definition starts, even if one follows", () => {
+    const text = 'Plain words. "Month" means a calendar month.';
+    expect(definitionSpan(text, 0)).toBeNull();
+    expect(definitionSpan(text, text.indexOf('"Month"'))?.start).toBe(text.indexOf('"Month"'));
   });
 });

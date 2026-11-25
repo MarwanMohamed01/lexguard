@@ -9,9 +9,11 @@
 import {
   CLAUSE_TYPE_NAMES,
   mergeClauses,
+  termMatcher,
   type ClausePiece,
   type MergedClause,
 } from "@lexguard/extraction";
+import { definitionSpan } from "@lexguard/chunker";
 import { claimForExtraction, getDocument, markExtractNotStarted } from "./documents";
 import { EXTRACT_VERSION, type ExtractParams } from "./extraction";
 import { pageOf, UNTRUSTED_NOTE } from "./search";
@@ -156,9 +158,10 @@ export async function handleClauses(
         riskFlags: [...p.riskFlags],
       });
     }
+    const definitions = await definitionsFor(db, tenantId, id, clauses, pageStarts);
     return Response.json({
       extractVersion: doc.version,
-      clauses,
+      clauses: clauses.map((c, i) => ({ ...c, definitions: definitions[i] ?? [] })),
       truncated: pieces.length > MAX_CLAUSES_RETURNED,
       note: UNTRUSTED_NOTE,
     });
@@ -175,10 +178,11 @@ export async function handleClauses(
     if (quote === null) continue;
     clauses.push({ ...m, quote, page: pageOf(pageStarts, m.start) });
   }
+  const definitions = await definitionsFor(db, tenantId, id, clauses, pageStarts);
   return Response.json({
     extractVersion: doc.version,
     merged: true,
-    clauses,
+    clauses: clauses.map((c, i) => ({ ...c, definitions: definitions[i] ?? [] })),
     truncated: all.length > MAX_CLAUSES_RETURNED,
     note: UNTRUSTED_NOTE,
   });
@@ -211,4 +215,80 @@ export function documentText(
     }
     return at === to ? out : null;
   };
+}
+
+/** Definitions attached to one clause at most (the most-used terms come first in the text). */
+export const MAX_DEFINITIONS_PER_CLAUSE = 10;
+
+export interface AttachedDefinition {
+  term: string;
+  quote: string;
+  start: number;
+  end: number;
+  page: number | null;
+}
+
+/**
+ * Cross-references (M4 step 7, D40): for each clause, the defined terms its quote uses, each
+ * with its definition quoted from the document (definitionSpan, cut at the chunk holding the
+ * definition) and its page. The first definition of a term in the document is used; a clause
+ * that contains the definition itself does not get it repeated.
+ */
+export async function definitionsFor(
+  db: D1Database,
+  tenantId: string,
+  id: string,
+  clauses: readonly { quote: string; start: number; end: number }[],
+  pageStarts: readonly number[] | null,
+): Promise<AttachedDefinition[][]> {
+  if (clauses.length === 0) return [];
+  const { results: rows } = await db
+    .prepare(
+      `SELECT term, start_offset AS start FROM definitions
+       WHERE tenant_id = ? AND document_id = ? ORDER BY start_offset`,
+    )
+    .bind(tenantId, id)
+    .all<{ term: string; start: number }>();
+  const first = new Map<string, number>();
+  for (const r of rows) if (!first.has(r.term)) first.set(r.term, r.start);
+  const find = termMatcher([...first.keys()]);
+  const used = clauses.map((c) => find(c.quote).slice(0, MAX_DEFINITIONS_PER_CLAUSE));
+
+  // The chunks holding the definitions that are needed, read once each.
+  const starts = [...new Set(used.flat().map((t) => first.get(t) ?? -1))].filter((s) => s >= 0);
+  if (starts.length === 0) return clauses.map(() => []);
+  const { results: chunks } = await db
+    .prepare(
+      `SELECT start_offset AS start, end_offset AS end, text FROM chunks
+       WHERE tenant_id = ? AND document_id = ?
+         AND EXISTS (SELECT 1 FROM json_each(?) j
+                     WHERE j.value >= chunks.start_offset AND j.value < chunks.end_offset)`,
+    )
+    .bind(tenantId, id, JSON.stringify(starts))
+    .all<{ start: number; end: number; text: string }>();
+
+  const spans = new Map<number, AttachedDefinition | null>();
+  const spanAt = (term: string, at: number): AttachedDefinition | null => {
+    const chunk = chunks.find((c) => c.start <= at && at < c.end);
+    if (chunk === undefined) return null;
+    const span = definitionSpan(chunk.text, at - chunk.start);
+    if (span === null) return null;
+    return {
+      term,
+      quote: chunk.text.slice(span.start, span.end),
+      start: chunk.start + span.start,
+      end: chunk.start + span.end,
+      page: pageOf(pageStarts, chunk.start + span.start),
+    };
+  };
+
+  return clauses.map((clause, i) =>
+    (used[i] ?? []).flatMap((term) => {
+      const at = first.get(term);
+      if (at === undefined || (at >= clause.start && at < clause.end)) return [];
+      if (!spans.has(at)) spans.set(at, spanAt(term, at));
+      const d = spans.get(at);
+      return d === null || d === undefined ? [] : [{ ...d, term }];
+    }),
+  );
 }

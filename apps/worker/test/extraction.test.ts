@@ -5,6 +5,7 @@
 import { env } from "cloudflare:workers";
 import type { Prompt } from "@lexguard/extraction";
 import { describe, expect, it } from "vitest";
+import { findDefinitions } from "@lexguard/chunker";
 import { handle } from "../src/app";
 import { documentText } from "../src/clauses";
 import {
@@ -551,6 +552,77 @@ describe("endpoints", () => {
       parties: ["Acme", "Beta"],
     });
     expect(doc.markdown.slice(m?.start, m?.end)).toBe(m?.quote);
+  });
+
+  it("attaches the definitions of the terms a clause uses, quoted with their page (D40)", async () => {
+    const chunkTexts = [
+      'This Agreement is made as of March 1, 2020 (the "Effective Date") by Acme Inc. ("Supplier"). ',
+      '"Products" means the goods listed in Schedule A.\n\n',
+      "5. Termination. The Supplier may terminate within 30 days after the Effective Date. ",
+    ];
+    const doc = await readyDocument("acme", chunkTexts, [0, chunkTexts[0]?.length ?? 0]);
+    await env.DB.prepare(
+      "UPDATE documents SET extract_status = NULL, extract_job = NULL WHERE tenant_id = 'acme' AND id = ?",
+    )
+      .bind(doc.id)
+      .run();
+    // The definitions as the chunking job stores them (findDefinitions on the whole text).
+    const defs = findDefinitions(doc.markdown);
+    expect(defs.map((d) => d.term)).toEqual(["Effective Date", "Supplier", "Products"]);
+    await env.DB.batch(
+      defs.map((d, idx) =>
+        env.DB.prepare(
+          "INSERT INTO definitions (tenant_id, document_id, idx, term, start_offset) VALUES ('acme', ?, ?, ?, ?)",
+        ).bind(doc.id, idx, d.term, d.start),
+      ),
+    );
+    // "Supplier" appears again later as a defined term: the FIRST definition is the one used.
+    await env.DB.prepare(
+      "INSERT INTO definitions (tenant_id, document_id, idx, term, start_offset) VALUES ('acme', ?, 99, 'Supplier', ?)",
+    )
+      .bind(doc.id, defs[2]?.start ?? 0)
+      .run();
+    const termination = "The Supplier may terminate within 30 days after the Effective Date.";
+    const products = '"Products" means the goods listed in Schedule A.';
+    const started: { jobId: string }[] = [];
+    await call(`/v1/documents/${doc.id}/extract`, "POST", "acme", deps(started));
+    await runExtraction(
+      env.DB,
+      fakeServices((chunk) =>
+        chunk.includes(termination)
+          ? { clauses: [{ clauseType: "Termination For Convenience", quote: termination }] }
+          : chunk.includes(products)
+            ? { clauses: [{ clauseType: "License Grant", quote: products }] }
+            : { clauses: [] },
+      ).services,
+      { tenantId: "acme", documentId: doc.id, jobId: started[0]?.jobId ?? "" },
+      directSteps().step,
+    );
+
+    for (const view of ["", "?merged=true"]) {
+      const res = await call(`/v1/documents/${doc.id}/clauses${view}`, "GET", "acme");
+      const body = await res.json<{
+        clauses: {
+          type: string;
+          definitions: { term: string; quote: string; start: number; end: number; page: number }[];
+        }[];
+      }>();
+      const term = body.clauses.find((c) => c.type === "Termination For Convenience");
+      expect(term?.definitions.map((d) => [d.term, d.quote, d.page])).toEqual([
+        [
+          "Supplier",
+          'This Agreement is made as of March 1, 2020 (the "Effective Date") by Acme Inc. ("Supplier")',
+          1,
+        ],
+        ["Effective Date", 'This Agreement is made as of March 1, 2020 (the "Effective Date")', 1],
+      ]);
+      for (const d of term?.definitions ?? []) {
+        expect(doc.markdown.slice(d.start, d.end)).toBe(d.quote);
+      }
+      // A clause that IS the definition does not get it repeated.
+      const own = body.clauses.find((c) => c.type === "License Grant");
+      expect(own?.definitions).toEqual([]);
+    }
   });
 
   it("wrong methods are refused", async () => {
