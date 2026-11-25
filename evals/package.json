@@ -25,6 +25,8 @@
     "fetch:cuad-pdfs": "node cuad/fetch-pdfs.mjs",
     "embed:cuad": "vitest run --config vitest.embed.config.ts",
     "extract:cuad": "vitest run --config vitest.extract.config.ts",
-    "baselines:cuad": "vitest run --config vitest.baselines.config.ts"
+    "baselines:cuad": "vitest run --config vitest.baselines.config.ts",
+    "fetch:bipia": "node redteam/fetch-bipia.mjs",
+    "injection:cuad": "vitest run --config vitest.injection.config.ts"
   }
 }

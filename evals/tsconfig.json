@@ -12,6 +12,7 @@
     "extraction",
     "vitest.embed.config.ts",
     "vitest.extract.config.ts",
-    "vitest.baselines.config.ts"
+    "vitest.baselines.config.ts",
+    "vitest.injection.config.ts"
   ]
 }
