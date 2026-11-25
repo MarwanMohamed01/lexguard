@@ -19,11 +19,18 @@ export interface DocumentSummary {
   error: string | null;
   createdAt: string;
   updatedAt: string | null;
+  /** Search index (D29): null until chunking hands the document over. */
+  indexStatus: IndexStatus | null;
+  indexVersion: string | null;
+  indexError: string | null;
 }
+
+export type IndexStatus = "indexing" | "indexed" | "failed";
 
 const SUMMARY_COLUMNS = `id, filename, mime_type AS mimeType, size_bytes AS sizeBytes, sha256, status,
   chars, hidden_chars_removed AS hiddenCharsRemoved, error, created_at AS createdAt,
-  updated_at AS updatedAt, json_array_length(page_starts) AS pages`;
+  updated_at AS updatedAt, json_array_length(page_starts) AS pages,
+  index_status AS indexStatus, index_version AS indexVersion, index_error AS indexError`;
 
 export interface NewDocument {
   id: string;
@@ -173,6 +180,45 @@ export async function markFailed(
     .bind(...params)
     .run();
   return result.meta.changes === 1;
+}
+
+/**
+ * Hands a ready document whose search index is missing (documents from before M3) or failed
+ * to a new indexing job, identified by `indexJob` (fencing ticket, D29). A single UPDATE, so
+ * two re-uploads racing each other cannot both start a job. Returns true when this call won.
+ */
+export async function claimForIndexing(
+  db: D1Database,
+  tenantId: string,
+  id: string,
+  indexJob: string,
+): Promise<boolean> {
+  const result = await db
+    .prepare(
+      `UPDATE documents SET index_status = 'indexing', index_job = ?, index_error = NULL
+       WHERE tenant_id = ? AND id = ? AND status = 'ready'
+         AND (index_status IS NULL OR index_status = 'failed')`,
+    )
+    .bind(indexJob, tenantId, id)
+    .run();
+  return result.meta.changes === 1;
+}
+
+/** Marks the index failed, only if `indexJob` still owns it. */
+export async function markIndexNotStarted(
+  db: D1Database,
+  tenantId: string,
+  id: string,
+  indexJob: string,
+): Promise<void> {
+  await db
+    .prepare(
+      `UPDATE documents SET index_status = 'failed', index_error = 'indexing_not_started',
+         index_job = NULL
+       WHERE tenant_id = ? AND id = ? AND index_job = ? AND index_status = 'indexing'`,
+    )
+    .bind(tenantId, id, indexJob)
+    .run();
 }
 
 /**

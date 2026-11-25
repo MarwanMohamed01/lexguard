@@ -18,19 +18,31 @@
       "migrations_dir": "migrations",
     },
   ],
-  // Chunking job (src/chunking.ts): one instance per converted document. Created on deploy.
+  // Chunking job (src/chunking.ts): one instance per converted document. Indexing job
+  // (src/indexing.ts): started by the chunking job when it finishes. Created on deploy.
   "workflows": [
     {
       "name": "lexguard-chunk-document",
       "binding": "CHUNK_DOCUMENT",
       "class_name": "ChunkDocument",
     },
+    {
+      "name": "lexguard-index-document",
+      "binding": "INDEX_DOCUMENT",
+      "class_name": "IndexDocument",
+    },
   ],
+  // Chunk vectors (bge-m3, 1,024 dimensions, cosine), one namespace per tenant, metadata
+  // index on "doc". NOT created by deploy: created once with `wrangler vectorize create`
+  // (D29), and only with Marwan's OK.
+  // `remote: true`: `wrangler dev` uses the real index (Vectorize has no local simulation, as
+  // for AI below); tests never connect (remoteBindings: false in vitest.config.ts).
+  "vectorize": [{ "binding": "VECTORS", "index_name": "lexguard-chunks", "remote": true }],
   // Workers AI: env.AI.toMarkdown converts uploaded PDF/DOCX to Markdown (free for those
   // formats; images would use neurons, so uploads are limited to PDF and DOCX).
   "ai": { "binding": "AI", "remote": true },
   // Secret names only (values are set with `wrangler secret put`, or .dev.vars locally).
   // TENANT_KEYS: JSON object mapping SHA-256(api key) in hex to a tenant ID.
   "secrets": { "required": ["TENANT_KEYS"] },
-  // More bindings (Vectorize, Queues...) are added in later milestones.
+  // More bindings (Queues...) are added in later milestones.
 }

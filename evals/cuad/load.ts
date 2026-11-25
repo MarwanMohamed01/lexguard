@@ -44,6 +44,36 @@ const Squad = z.object({
   ),
 });
 
+const Questions = z.object({
+  data: z.array(
+    z.object({
+      paragraphs: z.array(
+        z.object({ qas: z.array(z.object({ id: z.string(), question: z.string() })) }),
+      ),
+    }),
+  ),
+});
+
+/**
+ * CUAD's question for each clause type, e.g. "Governing Law" -> 'Highlight the parts (if any)
+ * of this contract related to "Governing Law" ... Details: Which state/country's law governs
+ * the interpretation of the contract?'. Every contract asks the same 41 questions; a type
+ * asked two different ways would be a data problem, so it throws.
+ */
+export function loadCuadQuestions(): Map<string, string> {
+  const parsed = Questions.parse(JSON.parse(readFileSync(CUAD_FILE, "utf8")));
+  const questions = new Map<string, string>();
+  for (const qa of parsed.data.flatMap((c) => c.paragraphs.flatMap((p) => p.qas))) {
+    const clauseType = qa.id.split("__").at(-1) ?? qa.id;
+    const known = questions.get(clauseType);
+    if (known !== undefined && known !== qa.question) {
+      throw new Error(`clause type asked two ways: ${clauseType}`);
+    }
+    questions.set(clauseType, qa.question);
+  }
+  return questions;
+}
+
 export function loadCuad(): CuadContract[] {
   const parsed = Squad.parse(JSON.parse(readFileSync(CUAD_FILE, "utf8")));
   return parsed.data.map((contract) => {

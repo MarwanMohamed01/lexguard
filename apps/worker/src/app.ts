@@ -2,7 +2,15 @@
 // converter, a fixed clock) while production passes the real ones.
 import { authenticate } from "./auth";
 import { countCreatedSince, getDocument } from "./documents";
+import { handleSearch, type SearchServices } from "./search";
 import { handleUpload, type UploadDeps } from "./upload";
+
+/**
+ * What the router needs from outside. `search` is optional so tests of other routes need not
+ * build it; without it, search answers from keywords only and reports the vector side as
+ * degraded (production always passes it, see index.ts).
+ */
+export type AppDeps = UploadDeps & { search?: SearchServices | undefined };
 
 /**
  * New documents per tenant per day (threat T15). The Free plan's daily budgets are shared by
@@ -34,7 +42,7 @@ const notFound = () => Response.json({ error: "not_found" }, { status: 404 });
 const methodNotAllowed = (allow: string) =>
   Response.json({ error: "method_not_allowed" }, { status: 405, headers: { Allow: allow } });
 
-export async function handle(request: Request, env: Env, deps: UploadDeps): Promise<Response> {
+export async function handle(request: Request, env: Env, deps: AppDeps): Promise<Response> {
   const url = new URL(request.url);
 
   switch (url.pathname) {
@@ -58,7 +66,7 @@ function secured(response: Response): Response {
   return new Response(response.body, { status: response.status, headers });
 }
 
-async function handleV1(request: Request, url: URL, env: Env, deps: UploadDeps): Promise<Response> {
+async function handleV1(request: Request, url: URL, env: Env, deps: AppDeps): Promise<Response> {
   // Everything under /v1/ belongs to a tenant: no valid API key, no access.
   const auth = await authenticate(request, env.TENANT_KEYS);
   if (!auth.ok) {
@@ -86,6 +94,14 @@ async function handleV1(request: Request, url: URL, env: Env, deps: UploadDeps):
     const id = match[1].toLowerCase();
     const document = UUID.test(id) ? await getDocument(env.DB, tenantId, id) : null;
     return document === null ? notFound() : Response.json({ document });
+  }
+
+  const search = /^\/v1\/documents\/([^/]+)\/search$/.exec(url.pathname);
+  if (search?.[1] !== undefined) {
+    if (request.method !== "POST") return methodNotAllowed("POST");
+    const id = search[1].toLowerCase();
+    if (!UUID.test(id)) return notFound();
+    return handleSearch(request, env.DB, tenantId, id, deps.search);
   }
 
   return notFound();

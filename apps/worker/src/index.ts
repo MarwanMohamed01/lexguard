@@ -1,9 +1,11 @@
 // Entry point of the Lexguard Worker. Cloudflare calls `fetch` once per HTTP request, and
 // runs the exported Workflow classes (bound in wrangler.jsonc) as background jobs.
 import { handle } from "./app";
+import { vectorIndex, workersAiEmbedder } from "./indexing";
 import { CONVERSION_OPTIONS } from "./upload";
 
 export { ChunkDocument } from "./chunking";
+export { IndexDocument } from "./indexing";
 
 export default {
   fetch(request, env): Promise<Response> {
@@ -13,6 +15,10 @@ export default {
         // The ticket doubles as the instance ID: one instance per ticket, never two.
         await env.CHUNK_DOCUMENT.create({ id: params.jobId, params });
       },
+      startIndexing: async (params) => {
+        await env.INDEX_DOCUMENT.create({ id: params.jobId, params });
+      },
+      search: { embed: workersAiEmbedder(env.AI), vectors: vectorIndex(env) },
     });
   },
 } satisfies ExportedHandler<Env>;

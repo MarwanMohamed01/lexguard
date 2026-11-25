@@ -35,11 +35,20 @@ async function insertConverted(
 
 type Modifier = Parameters<Parameters<WorkflowInstanceIntrospector["modify"]>[0]>[0];
 
-/** Starts the job like upload does (ticket = instance ID), with retries but no delays. */
-async function run(params: ChunkParams, modify?: (m: Modifier) => Promise<void>) {
+/**
+ * Starts the job like upload does (ticket = instance ID), with retries but no delays. The
+ * hand-over to indexing is replaced unless `realHandOver`: these tests are about chunking,
+ * and the indexing job needs Workers AI (the full hand-over runs in pipeline.test.ts).
+ */
+async function run(
+  params: ChunkParams,
+  modify?: (m: Modifier) => Promise<void>,
+  realHandOver = false,
+) {
   const instance = await introspectWorkflowInstance(env.CHUNK_DOCUMENT, params.jobId);
   await instance.modify(async (m) => {
     await m.disableRetryDelays();
+    if (!realHandOver) await m.mockStepResult({ name: "start indexing" }, true);
     await modify?.(m);
   });
   await env.CHUNK_DOCUMENT.create({ id: params.jobId, params });
@@ -171,6 +180,33 @@ describe("ChunkDocument workflow", () => {
     await instance.waitForStatus("complete");
 
     expect(await documentRow("acme", id)).toEqual({ status: "ready", error: null });
+  });
+
+  it("hands the ready document to an indexing job, and keeps it ready if that cannot start", async () => {
+    const { id, jobId } = await insertConverted("acme", contractText(5_000));
+    await using instance = await run(
+      { tenantId: "acme", documentId: id, jobId },
+      async (m) => {
+        await m.mockStepError({ name: "start indexing" }, new Error("workflows down")); // always
+      },
+      true,
+    );
+
+    await instance.waitForStatus("complete");
+
+    const row = await env.DB.prepare(
+      `SELECT status, index_status, index_error, index_job FROM documents
+       WHERE tenant_id = 'acme' AND id = ?`,
+    )
+      .bind(id)
+      .first();
+    expect(row).toEqual({
+      status: "ready",
+      index_status: "failed",
+      index_error: "indexing_not_started",
+      index_job: null,
+    });
+    expect((await storedChunks("acme", id)).length).toBeGreaterThan(0);
   });
 });
 

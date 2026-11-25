@@ -29,3 +29,6 @@ Thumbs.db
 
 # Downloaded eval datasets (fetched by evals/*/fetch.mjs, never committed)
 evals/data/
+
+# CPU facts filtered from wrangler tail (scripts/tail-cpu.mjs)
+tail-cpu.jsonl

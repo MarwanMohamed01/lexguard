@@ -1,0 +1,9 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  // Throwaway Worker for the M3 embedding-model probe (docs/DECISIONS.md D25). Only ever run
+  // with `wrangler dev`; never deployed.
+  "name": "lexguard-embed-probe",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-11-01",
+  "ai": { "binding": "AI", "remote": true },
+}

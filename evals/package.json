@@ -11,6 +11,7 @@
   "dependencies": {
     "@lexguard/chunker": "0.0.0",
     "@lexguard/guardrails": "0.0.0",
+    "@lexguard/retrieval": "0.0.0",
     "zod": "4.6.7"
   },
   "scripts": {
@@ -20,6 +21,7 @@
     "eval:watch": "evalite watch",
     "fetch:gretel": "node gretel/fetch.mjs",
     "fetch:cuad": "node cuad/fetch.mjs",
-    "fetch:cuad-pdfs": "node cuad/fetch-pdfs.mjs"
+    "fetch:cuad-pdfs": "node cuad/fetch-pdfs.mjs",
+    "embed:cuad": "vitest run --config vitest.embed.config.ts"
   }
 }

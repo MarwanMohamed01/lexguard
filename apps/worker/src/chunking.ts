@@ -7,6 +7,7 @@
 //
 // Steps for one document (a 1M-char document takes about 15 of the 1,024 allowed):
 //   load -> detect 1..N -> plan -> store chunks 1..M -> store definitions 1..K -> finish
+//   -> start indexing (src/indexing.ts, D29)
 //
 // Fencing (D20): the job only works while the document's chunk_job is its own jobId. Every
 // read checks it and every write is conditional on it, inside the same SQL statement, so a
@@ -20,6 +21,7 @@ import { planChunks, planWindows, detectWindow, type Detections } from "@lexguar
 import { WorkflowEntrypoint, type WorkflowEvent, type WorkflowStep } from "cloudflare:workers";
 import { NonRetryableError } from "cloudflare:workflows";
 import { markFailed } from "./documents";
+import type { IndexParams } from "./indexing";
 
 export interface ChunkParams {
   tenantId: string;
@@ -151,18 +153,25 @@ export class ChunkDocument extends WorkflowEntrypoint<Env, ChunkParams> {
         });
       }
 
-      await step.do("finish", STEP, async () => {
+      // Ready, and handed to an indexing job in the same UPDATE: the new index ticket is
+      // created inside the step, so a replayed step reuses the same one (D29).
+      const indexJob = await step.do("finish", STEP, async () => {
+        const ticket = crypto.randomUUID();
         const result = await db
           .prepare(
-            `UPDATE documents SET status = 'ready', chunk_job = NULL, updated_at = ?
+            `UPDATE documents SET status = 'ready', chunk_job = NULL, updated_at = ?,
+               index_status = 'indexing', index_job = ?, index_error = NULL
              WHERE tenant_id = ? AND id = ? AND chunk_job = ? AND status = 'chunking'`,
           )
-          .bind(new Date().toISOString(), ...owner)
+          .bind(new Date().toISOString(), ticket, ...owner)
           .run();
         if (result.meta.changes !== 1) throw superseded();
-        return true;
+        return ticket;
       });
 
+      // Never throws: the chunks are stored and the document is ready whatever happens here.
+      // If the indexing job cannot be started, only the index is marked failed.
+      await this.startIndexing(step, { tenantId, documentId, jobId: indexJob });
       return { chunks: plan.chunks.length, definitions: plan.definitions.length };
     } catch (error) {
       // A step failed for good. Mark the document failed, but only if this job still owns it:
@@ -172,6 +181,34 @@ export class ChunkDocument extends WorkflowEntrypoint<Env, ChunkParams> {
       );
       if (!failed) return { superseded: true };
       throw error;
+    }
+  }
+
+  private async startIndexing(step: WorkflowStep, params: IndexParams): Promise<void> {
+    try {
+      await step.do("start indexing", STEP, async () => {
+        try {
+          // The index ticket doubles as the instance ID: one instance per ticket.
+          await this.env.INDEX_DOCUMENT.create({ id: params.jobId, params });
+        } catch (error) {
+          // A retried step whose first attempt did create the instance: that is success.
+          await this.env.INDEX_DOCUMENT.get(params.jobId).catch(() => {
+            throw error;
+          });
+        }
+        return true;
+      });
+    } catch {
+      await step.do("indexing not started", STEP, async () => {
+        await this.env.DB.prepare(
+          `UPDATE documents SET index_status = 'failed', index_error = 'indexing_not_started',
+             index_job = NULL
+           WHERE tenant_id = ? AND id = ? AND index_job = ? AND index_status = 'indexing'`,
+        )
+          .bind(params.tenantId, params.documentId, params.jobId)
+          .run();
+        return true;
+      });
     }
   }
 }

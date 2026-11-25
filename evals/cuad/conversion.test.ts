@@ -131,7 +131,8 @@ describe.skipIf(!available())("CUAD PDFs through the real Worker (toMarkdown)", 
       new URL("../results/cuad-conversion.json", import.meta.url),
       `${JSON.stringify(report, null, 2)}\n`,
     );
-  });
+    // Matching 1,174 clauses in 30 documents; slower when other CUAD evals run in parallel.
+  }, 120_000);
 
   it("converts and chunks every PDF", () => {
     expect(report.documents).toBe(30);

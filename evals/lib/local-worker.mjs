@@ -1,8 +1,9 @@
 // Runs the real Lexguard Worker under `wrangler dev` for local evals (M2 steps 6-7).
 //
-// Worker code, D1 and the chunking Workflow run on this machine; only toMarkdown runs on
-// Cloudflare (it always does), through your existing `wrangler login`. Nothing is deployed
-// and nothing is created on the account.
+// Worker code, D1 and the Workflows run on this machine; toMarkdown, the bge-m3 embeddings
+// and the Vectorize index run on Cloudflare (they have no local version), through your
+// existing `wrangler login`. Nothing is deployed and nothing is created on the account, but
+// vectors written during a run land in the real index: the caller deletes them (M3 step 7).
 //
 // The API key is generated here, in memory, for this run only: it reaches wrangler as an
 // environment variable (TENANT_KEYS holds only its hash) and is never written to disk.
@@ -31,12 +32,26 @@ function wrangler(args) {
   return result.stdout;
 }
 
-/** Starts the Worker on `port` with a fresh local D1; resolves once it answers /health. */
-export async function startLocalWorker({ stateDir, port = 8799, tenant = "eval" }) {
+/**
+ * Starts the Worker on `port` with a fresh local D1; resolves once it answers /health.
+ * `tenant` gets the default key; `otherTenants` get their own keys, for isolation checks.
+ */
+export async function startLocalWorker({
+  stateDir,
+  port = 8799,
+  tenant = "eval",
+  otherTenants = [],
+}) {
   const state = fileURLToPath(stateDir);
   const base = `http://127.0.0.1:${String(port)}`;
-  const key = `lg_${randomBytes(32).toString("base64url")}`;
-  const tenantKeys = JSON.stringify({ [createHash("sha256").update(key).digest("hex")]: tenant });
+  const keys = Object.fromEntries(
+    [tenant, ...otherTenants].map((t) => [t, `lg_${randomBytes(32).toString("base64url")}`]),
+  );
+  const tenantKeys = JSON.stringify(
+    Object.fromEntries(
+      Object.entries(keys).map(([t, k]) => [createHash("sha256").update(k).digest("hex"), t]),
+    ),
+  );
 
   rmSync(state, { recursive: true, force: true });
   wrangler(["d1", "migrations", "apply", "lexguard", "--local", "--persist-to", state]);
@@ -70,16 +85,19 @@ export async function startLocalWorker({ stateDir, port = 8799, tenant = "eval" 
     await sleep(500);
   }
 
-  const auth = { Authorization: `Bearer ${key}` };
+  const authFor = (t = tenant) => ({ Authorization: `Bearer ${keys[t]}` });
 
   return {
-    /** Uploads a file and waits until chunking is over; returns the outcome. */
-    async upload(bytes, filename) {
+    /**
+     * Uploads a file and waits until chunking is over (and, with `waitForIndex`, until the
+     * search index is done too); returns the outcome.
+     */
+    async upload(bytes, filename, { as = tenant, waitForIndex = false } = {}) {
       const started = Date.now();
       const response = await fetch(`${base}/v1/documents`, {
         method: "POST",
         headers: {
-          ...auth,
+          ...authFor(as),
           "Content-Length": String(bytes.length),
           "X-Filename": encodeURIComponent(filename),
         },
@@ -88,9 +106,12 @@ export async function startLocalWorker({ stateDir, port = 8799, tenant = "eval" 
       const body = await response.json();
       const uploadMs = Date.now() - started;
       let document = body.document;
-      while (document?.status === "chunking" && Date.now() - started < 10 * 60 * 1000) {
+      const busy = (d) =>
+        d?.status === "chunking" ||
+        (waitForIndex && d?.status === "ready" && (d.indexStatus ?? "indexing") === "indexing");
+      while (busy(document) && Date.now() - started < 10 * 60 * 1000) {
         await sleep(1000);
-        const status = await fetch(`${base}/v1/documents/${document.id}`, { headers: auth });
+        const status = await fetch(`${base}/v1/documents/${document.id}`, { headers: authFor(as) });
         document = (await status.json()).document;
       }
       return {
@@ -100,6 +121,18 @@ export async function startLocalWorker({ stateDir, port = 8799, tenant = "eval" 
         uploadMs,
         readyMs: Date.now() - started,
       };
+    },
+
+    /** An authenticated JSON request as `as` (default tenant); returns status and body. */
+    async request(path, { method = "GET", body, as = tenant } = {}) {
+      const text = body === undefined ? undefined : JSON.stringify(body);
+      const headers = { ...authFor(as) };
+      if (text !== undefined) {
+        headers["Content-Type"] = "application/json";
+        headers["Content-Length"] = String(Buffer.byteLength(text));
+      }
+      const response = await fetch(`${base}${path}`, { method, headers, body: text });
+      return { status: response.status, body: await response.json() };
     },
 
     /** Runs a read-only query against the local D1 and returns the rows. */
@@ -131,8 +164,21 @@ export async function startLocalWorker({ stateDir, port = 8799, tenant = "eval" 
 
     async stop() {
       kill();
-      await sleep(1000);
-      rmSync(state, { recursive: true, force: true });
+      // On Windows, workerd can hold its SQLite files for a moment after being killed
+      // (EBUSY ended the 30-PDF run, M3 step 7): retry, then leave the folder with a warning.
+      // It is git-ignored and wiped at the next start anyway.
+      for (let attempt = 1; ; attempt++) {
+        await sleep(1000);
+        try {
+          rmSync(state, { recursive: true, force: true });
+          return;
+        } catch (error) {
+          if (attempt >= 10) {
+            console.warn(`could not delete ${state} (${error.code ?? error}); delete it later`);
+            return;
+          }
+        }
+      }
     },
   };
 }

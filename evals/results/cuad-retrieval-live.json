@@ -1,0 +1,72 @@
+{
+  "documents": 30,
+  "indexed": 30,
+  "cases": 415,
+  "unlocatedSpans": 78,
+  "missingSearches": 0,
+  "modes": {
+    "keyword": {
+      "cases": 415,
+      "hit1": 0.4217,
+      "hit5": 0.6795,
+      "recall5": 0.5854,
+      "recall10": 0.7121,
+      "mrr10": 0.528,
+      "ndcg10": 0.5481
+    },
+    "vector": {
+      "cases": 415,
+      "hit1": 0.3446,
+      "hit5": 0.641,
+      "recall5": 0.5357,
+      "recall10": 0.6583,
+      "mrr10": 0.4657,
+      "ndcg10": 0.4832
+    },
+    "hybrid": {
+      "cases": 415,
+      "hit1": 0.4434,
+      "hit5": 0.7084,
+      "recall5": 0.6143,
+      "recall10": 0.7136,
+      "mrr10": 0.5498,
+      "ndcg10": 0.5606
+    }
+  },
+  "latencyMs": {
+    "keyword": {
+      "p50": 20,
+      "p95": 34
+    },
+    "vector": {
+      "p50": 326,
+      "p95": 456
+    },
+    "hybrid": {
+      "p50": 326,
+      "p95": 445
+    }
+  },
+  "searchableAfterIndexedMs": {
+    "p50": 361,
+    "max": 568
+  },
+  "indexedMs": {
+    "p50": 95978,
+    "max": 139779
+  },
+  "searches": 3690,
+  "errors": 0,
+  "vectorUnavailable": 1,
+  "degraded": 0,
+  "isolation": {
+    "otherTenantStatus": 404,
+    "ownVectorResults": 2,
+    "ownSearchableMs": 360
+  },
+  "vectorCount": {
+    "before": 0,
+    "expected": 1820,
+    "actual": 1820
+  }
+}

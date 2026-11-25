@@ -7,17 +7,20 @@ import { sanitizeText } from "@lexguard/guardrails/sanitize";
 import { sha256Hex } from "./auth";
 import type { ChunkParams } from "./chunking";
 import {
+  claimForIndexing,
   claimForRetry,
   findBySha256,
   getDocument,
   markConverted,
   markFailed,
+  markIndexNotStarted,
   reserveDocument,
   type ConvertedText,
   type DocumentSummary,
 } from "./documents";
 import { extractPages } from "./pages";
 import { detectFileKind, MIME_TYPES } from "./filetype";
+import type { IndexParams } from "./indexing";
 
 export const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
 /** D1 stores at most 2 MB per string or row (D14); the Markdown must fit in one row. */
@@ -49,9 +52,14 @@ export type Converter = (file: MarkdownDocument) => Promise<ConversionResponse>;
 /** Starts the chunking job; passed in so upload tests do not run it. */
 export type StartChunking = (params: ChunkParams) => Promise<void>;
 
+/** Starts the indexing job (src/indexing.ts) for a re-uploaded, not yet indexed document. */
+export type StartIndexing = (params: IndexParams) => Promise<void>;
+
 export interface UploadDeps {
   convert: Converter;
   startChunking: StartChunking;
+  /** Optional so tests of other paths need not pass it; production always does (index.ts). */
+  startIndexing?: StartIndexing;
   now?: () => Date;
   /** Overrides DAILY_UPLOADS_PER_TENANT (app.ts), for tests. */
   uploadsPerDay?: number;
@@ -133,8 +141,13 @@ export async function handleUpload(
       converting: ago(STALE_CONVERSION_MS),
       chunking: ago(STALE_CHUNKING_MS),
     });
-    // Already done, or in progress right now (converting or chunking): nothing to redo.
-    if (!retry) return Response.json({ document: existing }, { status: 200 });
+    if (!retry) {
+      // Ready but never indexed (uploaded before M3) or its index failed: re-uploading the
+      // file starts indexing, under a new ticket claimed atomically (D32).
+      const indexed = await indexIfMissing(env.DB, tenantId, existing, deps.startIndexing);
+      // Otherwise already done, or in progress right now: nothing to redo.
+      return Response.json({ document: indexed }, { status: 200 });
+    }
     id = existing.id;
   }
 
@@ -162,6 +175,30 @@ export async function handleUpload(
   return error === null
     ? Response.json({ document }, { status: 201 })
     : fail(error === "chunking_not_started" ? 503 : 422, error, document);
+}
+
+/**
+ * Starts the indexing job for a ready document whose index is missing or failed, if this
+ * call wins the claim. Returns the document as it is afterwards.
+ */
+async function indexIfMissing(
+  db: D1Database,
+  tenantId: string,
+  existing: DocumentSummary,
+  startIndexing: StartIndexing | undefined,
+): Promise<DocumentSummary> {
+  if (startIndexing === undefined || existing.status !== "ready") return existing;
+  if (existing.indexStatus !== null && existing.indexStatus !== "failed") return existing;
+  const jobId = crypto.randomUUID();
+  if (!(await claimForIndexing(db, tenantId, existing.id, jobId))) return existing;
+  try {
+    // The ticket doubles as the instance ID, as for the chunking job.
+    await startIndexing({ tenantId, documentId: existing.id, jobId });
+  } catch (cause) {
+    logError("indexing job not started", cause);
+    await markIndexNotStarted(db, tenantId, existing.id, jobId);
+  }
+  return (await getDocument(db, tenantId, existing.id)) ?? existing;
 }
 
 /**

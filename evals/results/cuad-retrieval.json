@@ -1,0 +1,3268 @@
+{
+  "queries": {
+    "Document Name": "Document Name: The name of the contract",
+    "Parties": "Parties: The two or more parties who signed the contract",
+    "Agreement Date": "Agreement Date: The date of the contract",
+    "Effective Date": "Effective Date: The date when the contract is effective",
+    "Expiration Date": "Expiration Date: On what date will the contract's initial term expire?",
+    "Renewal Term": "Renewal Term: What is the renewal term after the initial term expires? This includes automatic extensions and unilateral extensions with prior notice.",
+    "Notice Period To Terminate Renewal": "Notice Period To Terminate Renewal: What is the notice period required to terminate renewal?",
+    "Governing Law": "Governing Law: Which state/country's law governs the interpretation of the contract?",
+    "Most Favored Nation": "Most Favored Nation: Is there a clause that if a third party gets better terms on the licensing or sale of technology/goods/services described in the contract, the buyer of such technology/goods/services under the contract shall be entitled to those better terms?",
+    "Non-Compete": "Non-Compete: Is there a restriction on the ability of a party to compete with the counterparty or operate in a certain geography or business or technology sector?",
+    "Exclusivity": "Exclusivity: Is there an exclusive dealing  commitment with the counterparty? This includes a commitment to procure all “requirements” from one party of certain technology, goods, or services or a prohibition on licensing or selling technology, goods or services to third parties, or a prohibition on  collaborating or working with other parties), whether during the contract or  after the contract ends (or both).",
+    "No-Solicit Of Customers": "No-Solicit Of Customers: Is a party restricted from contracting or soliciting customers or partners of the counterparty, whether during the contract or after the contract ends (or both)?",
+    "Competitive Restriction Exception": "Competitive Restriction Exception: This category includes the exceptions or carveouts to Non-Compete, Exclusivity and No-Solicit of Customers above.",
+    "No-Solicit Of Employees": "No-Solicit Of Employees: Is there a restriction on a party’s soliciting or hiring employees and/or contractors from the  counterparty, whether during the contract or after the contract ends (or both)?",
+    "Non-Disparagement": "Non-Disparagement: Is there a requirement on a party not to disparage the counterparty?",
+    "Termination For Convenience": "Termination For Convenience: Can a party terminate this  contract without cause (solely by giving a notice and allowing a waiting  period to expire)?",
+    "Rofr/Rofo/Rofn": "Rofr/Rofo/Rofn: Is there a clause granting one party a right of first refusal, right of first offer or right of first negotiation to purchase, license, market, or distribute equity interest, technology, assets, products or services?",
+    "Change Of Control": "Change Of Control: Does one party have the right to terminate or is consent or notice required of the counterparty if such party undergoes a change of control, such as a merger, stock sale, transfer of all or substantially all of its assets or business, or assignment by operation of law?",
+    "Anti-Assignment": "Anti-Assignment: Is consent or notice required of a party if the contract is assigned to a third party?",
+    "Revenue/Profit Sharing": "Revenue/Profit Sharing: Is one party required to share revenue or profit with the counterparty for any technology, goods, or services?",
+    "Price Restrictions": "Price Restrictions: Is there a restriction on the  ability of a party to raise or reduce prices of technology, goods, or  services provided?",
+    "Minimum Commitment": "Minimum Commitment: Is there a minimum order size or minimum amount or units per-time period that one party must buy from the counterparty under the contract?",
+    "Volume Restriction": "Volume Restriction: Is there a fee increase or consent requirement, etc. if one party’s use of the product/services exceeds certain threshold?",
+    "Ip Ownership Assignment": "Ip Ownership Assignment: Does intellectual property created  by one party become the property of the counterparty, either per the terms of the contract or upon the occurrence of certain events?",
+    "Joint Ip Ownership": "Joint Ip Ownership: Is there any clause providing for joint or shared ownership of intellectual property between the parties to the contract?",
+    "License Grant": "License Grant: Does the contract contain a license granted by one party to its counterparty?",
+    "Non-Transferable License": "Non-Transferable License: Does the contract limit the ability of a party to transfer the license being granted to a third party?",
+    "Affiliate License-Licensor": "Affiliate License-Licensor: Does the contract contain a license grant by affiliates of the licensor or that includes intellectual property of affiliates of the licensor?",
+    "Affiliate License-Licensee": "Affiliate License-Licensee: Does the contract contain a license grant to a licensee (incl. sublicensor) and the affiliates of such licensee/sublicensor?",
+    "Unlimited/All-You-Can-Eat-License": "Unlimited/All-You-Can-Eat-License: Is there a clause granting one party an “enterprise,” “all you can eat” or unlimited usage license?",
+    "Irrevocable Or Perpetual License": "Irrevocable Or Perpetual License: Does the contract contain a  license grant that is irrevocable or perpetual?",
+    "Source Code Escrow": "Source Code Escrow: Is one party required to deposit its source code into escrow with a third party, which can be released to the counterparty upon the occurrence of certain events (bankruptcy,  insolvency, etc.)?",
+    "Post-Termination Services": "Post-Termination Services: Is a party subject to obligations after the termination or expiration of a contract, including any post-termination transition, payment, transfer of IP, wind-down, last-buy, or similar commitments?",
+    "Audit Rights": "Audit Rights: Does a party have the right to  audit the books, records, or physical locations of the counterparty to ensure compliance with the contract?",
+    "Uncapped Liability": "Uncapped Liability: Is a party’s liability uncapped upon the breach of its obligation in the contract? This also includes uncap liability for a particular type of breach such as IP infringement or breach of confidentiality obligation.",
+    "Cap On Liability": "Cap On Liability: Does the contract include a cap on liability upon the breach of a party’s obligation? This includes time limitation for the counterparty to bring claims or maximum amount for recovery.",
+    "Liquidated Damages": "Liquidated Damages: Does the contract contain a clause that would award either party liquidated damages for breach or a fee upon the termination of a contract (termination fee)?",
+    "Warranty Duration": "Warranty Duration: What is the duration of any  warranty against defects or errors in technology, products, or services  provided under the contract?",
+    "Insurance": "Insurance: Is there a requirement for insurance that must be maintained by one party for the benefit of the counterparty?",
+    "Covenant Not To Sue": "Covenant Not To Sue: Is a party restricted from contesting the validity of the counterparty’s ownership of intellectual property or otherwise bringing a claim against the counterparty for matters unrelated to the contract?",
+    "Third Party Beneficiary": "Third Party Beneficiary: Is there a non-contracting party who is a beneficiary to some or all of the clauses in the contract and therefore can enforce its rights against a contracting party?"
+  },
+  "reports": [
+    {
+      "corpus": "CUAD text",
+      "documents": 510,
+      "chunks": 17026,
+      "cases": 6702,
+      "methods": [
+        {
+          "method": "random",
+          "all": {
+            "cases": 6702,
+            "hit1": 0.0683,
+            "hit5": 0.2617,
+            "recall5": 0.2312,
+            "recall10": 0.4149,
+            "mrr10": 0.1582,
+            "ndcg10": 0.2114
+          },
+          "byClauseType": {
+            "Affiliate License-Licensee": {
+              "cases": 59,
+              "hit5": 0.1525,
+              "mrr10": 0.0869
+            },
+            "Affiliate License-Licensor": {
+              "cases": 23,
+              "hit5": 0.1304,
+              "mrr10": 0.0732
+            },
+            "Agreement Date": {
+              "cases": 470,
+              "hit5": 0.3021,
+              "mrr10": 0.1907
+            },
+            "Anti-Assignment": {
+              "cases": 374,
+              "hit5": 0.2834,
+              "mrr10": 0.1482
+            },
+            "Audit Rights": {
+              "cases": 214,
+              "hit5": 0.2336,
+              "mrr10": 0.1354
+            },
+            "Cap On Liability": {
+              "cases": 275,
+              "hit5": 0.28,
+              "mrr10": 0.1644
+            },
+            "Change Of Control": {
+              "cases": 121,
+              "hit5": 0.1901,
+              "mrr10": 0.1264
+            },
+            "Competitive Restriction Exception": {
+              "cases": 76,
+              "hit5": 0.2237,
+              "mrr10": 0.1308
+            },
+            "Covenant Not To Sue": {
+              "cases": 100,
+              "hit5": 0.16,
+              "mrr10": 0.0837
+            },
+            "Document Name": {
+              "cases": 510,
+              "hit5": 0.3137,
+              "mrr10": 0.2121
+            },
+            "Effective Date": {
+              "cases": 390,
+              "hit5": 0.2795,
+              "mrr10": 0.1718
+            },
+            "Exclusivity": {
+              "cases": 180,
+              "hit5": 0.2778,
+              "mrr10": 0.181
+            },
+            "Expiration Date": {
+              "cases": 413,
+              "hit5": 0.2785,
+              "mrr10": 0.1718
+            },
+            "Governing Law": {
+              "cases": 437,
+              "hit5": 0.2609,
+              "mrr10": 0.143
+            },
+            "Insurance": {
+              "cases": 166,
+              "hit5": 0.1867,
+              "mrr10": 0.1221
+            },
+            "Ip Ownership Assignment": {
+              "cases": 124,
+              "hit5": 0.1935,
+              "mrr10": 0.1288
+            },
+            "Irrevocable Or Perpetual License": {
+              "cases": 70,
+              "hit5": 0.1429,
+              "mrr10": 0.0837
+            },
+            "Joint Ip Ownership": {
+              "cases": 46,
+              "hit5": 0.1304,
+              "mrr10": 0.0944
+            },
+            "License Grant": {
+              "cases": 255,
+              "hit5": 0.2863,
+              "mrr10": 0.1573
+            },
+            "Liquidated Damages": {
+              "cases": 61,
+              "hit5": 0.1803,
+              "mrr10": 0.1225
+            },
+            "Minimum Commitment": {
+              "cases": 165,
+              "hit5": 0.2182,
+              "mrr10": 0.1367
+            },
+            "Most Favored Nation": {
+              "cases": 28,
+              "hit5": 0.1786,
+              "mrr10": 0.0843
+            },
+            "No-Solicit Of Customers": {
+              "cases": 34,
+              "hit5": 0.3235,
+              "mrr10": 0.1522
+            },
+            "No-Solicit Of Employees": {
+              "cases": 59,
+              "hit5": 0.3559,
+              "mrr10": 0.1754
+            },
+            "Non-Compete": {
+              "cases": 119,
+              "hit5": 0.2605,
+              "mrr10": 0.1758
+            },
+            "Non-Disparagement": {
+              "cases": 38,
+              "hit5": 0.1053,
+              "mrr10": 0.0423
+            },
+            "Non-Transferable License": {
+              "cases": 138,
+              "hit5": 0.1812,
+              "mrr10": 0.1099
+            },
+            "Notice Period To Terminate Renewal": {
+              "cases": 111,
+              "hit5": 0.2252,
+              "mrr10": 0.1375
+            },
+            "Parties": {
+              "cases": 509,
+              "hit5": 0.334,
+              "mrr10": 0.2202
+            },
+            "Post-Termination Services": {
+              "cases": 182,
+              "hit5": 0.1813,
+              "mrr10": 0.1067
+            },
+            "Price Restrictions": {
+              "cases": 15,
+              "hit5": 0.4,
+              "mrr10": 0.1633
+            },
+            "Renewal Term": {
+              "cases": 176,
+              "hit5": 0.2102,
+              "mrr10": 0.1393
+            },
+            "Revenue/Profit Sharing": {
+              "cases": 166,
+              "hit5": 0.3012,
+              "mrr10": 0.1783
+            },
+            "Rofr/Rofo/Rofn": {
+              "cases": 85,
+              "hit5": 0.2,
+              "mrr10": 0.1182
+            },
+            "Source Code Escrow": {
+              "cases": 13,
+              "hit5": 0.1538,
+              "mrr10": 0.1583
+            },
+            "Termination For Convenience": {
+              "cases": 183,
+              "hit5": 0.2896,
+              "mrr10": 0.1664
+            },
+            "Third Party Beneficiary": {
+              "cases": 32,
+              "hit5": 0.2813,
+              "mrr10": 0.1151
+            },
+            "Uncapped Liability": {
+              "cases": 111,
+              "hit5": 0.1622,
+              "mrr10": 0.0812
+            },
+            "Unlimited/All-You-Can-Eat-License": {
+              "cases": 17,
+              "hit5": 0.4706,
+              "mrr10": 0.2754
+            },
+            "Volume Restriction": {
+              "cases": 82,
+              "hit5": 0.3171,
+              "mrr10": 0.1458
+            },
+            "Warranty Duration": {
+              "cases": 75,
+              "hit5": 0.28,
+              "mrr10": 0.1646
+            }
+          }
+        },
+        {
+          "method": "keyword (FTS5 unicode61)",
+          "all": {
+            "cases": 6702,
+            "hit1": 0.4212,
+            "hit5": 0.7147,
+            "recall5": 0.6603,
+            "recall10": 0.7921,
+            "mrr10": 0.5461,
+            "ndcg10": 0.5885
+          },
+          "byClauseType": {
+            "Affiliate License-Licensee": {
+              "cases": 59,
+              "hit5": 0.7458,
+              "mrr10": 0.5213
+            },
+            "Affiliate License-Licensor": {
+              "cases": 23,
+              "hit5": 0.6957,
+              "mrr10": 0.4356
+            },
+            "Agreement Date": {
+              "cases": 470,
+              "hit5": 0.4277,
+              "mrr10": 0.2357
+            },
+            "Anti-Assignment": {
+              "cases": 374,
+              "hit5": 0.9385,
+              "mrr10": 0.8113
+            },
+            "Audit Rights": {
+              "cases": 214,
+              "hit5": 0.9346,
+              "mrr10": 0.8446
+            },
+            "Cap On Liability": {
+              "cases": 275,
+              "hit5": 0.88,
+              "mrr10": 0.6728
+            },
+            "Change Of Control": {
+              "cases": 121,
+              "hit5": 0.9339,
+              "mrr10": 0.7467
+            },
+            "Competitive Restriction Exception": {
+              "cases": 76,
+              "hit5": 0.75,
+              "mrr10": 0.5443
+            },
+            "Covenant Not To Sue": {
+              "cases": 100,
+              "hit5": 0.79,
+              "mrr10": 0.5355
+            },
+            "Document Name": {
+              "cases": 510,
+              "hit5": 0.3294,
+              "mrr10": 0.2105
+            },
+            "Effective Date": {
+              "cases": 390,
+              "hit5": 0.6385,
+              "mrr10": 0.3738
+            },
+            "Exclusivity": {
+              "cases": 180,
+              "hit5": 0.7,
+              "mrr10": 0.4754
+            },
+            "Expiration Date": {
+              "cases": 413,
+              "hit5": 0.8789,
+              "mrr10": 0.6798
+            },
+            "Governing Law": {
+              "cases": 437,
+              "hit5": 0.9451,
+              "mrr10": 0.8081
+            },
+            "Insurance": {
+              "cases": 166,
+              "hit5": 0.9337,
+              "mrr10": 0.7195
+            },
+            "Ip Ownership Assignment": {
+              "cases": 124,
+              "hit5": 0.6613,
+              "mrr10": 0.4764
+            },
+            "Irrevocable Or Perpetual License": {
+              "cases": 70,
+              "hit5": 0.9571,
+              "mrr10": 0.8628
+            },
+            "Joint Ip Ownership": {
+              "cases": 46,
+              "hit5": 0.7826,
+              "mrr10": 0.613
+            },
+            "License Grant": {
+              "cases": 255,
+              "hit5": 0.8353,
+              "mrr10": 0.6044
+            },
+            "Liquidated Damages": {
+              "cases": 61,
+              "hit5": 0.7541,
+              "mrr10": 0.5611
+            },
+            "Minimum Commitment": {
+              "cases": 165,
+              "hit5": 0.7939,
+              "mrr10": 0.6083
+            },
+            "Most Favored Nation": {
+              "cases": 28,
+              "hit5": 0.5,
+              "mrr10": 0.3266
+            },
+            "No-Solicit Of Customers": {
+              "cases": 34,
+              "hit5": 0.7059,
+              "mrr10": 0.5986
+            },
+            "No-Solicit Of Employees": {
+              "cases": 59,
+              "hit5": 0.8475,
+              "mrr10": 0.7556
+            },
+            "Non-Compete": {
+              "cases": 119,
+              "hit5": 0.4706,
+              "mrr10": 0.3449
+            },
+            "Non-Disparagement": {
+              "cases": 38,
+              "hit5": 0.5263,
+              "mrr10": 0.459
+            },
+            "Non-Transferable License": {
+              "cases": 138,
+              "hit5": 0.8261,
+              "mrr10": 0.6849
+            },
+            "Notice Period To Terminate Renewal": {
+              "cases": 111,
+              "hit5": 0.8829,
+              "mrr10": 0.7417
+            },
+            "Parties": {
+              "cases": 509,
+              "hit5": 0.334,
+              "mrr10": 0.2007
+            },
+            "Post-Termination Services": {
+              "cases": 182,
+              "hit5": 0.7637,
+              "mrr10": 0.5408
+            },
+            "Price Restrictions": {
+              "cases": 15,
+              "hit5": 0.6,
+              "mrr10": 0.4556
+            },
+            "Renewal Term": {
+              "cases": 176,
+              "hit5": 0.9432,
+              "mrr10": 0.8198
+            },
+            "Revenue/Profit Sharing": {
+              "cases": 166,
+              "hit5": 0.6024,
+              "mrr10": 0.4423
+            },
+            "Rofr/Rofo/Rofn": {
+              "cases": 85,
+              "hit5": 0.7765,
+              "mrr10": 0.6262
+            },
+            "Source Code Escrow": {
+              "cases": 13,
+              "hit5": 1,
+              "mrr10": 0.8974
+            },
+            "Termination For Convenience": {
+              "cases": 183,
+              "hit5": 0.9344,
+              "mrr10": 0.8211
+            },
+            "Third Party Beneficiary": {
+              "cases": 32,
+              "hit5": 0.8438,
+              "mrr10": 0.6938
+            },
+            "Uncapped Liability": {
+              "cases": 111,
+              "hit5": 0.8468,
+              "mrr10": 0.6644
+            },
+            "Unlimited/All-You-Can-Eat-License": {
+              "cases": 17,
+              "hit5": 0.9412,
+              "mrr10": 0.8353
+            },
+            "Volume Restriction": {
+              "cases": 82,
+              "hit5": 0.439,
+              "mrr10": 0.2496
+            },
+            "Warranty Duration": {
+              "cases": 75,
+              "hit5": 0.7333,
+              "mrr10": 0.5988
+            }
+          }
+        },
+        {
+          "method": "keyword (FTS5 porter unicode61)",
+          "all": {
+            "cases": 6702,
+            "hit1": 0.4537,
+            "hit5": 0.7204,
+            "recall5": 0.6724,
+            "recall10": 0.7976,
+            "mrr10": 0.5677,
+            "ndcg10": 0.6075
+          },
+          "byClauseType": {
+            "Affiliate License-Licensee": {
+              "cases": 59,
+              "hit5": 0.8305,
+              "mrr10": 0.5781
+            },
+            "Affiliate License-Licensor": {
+              "cases": 23,
+              "hit5": 0.6522,
+              "mrr10": 0.4118
+            },
+            "Agreement Date": {
+              "cases": 470,
+              "hit5": 0.4745,
+              "mrr10": 0.2643
+            },
+            "Anti-Assignment": {
+              "cases": 374,
+              "hit5": 0.9759,
+              "mrr10": 0.9138
+            },
+            "Audit Rights": {
+              "cases": 214,
+              "hit5": 0.9439,
+              "mrr10": 0.8372
+            },
+            "Cap On Liability": {
+              "cases": 275,
+              "hit5": 0.8764,
+              "mrr10": 0.7016
+            },
+            "Change Of Control": {
+              "cases": 121,
+              "hit5": 0.9008,
+              "mrr10": 0.728
+            },
+            "Competitive Restriction Exception": {
+              "cases": 76,
+              "hit5": 0.6711,
+              "mrr10": 0.4918
+            },
+            "Covenant Not To Sue": {
+              "cases": 100,
+              "hit5": 0.81,
+              "mrr10": 0.6095
+            },
+            "Document Name": {
+              "cases": 510,
+              "hit5": 0.302,
+              "mrr10": 0.2015
+            },
+            "Effective Date": {
+              "cases": 390,
+              "hit5": 0.5436,
+              "mrr10": 0.2997
+            },
+            "Exclusivity": {
+              "cases": 180,
+              "hit5": 0.8389,
+              "mrr10": 0.6278
+            },
+            "Expiration Date": {
+              "cases": 413,
+              "hit5": 0.7579,
+              "mrr10": 0.5335
+            },
+            "Governing Law": {
+              "cases": 437,
+              "hit5": 0.9817,
+              "mrr10": 0.8723
+            },
+            "Insurance": {
+              "cases": 166,
+              "hit5": 0.9819,
+              "mrr10": 0.8722
+            },
+            "Ip Ownership Assignment": {
+              "cases": 124,
+              "hit5": 0.7097,
+              "mrr10": 0.5567
+            },
+            "Irrevocable Or Perpetual License": {
+              "cases": 70,
+              "hit5": 0.9571,
+              "mrr10": 0.8866
+            },
+            "Joint Ip Ownership": {
+              "cases": 46,
+              "hit5": 0.7609,
+              "mrr10": 0.6178
+            },
+            "License Grant": {
+              "cases": 255,
+              "hit5": 0.9333,
+              "mrr10": 0.7437
+            },
+            "Liquidated Damages": {
+              "cases": 61,
+              "hit5": 0.6885,
+              "mrr10": 0.5087
+            },
+            "Minimum Commitment": {
+              "cases": 165,
+              "hit5": 0.7818,
+              "mrr10": 0.5928
+            },
+            "Most Favored Nation": {
+              "cases": 28,
+              "hit5": 0.6429,
+              "mrr10": 0.409
+            },
+            "No-Solicit Of Customers": {
+              "cases": 34,
+              "hit5": 0.7941,
+              "mrr10": 0.7058
+            },
+            "No-Solicit Of Employees": {
+              "cases": 59,
+              "hit5": 0.9153,
+              "mrr10": 0.8834
+            },
+            "Non-Compete": {
+              "cases": 119,
+              "hit5": 0.5378,
+              "mrr10": 0.3733
+            },
+            "Non-Disparagement": {
+              "cases": 38,
+              "hit5": 0.6316,
+              "mrr10": 0.6013
+            },
+            "Non-Transferable License": {
+              "cases": 138,
+              "hit5": 0.9058,
+              "mrr10": 0.7748
+            },
+            "Notice Period To Terminate Renewal": {
+              "cases": 111,
+              "hit5": 0.991,
+              "mrr10": 0.9073
+            },
+            "Parties": {
+              "cases": 509,
+              "hit5": 0.2633,
+              "mrr10": 0.163
+            },
+            "Post-Termination Services": {
+              "cases": 182,
+              "hit5": 0.7747,
+              "mrr10": 0.5365
+            },
+            "Price Restrictions": {
+              "cases": 15,
+              "hit5": 0.5333,
+              "mrr10": 0.4583
+            },
+            "Renewal Term": {
+              "cases": 176,
+              "hit5": 0.9602,
+              "mrr10": 0.904
+            },
+            "Revenue/Profit Sharing": {
+              "cases": 166,
+              "hit5": 0.6867,
+              "mrr10": 0.5262
+            },
+            "Rofr/Rofo/Rofn": {
+              "cases": 85,
+              "hit5": 0.7529,
+              "mrr10": 0.6192
+            },
+            "Source Code Escrow": {
+              "cases": 13,
+              "hit5": 1,
+              "mrr10": 0.9615
+            },
+            "Termination For Convenience": {
+              "cases": 183,
+              "hit5": 0.9071,
+              "mrr10": 0.7532
+            },
+            "Third Party Beneficiary": {
+              "cases": 32,
+              "hit5": 0.8438,
+              "mrr10": 0.7177
+            },
+            "Uncapped Liability": {
+              "cases": 111,
+              "hit5": 0.8108,
+              "mrr10": 0.6263
+            },
+            "Unlimited/All-You-Can-Eat-License": {
+              "cases": 17,
+              "hit5": 0.9412,
+              "mrr10": 0.7732
+            },
+            "Volume Restriction": {
+              "cases": 82,
+              "hit5": 0.5366,
+              "mrr10": 0.348
+            },
+            "Warranty Duration": {
+              "cases": 75,
+              "hit5": 0.84,
+              "mrr10": 0.6113
+            }
+          }
+        },
+        {
+          "method": "vector (workers-ai-bge-m3, header)",
+          "all": {
+            "cases": 6702,
+            "hit1": 0.399,
+            "hit5": 0.6662,
+            "recall5": 0.6088,
+            "recall10": 0.7515,
+            "mrr10": 0.5156,
+            "ndcg10": 0.5536
+          },
+          "byClauseType": {
+            "Affiliate License-Licensee": {
+              "cases": 59,
+              "hit5": 0.7458,
+              "mrr10": 0.5416
+            },
+            "Affiliate License-Licensor": {
+              "cases": 23,
+              "hit5": 0.6957,
+              "mrr10": 0.5261
+            },
+            "Agreement Date": {
+              "cases": 470,
+              "hit5": 0.383,
+              "mrr10": 0.2278
+            },
+            "Anti-Assignment": {
+              "cases": 374,
+              "hit5": 0.885,
+              "mrr10": 0.7254
+            },
+            "Audit Rights": {
+              "cases": 214,
+              "hit5": 0.8598,
+              "mrr10": 0.7728
+            },
+            "Cap On Liability": {
+              "cases": 275,
+              "hit5": 0.8291,
+              "mrr10": 0.6092
+            },
+            "Change Of Control": {
+              "cases": 121,
+              "hit5": 0.7934,
+              "mrr10": 0.5818
+            },
+            "Competitive Restriction Exception": {
+              "cases": 76,
+              "hit5": 0.4474,
+              "mrr10": 0.3119
+            },
+            "Covenant Not To Sue": {
+              "cases": 100,
+              "hit5": 0.53,
+              "mrr10": 0.3064
+            },
+            "Document Name": {
+              "cases": 510,
+              "hit5": 0.3824,
+              "mrr10": 0.2391
+            },
+            "Effective Date": {
+              "cases": 390,
+              "hit5": 0.5154,
+              "mrr10": 0.3637
+            },
+            "Exclusivity": {
+              "cases": 180,
+              "hit5": 0.3667,
+              "mrr10": 0.2444
+            },
+            "Expiration Date": {
+              "cases": 413,
+              "hit5": 0.9346,
+              "mrr10": 0.8415
+            },
+            "Governing Law": {
+              "cases": 437,
+              "hit5": 0.9291,
+              "mrr10": 0.8282
+            },
+            "Insurance": {
+              "cases": 166,
+              "hit5": 0.8795,
+              "mrr10": 0.7209
+            },
+            "Ip Ownership Assignment": {
+              "cases": 124,
+              "hit5": 0.6694,
+              "mrr10": 0.5177
+            },
+            "Irrevocable Or Perpetual License": {
+              "cases": 70,
+              "hit5": 0.7429,
+              "mrr10": 0.6105
+            },
+            "Joint Ip Ownership": {
+              "cases": 46,
+              "hit5": 0.8261,
+              "mrr10": 0.6826
+            },
+            "License Grant": {
+              "cases": 255,
+              "hit5": 0.7098,
+              "mrr10": 0.4971
+            },
+            "Liquidated Damages": {
+              "cases": 61,
+              "hit5": 0.7213,
+              "mrr10": 0.5146
+            },
+            "Minimum Commitment": {
+              "cases": 165,
+              "hit5": 0.5636,
+              "mrr10": 0.4064
+            },
+            "Most Favored Nation": {
+              "cases": 28,
+              "hit5": 0.6071,
+              "mrr10": 0.4387
+            },
+            "No-Solicit Of Customers": {
+              "cases": 34,
+              "hit5": 0.6176,
+              "mrr10": 0.5043
+            },
+            "No-Solicit Of Employees": {
+              "cases": 59,
+              "hit5": 0.9492,
+              "mrr10": 0.8533
+            },
+            "Non-Compete": {
+              "cases": 119,
+              "hit5": 0.7311,
+              "mrr10": 0.5467
+            },
+            "Non-Disparagement": {
+              "cases": 38,
+              "hit5": 0.5526,
+              "mrr10": 0.4105
+            },
+            "Non-Transferable License": {
+              "cases": 138,
+              "hit5": 0.7246,
+              "mrr10": 0.475
+            },
+            "Notice Period To Terminate Renewal": {
+              "cases": 111,
+              "hit5": 0.973,
+              "mrr10": 0.8248
+            },
+            "Parties": {
+              "cases": 509,
+              "hit5": 0.2692,
+              "mrr10": 0.1843
+            },
+            "Post-Termination Services": {
+              "cases": 182,
+              "hit5": 0.7582,
+              "mrr10": 0.5641
+            },
+            "Price Restrictions": {
+              "cases": 15,
+              "hit5": 0.7333,
+              "mrr10": 0.6133
+            },
+            "Renewal Term": {
+              "cases": 176,
+              "hit5": 0.9261,
+              "mrr10": 0.8406
+            },
+            "Revenue/Profit Sharing": {
+              "cases": 166,
+              "hit5": 0.5422,
+              "mrr10": 0.3363
+            },
+            "Rofr/Rofo/Rofn": {
+              "cases": 85,
+              "hit5": 0.6353,
+              "mrr10": 0.5182
+            },
+            "Source Code Escrow": {
+              "cases": 13,
+              "hit5": 0.9231,
+              "mrr10": 0.8269
+            },
+            "Termination For Convenience": {
+              "cases": 183,
+              "hit5": 0.8907,
+              "mrr10": 0.7323
+            },
+            "Third Party Beneficiary": {
+              "cases": 32,
+              "hit5": 0.8125,
+              "mrr10": 0.6267
+            },
+            "Uncapped Liability": {
+              "cases": 111,
+              "hit5": 0.8288,
+              "mrr10": 0.5673
+            },
+            "Unlimited/All-You-Can-Eat-License": {
+              "cases": 17,
+              "hit5": 0.7647,
+              "mrr10": 0.4676
+            },
+            "Volume Restriction": {
+              "cases": 82,
+              "hit5": 0.4878,
+              "mrr10": 0.247
+            },
+            "Warranty Duration": {
+              "cases": 75,
+              "hit5": 0.7867,
+              "mrr10": 0.6366
+            }
+          }
+        },
+        {
+          "method": "hybrid RRF (workers-ai-bge-m3, header + FTS5 unicode61)",
+          "all": {
+            "cases": 6702,
+            "hit1": 0.456,
+            "hit5": 0.7337,
+            "recall5": 0.6777,
+            "recall10": 0.8045,
+            "mrr10": 0.5747,
+            "ndcg10": 0.6124
+          },
+          "byClauseType": {
+            "Affiliate License-Licensee": {
+              "cases": 59,
+              "hit5": 0.8644,
+              "mrr10": 0.6009
+            },
+            "Affiliate License-Licensor": {
+              "cases": 23,
+              "hit5": 0.8261,
+              "mrr10": 0.5754
+            },
+            "Agreement Date": {
+              "cases": 470,
+              "hit5": 0.4319,
+              "mrr10": 0.2616
+            },
+            "Anti-Assignment": {
+              "cases": 374,
+              "hit5": 0.9626,
+              "mrr10": 0.8201
+            },
+            "Audit Rights": {
+              "cases": 214,
+              "hit5": 0.9533,
+              "mrr10": 0.8397
+            },
+            "Cap On Liability": {
+              "cases": 275,
+              "hit5": 0.8945,
+              "mrr10": 0.7353
+            },
+            "Change Of Control": {
+              "cases": 121,
+              "hit5": 0.876,
+              "mrr10": 0.6938
+            },
+            "Competitive Restriction Exception": {
+              "cases": 76,
+              "hit5": 0.6447,
+              "mrr10": 0.4866
+            },
+            "Covenant Not To Sue": {
+              "cases": 100,
+              "hit5": 0.7,
+              "mrr10": 0.4188
+            },
+            "Document Name": {
+              "cases": 510,
+              "hit5": 0.3843,
+              "mrr10": 0.2261
+            },
+            "Effective Date": {
+              "cases": 390,
+              "hit5": 0.6513,
+              "mrr10": 0.4172
+            },
+            "Exclusivity": {
+              "cases": 180,
+              "hit5": 0.6,
+              "mrr10": 0.4235
+            },
+            "Expiration Date": {
+              "cases": 413,
+              "hit5": 0.9395,
+              "mrr10": 0.8057
+            },
+            "Governing Law": {
+              "cases": 437,
+              "hit5": 0.9519,
+              "mrr10": 0.8498
+            },
+            "Insurance": {
+              "cases": 166,
+              "hit5": 0.9277,
+              "mrr10": 0.8514
+            },
+            "Ip Ownership Assignment": {
+              "cases": 124,
+              "hit5": 0.75,
+              "mrr10": 0.5799
+            },
+            "Irrevocable Or Perpetual License": {
+              "cases": 70,
+              "hit5": 0.9286,
+              "mrr10": 0.8227
+            },
+            "Joint Ip Ownership": {
+              "cases": 46,
+              "hit5": 0.8043,
+              "mrr10": 0.6924
+            },
+            "License Grant": {
+              "cases": 255,
+              "hit5": 0.8627,
+              "mrr10": 0.6586
+            },
+            "Liquidated Damages": {
+              "cases": 61,
+              "hit5": 0.8033,
+              "mrr10": 0.5532
+            },
+            "Minimum Commitment": {
+              "cases": 165,
+              "hit5": 0.7636,
+              "mrr10": 0.5674
+            },
+            "Most Favored Nation": {
+              "cases": 28,
+              "hit5": 0.6071,
+              "mrr10": 0.4338
+            },
+            "No-Solicit Of Customers": {
+              "cases": 34,
+              "hit5": 0.7941,
+              "mrr10": 0.5699
+            },
+            "No-Solicit Of Employees": {
+              "cases": 59,
+              "hit5": 0.9153,
+              "mrr10": 0.8489
+            },
+            "Non-Compete": {
+              "cases": 119,
+              "hit5": 0.6303,
+              "mrr10": 0.4471
+            },
+            "Non-Disparagement": {
+              "cases": 38,
+              "hit5": 0.6842,
+              "mrr10": 0.4297
+            },
+            "Non-Transferable License": {
+              "cases": 138,
+              "hit5": 0.8986,
+              "mrr10": 0.6516
+            },
+            "Notice Period To Terminate Renewal": {
+              "cases": 111,
+              "hit5": 0.9279,
+              "mrr10": 0.8111
+            },
+            "Parties": {
+              "cases": 509,
+              "hit5": 0.3065,
+              "mrr10": 0.204
+            },
+            "Post-Termination Services": {
+              "cases": 182,
+              "hit5": 0.8571,
+              "mrr10": 0.6011
+            },
+            "Price Restrictions": {
+              "cases": 15,
+              "hit5": 0.6,
+              "mrr10": 0.4815
+            },
+            "Renewal Term": {
+              "cases": 176,
+              "hit5": 0.9545,
+              "mrr10": 0.8783
+            },
+            "Revenue/Profit Sharing": {
+              "cases": 166,
+              "hit5": 0.6386,
+              "mrr10": 0.453
+            },
+            "Rofr/Rofo/Rofn": {
+              "cases": 85,
+              "hit5": 0.7176,
+              "mrr10": 0.5962
+            },
+            "Source Code Escrow": {
+              "cases": 13,
+              "hit5": 0.9231,
+              "mrr10": 0.8846
+            },
+            "Termination For Convenience": {
+              "cases": 183,
+              "hit5": 0.9344,
+              "mrr10": 0.8065
+            },
+            "Third Party Beneficiary": {
+              "cases": 32,
+              "hit5": 0.9375,
+              "mrr10": 0.6922
+            },
+            "Uncapped Liability": {
+              "cases": 111,
+              "hit5": 0.8739,
+              "mrr10": 0.6709
+            },
+            "Unlimited/All-You-Can-Eat-License": {
+              "cases": 17,
+              "hit5": 0.7647,
+              "mrr10": 0.7085
+            },
+            "Volume Restriction": {
+              "cases": 82,
+              "hit5": 0.4634,
+              "mrr10": 0.2709
+            },
+            "Warranty Duration": {
+              "cases": 75,
+              "hit5": 0.8,
+              "mrr10": 0.6654
+            }
+          }
+        },
+        {
+          "method": "hybrid RRF (workers-ai-bge-m3, header + FTS5 porter unicode61)",
+          "all": {
+            "cases": 6702,
+            "hit1": 0.464,
+            "hit5": 0.7399,
+            "recall5": 0.6857,
+            "recall10": 0.8069,
+            "mrr10": 0.5814,
+            "ndcg10": 0.6189
+          },
+          "byClauseType": {
+            "Affiliate License-Licensee": {
+              "cases": 59,
+              "hit5": 0.8136,
+              "mrr10": 0.6034
+            },
+            "Affiliate License-Licensor": {
+              "cases": 23,
+              "hit5": 0.6957,
+              "mrr10": 0.5483
+            },
+            "Agreement Date": {
+              "cases": 470,
+              "hit5": 0.4681,
+              "mrr10": 0.2801
+            },
+            "Anti-Assignment": {
+              "cases": 374,
+              "hit5": 0.9652,
+              "mrr10": 0.8605
+            },
+            "Audit Rights": {
+              "cases": 214,
+              "hit5": 0.9579,
+              "mrr10": 0.8577
+            },
+            "Cap On Liability": {
+              "cases": 275,
+              "hit5": 0.88,
+              "mrr10": 0.7132
+            },
+            "Change Of Control": {
+              "cases": 121,
+              "hit5": 0.8595,
+              "mrr10": 0.7087
+            },
+            "Competitive Restriction Exception": {
+              "cases": 76,
+              "hit5": 0.6711,
+              "mrr10": 0.4251
+            },
+            "Covenant Not To Sue": {
+              "cases": 100,
+              "hit5": 0.73,
+              "mrr10": 0.4269
+            },
+            "Document Name": {
+              "cases": 510,
+              "hit5": 0.3549,
+              "mrr10": 0.217
+            },
+            "Effective Date": {
+              "cases": 390,
+              "hit5": 0.6026,
+              "mrr10": 0.3801
+            },
+            "Exclusivity": {
+              "cases": 180,
+              "hit5": 0.6889,
+              "mrr10": 0.4597
+            },
+            "Expiration Date": {
+              "cases": 413,
+              "hit5": 0.9249,
+              "mrr10": 0.7103
+            },
+            "Governing Law": {
+              "cases": 437,
+              "hit5": 0.9657,
+              "mrr10": 0.8804
+            },
+            "Insurance": {
+              "cases": 166,
+              "hit5": 0.9518,
+              "mrr10": 0.8908
+            },
+            "Ip Ownership Assignment": {
+              "cases": 124,
+              "hit5": 0.7661,
+              "mrr10": 0.5976
+            },
+            "Irrevocable Or Perpetual License": {
+              "cases": 70,
+              "hit5": 0.9286,
+              "mrr10": 0.8132
+            },
+            "Joint Ip Ownership": {
+              "cases": 46,
+              "hit5": 0.8043,
+              "mrr10": 0.7042
+            },
+            "License Grant": {
+              "cases": 255,
+              "hit5": 0.898,
+              "mrr10": 0.729
+            },
+            "Liquidated Damages": {
+              "cases": 61,
+              "hit5": 0.8361,
+              "mrr10": 0.5252
+            },
+            "Minimum Commitment": {
+              "cases": 165,
+              "hit5": 0.7758,
+              "mrr10": 0.5665
+            },
+            "Most Favored Nation": {
+              "cases": 28,
+              "hit5": 0.75,
+              "mrr10": 0.4384
+            },
+            "No-Solicit Of Customers": {
+              "cases": 34,
+              "hit5": 0.8235,
+              "mrr10": 0.6736
+            },
+            "No-Solicit Of Employees": {
+              "cases": 59,
+              "hit5": 0.9661,
+              "mrr10": 0.9013
+            },
+            "Non-Compete": {
+              "cases": 119,
+              "hit5": 0.7311,
+              "mrr10": 0.5137
+            },
+            "Non-Disparagement": {
+              "cases": 38,
+              "hit5": 0.7105,
+              "mrr10": 0.5103
+            },
+            "Non-Transferable License": {
+              "cases": 138,
+              "hit5": 0.9058,
+              "mrr10": 0.6913
+            },
+            "Notice Period To Terminate Renewal": {
+              "cases": 111,
+              "hit5": 0.982,
+              "mrr10": 0.9073
+            },
+            "Parties": {
+              "cases": 509,
+              "hit5": 0.2633,
+              "mrr10": 0.1793
+            },
+            "Post-Termination Services": {
+              "cases": 182,
+              "hit5": 0.8571,
+              "mrr10": 0.6182
+            },
+            "Price Restrictions": {
+              "cases": 15,
+              "hit5": 0.6667,
+              "mrr10": 0.45
+            },
+            "Renewal Term": {
+              "cases": 176,
+              "hit5": 0.9602,
+              "mrr10": 0.8884
+            },
+            "Revenue/Profit Sharing": {
+              "cases": 166,
+              "hit5": 0.6867,
+              "mrr10": 0.5099
+            },
+            "Rofr/Rofo/Rofn": {
+              "cases": 85,
+              "hit5": 0.7294,
+              "mrr10": 0.6001
+            },
+            "Source Code Escrow": {
+              "cases": 13,
+              "hit5": 0.9231,
+              "mrr10": 0.8974
+            },
+            "Termination For Convenience": {
+              "cases": 183,
+              "hit5": 0.9399,
+              "mrr10": 0.7823
+            },
+            "Third Party Beneficiary": {
+              "cases": 32,
+              "hit5": 0.9063,
+              "mrr10": 0.767
+            },
+            "Uncapped Liability": {
+              "cases": 111,
+              "hit5": 0.8919,
+              "mrr10": 0.6863
+            },
+            "Unlimited/All-You-Can-Eat-License": {
+              "cases": 17,
+              "hit5": 0.7647,
+              "mrr10": 0.7118
+            },
+            "Volume Restriction": {
+              "cases": 82,
+              "hit5": 0.5488,
+              "mrr10": 0.3189
+            },
+            "Warranty Duration": {
+              "cases": 75,
+              "hit5": 0.84,
+              "mrr10": 0.6796
+            }
+          }
+        }
+      ],
+      "skipped": [
+        "ollama-bge-m3, plain: embeddings not cached",
+        "ollama-bge-m3, header: embeddings not cached",
+        "workers-ai-bge-m3, plain: embeddings not cached"
+      ]
+    },
+    {
+      "corpus": "converted PDFs",
+      "documents": 30,
+      "chunks": 1818,
+      "cases": 415,
+      "methods": [
+        {
+          "method": "random",
+          "all": {
+            "cases": 415,
+            "hit1": 0.0554,
+            "hit5": 0.2217,
+            "recall5": 0.1929,
+            "recall10": 0.2762,
+            "mrr10": 0.1254,
+            "ndcg10": 0.1548
+          },
+          "byClauseType": {
+            "Affiliate License-Licensee": {
+              "cases": 2,
+              "hit5": 0.5,
+              "mrr10": 0.2167
+            },
+            "Affiliate License-Licensor": {
+              "cases": 3,
+              "hit5": 0.3333,
+              "mrr10": 0.1111
+            },
+            "Agreement Date": {
+              "cases": 24,
+              "hit5": 0.25,
+              "mrr10": 0.1698
+            },
+            "Anti-Assignment": {
+              "cases": 23,
+              "hit5": 0.2609,
+              "mrr10": 0.1237
+            },
+            "Audit Rights": {
+              "cases": 17,
+              "hit5": 0.2941,
+              "mrr10": 0.179
+            },
+            "Cap On Liability": {
+              "cases": 18,
+              "hit5": 0.1667,
+              "mrr10": 0.0937
+            },
+            "Change Of Control": {
+              "cases": 12,
+              "hit5": 0.25,
+              "mrr10": 0.1417
+            },
+            "Competitive Restriction Exception": {
+              "cases": 8,
+              "hit5": 0.25,
+              "mrr10": 0.0563
+            },
+            "Covenant Not To Sue": {
+              "cases": 8,
+              "hit5": 0.125,
+              "mrr10": 0.0625
+            },
+            "Document Name": {
+              "cases": 25,
+              "hit5": 0.2,
+              "mrr10": 0.131
+            },
+            "Effective Date": {
+              "cases": 20,
+              "hit5": 0.4,
+              "mrr10": 0.2263
+            },
+            "Exclusivity": {
+              "cases": 11,
+              "hit5": 0.3636,
+              "mrr10": 0.2045
+            },
+            "Expiration Date": {
+              "cases": 20,
+              "hit5": 0.25,
+              "mrr10": 0.1004
+            },
+            "Governing Law": {
+              "cases": 22,
+              "hit5": 0.2273,
+              "mrr10": 0.1
+            },
+            "Insurance": {
+              "cases": 13,
+              "hit5": 0,
+              "mrr10": 0
+            },
+            "Ip Ownership Assignment": {
+              "cases": 10,
+              "hit5": 0,
+              "mrr10": 0
+            },
+            "Irrevocable Or Perpetual License": {
+              "cases": 4,
+              "hit5": 0.25,
+              "mrr10": 0.0778
+            },
+            "Joint Ip Ownership": {
+              "cases": 4,
+              "hit5": 0,
+              "mrr10": 0.0774
+            },
+            "License Grant": {
+              "cases": 16,
+              "hit5": 0.375,
+              "mrr10": 0.1604
+            },
+            "Liquidated Damages": {
+              "cases": 7,
+              "hit5": 0.1429,
+              "mrr10": 0.1746
+            },
+            "Minimum Commitment": {
+              "cases": 11,
+              "hit5": 0.2727,
+              "mrr10": 0.1871
+            },
+            "Most Favored Nation": {
+              "cases": 1,
+              "hit5": 0,
+              "mrr10": 0
+            },
+            "No-Solicit Of Customers": {
+              "cases": 2,
+              "hit5": 0,
+              "mrr10": 0
+            },
+            "No-Solicit Of Employees": {
+              "cases": 6,
+              "hit5": 0,
+              "mrr10": 0
+            },
+            "Non-Compete": {
+              "cases": 10,
+              "hit5": 0.2,
+              "mrr10": 0.0583
+            },
+            "Non-Disparagement": {
+              "cases": 4,
+              "hit5": 0.25,
+              "mrr10": 0.1563
+            },
+            "Non-Transferable License": {
+              "cases": 8,
+              "hit5": 0.25,
+              "mrr10": 0.1806
+            },
+            "Notice Period To Terminate Renewal": {
+              "cases": 6,
+              "hit5": 0.1667,
+              "mrr10": 0.0833
+            },
+            "Parties": {
+              "cases": 30,
+              "hit5": 0.2667,
+              "mrr10": 0.1967
+            },
+            "Post-Termination Services": {
+              "cases": 12,
+              "hit5": 0,
+              "mrr10": 0.0341
+            },
+            "Price Restrictions": {
+              "cases": 2,
+              "hit5": 0.5,
+              "mrr10": 0.25
+            },
+            "Renewal Term": {
+              "cases": 10,
+              "hit5": 0.3,
+              "mrr10": 0.125
+            },
+            "Revenue/Profit Sharing": {
+              "cases": 13,
+              "hit5": 0.3077,
+              "mrr10": 0.2239
+            },
+            "Rofr/Rofo/Rofn": {
+              "cases": 8,
+              "hit5": 0,
+              "mrr10": 0.0317
+            },
+            "Termination For Convenience": {
+              "cases": 9,
+              "hit5": 0.1111,
+              "mrr10": 0.0481
+            },
+            "Third Party Beneficiary": {
+              "cases": 4,
+              "hit5": 0,
+              "mrr10": 0
+            },
+            "Uncapped Liability": {
+              "cases": 4,
+              "hit5": 0,
+              "mrr10": 0
+            },
+            "Volume Restriction": {
+              "cases": 5,
+              "hit5": 0.4,
+              "mrr10": 0.24
+            },
+            "Warranty Duration": {
+              "cases": 3,
+              "hit5": 0.3333,
+              "mrr10": 0.0833
+            }
+          }
+        },
+        {
+          "method": "keyword (FTS5 unicode61)",
+          "all": {
+            "cases": 415,
+            "hit1": 0.3904,
+            "hit5": 0.6434,
+            "recall5": 0.5486,
+            "recall10": 0.6855,
+            "mrr10": 0.4985,
+            "ndcg10": 0.5126
+          },
+          "byClauseType": {
+            "Affiliate License-Licensee": {
+              "cases": 2,
+              "hit5": 1,
+              "mrr10": 1
+            },
+            "Affiliate License-Licensor": {
+              "cases": 3,
+              "hit5": 0.6667,
+              "mrr10": 0.7083
+            },
+            "Agreement Date": {
+              "cases": 24,
+              "hit5": 0.4167,
+              "mrr10": 0.2796
+            },
+            "Anti-Assignment": {
+              "cases": 23,
+              "hit5": 0.9565,
+              "mrr10": 0.7507
+            },
+            "Audit Rights": {
+              "cases": 17,
+              "hit5": 0.8824,
+              "mrr10": 0.7794
+            },
+            "Cap On Liability": {
+              "cases": 18,
+              "hit5": 0.7778,
+              "mrr10": 0.5844
+            },
+            "Change Of Control": {
+              "cases": 12,
+              "hit5": 1,
+              "mrr10": 0.8403
+            },
+            "Competitive Restriction Exception": {
+              "cases": 8,
+              "hit5": 0.25,
+              "mrr10": 0.2847
+            },
+            "Covenant Not To Sue": {
+              "cases": 8,
+              "hit5": 0.625,
+              "mrr10": 0.4708
+            },
+            "Document Name": {
+              "cases": 25,
+              "hit5": 0.2,
+              "mrr10": 0.1164
+            },
+            "Effective Date": {
+              "cases": 20,
+              "hit5": 0.6,
+              "mrr10": 0.2933
+            },
+            "Exclusivity": {
+              "cases": 11,
+              "hit5": 0.5455,
+              "mrr10": 0.3494
+            },
+            "Expiration Date": {
+              "cases": 20,
+              "hit5": 0.85,
+              "mrr10": 0.5933
+            },
+            "Governing Law": {
+              "cases": 22,
+              "hit5": 0.9545,
+              "mrr10": 0.7417
+            },
+            "Insurance": {
+              "cases": 13,
+              "hit5": 0.7692,
+              "mrr10": 0.5798
+            },
+            "Ip Ownership Assignment": {
+              "cases": 10,
+              "hit5": 0.6,
+              "mrr10": 0.2768
+            },
+            "Irrevocable Or Perpetual License": {
+              "cases": 4,
+              "hit5": 1,
+              "mrr10": 0.875
+            },
+            "Joint Ip Ownership": {
+              "cases": 4,
+              "hit5": 0.75,
+              "mrr10": 0.4375
+            },
+            "License Grant": {
+              "cases": 16,
+              "hit5": 0.625,
+              "mrr10": 0.5356
+            },
+            "Liquidated Damages": {
+              "cases": 7,
+              "hit5": 0.5714,
+              "mrr10": 0.5238
+            },
+            "Minimum Commitment": {
+              "cases": 11,
+              "hit5": 0.6364,
+              "mrr10": 0.6114
+            },
+            "Most Favored Nation": {
+              "cases": 1,
+              "hit5": 1,
+              "mrr10": 1
+            },
+            "No-Solicit Of Customers": {
+              "cases": 2,
+              "hit5": 1,
+              "mrr10": 0.5
+            },
+            "No-Solicit Of Employees": {
+              "cases": 6,
+              "hit5": 0.6667,
+              "mrr10": 0.6071
+            },
+            "Non-Compete": {
+              "cases": 10,
+              "hit5": 0.7,
+              "mrr10": 0.3728
+            },
+            "Non-Disparagement": {
+              "cases": 4,
+              "hit5": 0.5,
+              "mrr10": 0.5
+            },
+            "Non-Transferable License": {
+              "cases": 8,
+              "hit5": 0.625,
+              "mrr10": 0.6563
+            },
+            "Notice Period To Terminate Renewal": {
+              "cases": 6,
+              "hit5": 0.6667,
+              "mrr10": 0.3889
+            },
+            "Parties": {
+              "cases": 30,
+              "hit5": 0.3,
+              "mrr10": 0.2502
+            },
+            "Post-Termination Services": {
+              "cases": 12,
+              "hit5": 0.6667,
+              "mrr10": 0.4861
+            },
+            "Price Restrictions": {
+              "cases": 2,
+              "hit5": 0.5,
+              "mrr10": 0.5
+            },
+            "Renewal Term": {
+              "cases": 10,
+              "hit5": 0.8,
+              "mrr10": 0.8
+            },
+            "Revenue/Profit Sharing": {
+              "cases": 13,
+              "hit5": 0.3077,
+              "mrr10": 0.2513
+            },
+            "Rofr/Rofo/Rofn": {
+              "cases": 8,
+              "hit5": 0.5,
+              "mrr10": 0.3616
+            },
+            "Termination For Convenience": {
+              "cases": 9,
+              "hit5": 0.5556,
+              "mrr10": 0.4917
+            },
+            "Third Party Beneficiary": {
+              "cases": 4,
+              "hit5": 1,
+              "mrr10": 1
+            },
+            "Uncapped Liability": {
+              "cases": 4,
+              "hit5": 1,
+              "mrr10": 0.7083
+            },
+            "Volume Restriction": {
+              "cases": 5,
+              "hit5": 0.6,
+              "mrr10": 0.5222
+            },
+            "Warranty Duration": {
+              "cases": 3,
+              "hit5": 1,
+              "mrr10": 0.75
+            }
+          }
+        },
+        {
+          "method": "keyword (FTS5 porter unicode61)",
+          "all": {
+            "cases": 415,
+            "hit1": 0.4217,
+            "hit5": 0.6795,
+            "recall5": 0.5854,
+            "recall10": 0.7121,
+            "mrr10": 0.528,
+            "ndcg10": 0.5481
+          },
+          "byClauseType": {
+            "Affiliate License-Licensee": {
+              "cases": 2,
+              "hit5": 1,
+              "mrr10": 0.6
+            },
+            "Affiliate License-Licensor": {
+              "cases": 3,
+              "hit5": 0.6667,
+              "mrr10": 0.5476
+            },
+            "Agreement Date": {
+              "cases": 24,
+              "hit5": 0.4583,
+              "mrr10": 0.2796
+            },
+            "Anti-Assignment": {
+              "cases": 23,
+              "hit5": 0.913,
+              "mrr10": 0.8563
+            },
+            "Audit Rights": {
+              "cases": 17,
+              "hit5": 0.8824,
+              "mrr10": 0.7377
+            },
+            "Cap On Liability": {
+              "cases": 18,
+              "hit5": 0.7778,
+              "mrr10": 0.5623
+            },
+            "Change Of Control": {
+              "cases": 12,
+              "hit5": 1,
+              "mrr10": 0.875
+            },
+            "Competitive Restriction Exception": {
+              "cases": 8,
+              "hit5": 0.5,
+              "mrr10": 0.3906
+            },
+            "Covenant Not To Sue": {
+              "cases": 8,
+              "hit5": 0.875,
+              "mrr10": 0.5938
+            },
+            "Document Name": {
+              "cases": 25,
+              "hit5": 0.2,
+              "mrr10": 0.1174
+            },
+            "Effective Date": {
+              "cases": 20,
+              "hit5": 0.55,
+              "mrr10": 0.2642
+            },
+            "Exclusivity": {
+              "cases": 11,
+              "hit5": 0.7273,
+              "mrr10": 0.6039
+            },
+            "Expiration Date": {
+              "cases": 20,
+              "hit5": 0.75,
+              "mrr10": 0.4905
+            },
+            "Governing Law": {
+              "cases": 22,
+              "hit5": 0.9545,
+              "mrr10": 0.7402
+            },
+            "Insurance": {
+              "cases": 13,
+              "hit5": 0.9231,
+              "mrr10": 0.8231
+            },
+            "Ip Ownership Assignment": {
+              "cases": 10,
+              "hit5": 0.7,
+              "mrr10": 0.5867
+            },
+            "Irrevocable Or Perpetual License": {
+              "cases": 4,
+              "hit5": 1,
+              "mrr10": 0.8
+            },
+            "Joint Ip Ownership": {
+              "cases": 4,
+              "hit5": 0.75,
+              "mrr10": 0.3958
+            },
+            "License Grant": {
+              "cases": 16,
+              "hit5": 0.75,
+              "mrr10": 0.6371
+            },
+            "Liquidated Damages": {
+              "cases": 7,
+              "hit5": 0.7143,
+              "mrr10": 0.5476
+            },
+            "Minimum Commitment": {
+              "cases": 11,
+              "hit5": 0.6364,
+              "mrr10": 0.5909
+            },
+            "Most Favored Nation": {
+              "cases": 1,
+              "hit5": 1,
+              "mrr10": 0.5
+            },
+            "No-Solicit Of Customers": {
+              "cases": 2,
+              "hit5": 1,
+              "mrr10": 0.6667
+            },
+            "No-Solicit Of Employees": {
+              "cases": 6,
+              "hit5": 0.8333,
+              "mrr10": 0.7278
+            },
+            "Non-Compete": {
+              "cases": 10,
+              "hit5": 0.6,
+              "mrr10": 0.3723
+            },
+            "Non-Disparagement": {
+              "cases": 4,
+              "hit5": 0.75,
+              "mrr10": 0.75
+            },
+            "Non-Transferable License": {
+              "cases": 8,
+              "hit5": 0.875,
+              "mrr10": 0.7125
+            },
+            "Notice Period To Terminate Renewal": {
+              "cases": 6,
+              "hit5": 1,
+              "mrr10": 0.5833
+            },
+            "Parties": {
+              "cases": 30,
+              "hit5": 0.2667,
+              "mrr10": 0.2122
+            },
+            "Post-Termination Services": {
+              "cases": 12,
+              "hit5": 0.6667,
+              "mrr10": 0.4738
+            },
+            "Price Restrictions": {
+              "cases": 2,
+              "hit5": 0.5,
+              "mrr10": 0.5
+            },
+            "Renewal Term": {
+              "cases": 10,
+              "hit5": 1,
+              "mrr10": 0.8833
+            },
+            "Revenue/Profit Sharing": {
+              "cases": 13,
+              "hit5": 0.3846,
+              "mrr10": 0.3668
+            },
+            "Rofr/Rofo/Rofn": {
+              "cases": 8,
+              "hit5": 0.5,
+              "mrr10": 0.3824
+            },
+            "Termination For Convenience": {
+              "cases": 9,
+              "hit5": 0.4444,
+              "mrr10": 0.4206
+            },
+            "Third Party Beneficiary": {
+              "cases": 4,
+              "hit5": 1,
+              "mrr10": 1
+            },
+            "Uncapped Liability": {
+              "cases": 4,
+              "hit5": 1,
+              "mrr10": 0.5625
+            },
+            "Volume Restriction": {
+              "cases": 5,
+              "hit5": 0.8,
+              "mrr10": 0.5067
+            },
+            "Warranty Duration": {
+              "cases": 3,
+              "hit5": 0.6667,
+              "mrr10": 0.5333
+            }
+          }
+        },
+        {
+          "method": "vector (workers-ai-bge-m3, plain)",
+          "all": {
+            "cases": 415,
+            "hit1": 0.3446,
+            "hit5": 0.641,
+            "recall5": 0.5357,
+            "recall10": 0.6583,
+            "mrr10": 0.4658,
+            "ndcg10": 0.4833
+          },
+          "byClauseType": {
+            "Affiliate License-Licensee": {
+              "cases": 2,
+              "hit5": 1,
+              "mrr10": 1
+            },
+            "Affiliate License-Licensor": {
+              "cases": 3,
+              "hit5": 0.3333,
+              "mrr10": 0.375
+            },
+            "Agreement Date": {
+              "cases": 24,
+              "hit5": 0.4583,
+              "mrr10": 0.3174
+            },
+            "Anti-Assignment": {
+              "cases": 23,
+              "hit5": 0.913,
+              "mrr10": 0.7754
+            },
+            "Audit Rights": {
+              "cases": 17,
+              "hit5": 0.8824,
+              "mrr10": 0.7225
+            },
+            "Cap On Liability": {
+              "cases": 18,
+              "hit5": 0.7778,
+              "mrr10": 0.4312
+            },
+            "Change Of Control": {
+              "cases": 12,
+              "hit5": 0.9167,
+              "mrr10": 0.6208
+            },
+            "Competitive Restriction Exception": {
+              "cases": 8,
+              "hit5": 0.375,
+              "mrr10": 0.2292
+            },
+            "Covenant Not To Sue": {
+              "cases": 8,
+              "hit5": 0.5,
+              "mrr10": 0.3899
+            },
+            "Document Name": {
+              "cases": 25,
+              "hit5": 0.52,
+              "mrr10": 0.2591
+            },
+            "Effective Date": {
+              "cases": 20,
+              "hit5": 0.5,
+              "mrr10": 0.4005
+            },
+            "Exclusivity": {
+              "cases": 11,
+              "hit5": 0.2727,
+              "mrr10": 0.1887
+            },
+            "Expiration Date": {
+              "cases": 20,
+              "hit5": 0.95,
+              "mrr10": 0.8417
+            },
+            "Governing Law": {
+              "cases": 22,
+              "hit5": 0.9091,
+              "mrr10": 0.7386
+            },
+            "Insurance": {
+              "cases": 13,
+              "hit5": 0.9231,
+              "mrr10": 0.7949
+            },
+            "Ip Ownership Assignment": {
+              "cases": 10,
+              "hit5": 0.5,
+              "mrr10": 0.3433
+            },
+            "Irrevocable Or Perpetual License": {
+              "cases": 4,
+              "hit5": 0.5,
+              "mrr10": 0.375
+            },
+            "Joint Ip Ownership": {
+              "cases": 4,
+              "hit5": 0.75,
+              "mrr10": 0.75
+            },
+            "License Grant": {
+              "cases": 16,
+              "hit5": 0.5625,
+              "mrr10": 0.4569
+            },
+            "Liquidated Damages": {
+              "cases": 7,
+              "hit5": 0.5714,
+              "mrr10": 0.4286
+            },
+            "Minimum Commitment": {
+              "cases": 11,
+              "hit5": 0.4545,
+              "mrr10": 0.3283
+            },
+            "Most Favored Nation": {
+              "cases": 1,
+              "hit5": 0,
+              "mrr10": 0
+            },
+            "No-Solicit Of Customers": {
+              "cases": 2,
+              "hit5": 1,
+              "mrr10": 0.625
+            },
+            "No-Solicit Of Employees": {
+              "cases": 6,
+              "hit5": 0.6667,
+              "mrr10": 0.4792
+            },
+            "Non-Compete": {
+              "cases": 10,
+              "hit5": 0.8,
+              "mrr10": 0.6292
+            },
+            "Non-Disparagement": {
+              "cases": 4,
+              "hit5": 0.5,
+              "mrr10": 0.5
+            },
+            "Non-Transferable License": {
+              "cases": 8,
+              "hit5": 0.875,
+              "mrr10": 0.4417
+            },
+            "Notice Period To Terminate Renewal": {
+              "cases": 6,
+              "hit5": 0.6667,
+              "mrr10": 0.375
+            },
+            "Parties": {
+              "cases": 30,
+              "hit5": 0.2667,
+              "mrr10": 0.2119
+            },
+            "Post-Termination Services": {
+              "cases": 12,
+              "hit5": 0.75,
+              "mrr10": 0.4606
+            },
+            "Price Restrictions": {
+              "cases": 2,
+              "hit5": 0.5,
+              "mrr10": 0.5
+            },
+            "Renewal Term": {
+              "cases": 10,
+              "hit5": 0.8,
+              "mrr10": 0.6121
+            },
+            "Revenue/Profit Sharing": {
+              "cases": 13,
+              "hit5": 0.4615,
+              "mrr10": 0.1679
+            },
+            "Rofr/Rofo/Rofn": {
+              "cases": 8,
+              "hit5": 0.25,
+              "mrr10": 0.25
+            },
+            "Termination For Convenience": {
+              "cases": 9,
+              "hit5": 0.5556,
+              "mrr10": 0.2001
+            },
+            "Third Party Beneficiary": {
+              "cases": 4,
+              "hit5": 0.75,
+              "mrr10": 0.6528
+            },
+            "Uncapped Liability": {
+              "cases": 4,
+              "hit5": 1,
+              "mrr10": 0.3542
+            },
+            "Volume Restriction": {
+              "cases": 5,
+              "hit5": 0.6,
+              "mrr10": 0.325
+            },
+            "Warranty Duration": {
+              "cases": 3,
+              "hit5": 1,
+              "mrr10": 0.5278
+            }
+          }
+        },
+        {
+          "method": "hybrid RRF (workers-ai-bge-m3, plain + FTS5 unicode61)",
+          "all": {
+            "cases": 415,
+            "hit1": 0.453,
+            "hit5": 0.6795,
+            "recall5": 0.5826,
+            "recall10": 0.6954,
+            "mrr10": 0.5471,
+            "ndcg10": 0.5515
+          },
+          "byClauseType": {
+            "Affiliate License-Licensee": {
+              "cases": 2,
+              "hit5": 1,
+              "mrr10": 1
+            },
+            "Affiliate License-Licensor": {
+              "cases": 3,
+              "hit5": 0.6667,
+              "mrr10": 0.4444
+            },
+            "Agreement Date": {
+              "cases": 24,
+              "hit5": 0.4583,
+              "mrr10": 0.3256
+            },
+            "Anti-Assignment": {
+              "cases": 23,
+              "hit5": 0.9565,
+              "mrr10": 0.8732
+            },
+            "Audit Rights": {
+              "cases": 17,
+              "hit5": 0.9412,
+              "mrr10": 0.8544
+            },
+            "Cap On Liability": {
+              "cases": 18,
+              "hit5": 0.7778,
+              "mrr10": 0.6394
+            },
+            "Change Of Control": {
+              "cases": 12,
+              "hit5": 0.9167,
+              "mrr10": 0.7917
+            },
+            "Competitive Restriction Exception": {
+              "cases": 8,
+              "hit5": 0.375,
+              "mrr10": 0.2813
+            },
+            "Covenant Not To Sue": {
+              "cases": 8,
+              "hit5": 0.625,
+              "mrr10": 0.3854
+            },
+            "Document Name": {
+              "cases": 25,
+              "hit5": 0.28,
+              "mrr10": 0.1839
+            },
+            "Effective Date": {
+              "cases": 20,
+              "hit5": 0.55,
+              "mrr10": 0.395
+            },
+            "Exclusivity": {
+              "cases": 11,
+              "hit5": 0.3636,
+              "mrr10": 0.303
+            },
+            "Expiration Date": {
+              "cases": 20,
+              "hit5": 0.85,
+              "mrr10": 0.6938
+            },
+            "Governing Law": {
+              "cases": 22,
+              "hit5": 0.9545,
+              "mrr10": 0.7973
+            },
+            "Insurance": {
+              "cases": 13,
+              "hit5": 0.9231,
+              "mrr10": 0.8718
+            },
+            "Ip Ownership Assignment": {
+              "cases": 10,
+              "hit5": 0.5,
+              "mrr10": 0.4833
+            },
+            "Irrevocable Or Perpetual License": {
+              "cases": 4,
+              "hit5": 0.5,
+              "mrr10": 0.5313
+            },
+            "Joint Ip Ownership": {
+              "cases": 4,
+              "hit5": 0.75,
+              "mrr10": 0.625
+            },
+            "License Grant": {
+              "cases": 16,
+              "hit5": 0.875,
+              "mrr10": 0.6183
+            },
+            "Liquidated Damages": {
+              "cases": 7,
+              "hit5": 0.7143,
+              "mrr10": 0.619
+            },
+            "Minimum Commitment": {
+              "cases": 11,
+              "hit5": 0.6364,
+              "mrr10": 0.5039
+            },
+            "Most Favored Nation": {
+              "cases": 1,
+              "hit5": 1,
+              "mrr10": 0.25
+            },
+            "No-Solicit Of Customers": {
+              "cases": 2,
+              "hit5": 1,
+              "mrr10": 1
+            },
+            "No-Solicit Of Employees": {
+              "cases": 6,
+              "hit5": 1,
+              "mrr10": 0.75
+            },
+            "Non-Compete": {
+              "cases": 10,
+              "hit5": 0.7,
+              "mrr10": 0.5917
+            },
+            "Non-Disparagement": {
+              "cases": 4,
+              "hit5": 0.5,
+              "mrr10": 0.5
+            },
+            "Non-Transferable License": {
+              "cases": 8,
+              "hit5": 1,
+              "mrr10": 0.7229
+            },
+            "Notice Period To Terminate Renewal": {
+              "cases": 6,
+              "hit5": 0.6667,
+              "mrr10": 0.4028
+            },
+            "Parties": {
+              "cases": 30,
+              "hit5": 0.3333,
+              "mrr10": 0.2503
+            },
+            "Post-Termination Services": {
+              "cases": 12,
+              "hit5": 0.8333,
+              "mrr10": 0.7083
+            },
+            "Price Restrictions": {
+              "cases": 2,
+              "hit5": 0.5,
+              "mrr10": 0.5
+            },
+            "Renewal Term": {
+              "cases": 10,
+              "hit5": 0.8,
+              "mrr10": 0.7333
+            },
+            "Revenue/Profit Sharing": {
+              "cases": 13,
+              "hit5": 0.2308,
+              "mrr10": 0.2577
+            },
+            "Rofr/Rofo/Rofn": {
+              "cases": 8,
+              "hit5": 0.5,
+              "mrr10": 0.2938
+            },
+            "Termination For Convenience": {
+              "cases": 9,
+              "hit5": 0.7778,
+              "mrr10": 0.3926
+            },
+            "Third Party Beneficiary": {
+              "cases": 4,
+              "hit5": 1,
+              "mrr10": 1
+            },
+            "Uncapped Liability": {
+              "cases": 4,
+              "hit5": 1,
+              "mrr10": 0.5833
+            },
+            "Volume Restriction": {
+              "cases": 5,
+              "hit5": 0.8,
+              "mrr10": 0.4067
+            },
+            "Warranty Duration": {
+              "cases": 3,
+              "hit5": 1,
+              "mrr10": 0.7778
+            }
+          }
+        },
+        {
+          "method": "hybrid RRF (workers-ai-bge-m3, plain + FTS5 porter unicode61)",
+          "all": {
+            "cases": 415,
+            "hit1": 0.4434,
+            "hit5": 0.7084,
+            "recall5": 0.6147,
+            "recall10": 0.7136,
+            "mrr10": 0.5498,
+            "ndcg10": 0.5606
+          },
+          "byClauseType": {
+            "Affiliate License-Licensee": {
+              "cases": 2,
+              "hit5": 1,
+              "mrr10": 1
+            },
+            "Affiliate License-Licensor": {
+              "cases": 3,
+              "hit5": 0.6667,
+              "mrr10": 0.4444
+            },
+            "Agreement Date": {
+              "cases": 24,
+              "hit5": 0.5833,
+              "mrr10": 0.3483
+            },
+            "Anti-Assignment": {
+              "cases": 23,
+              "hit5": 0.9565,
+              "mrr10": 0.8406
+            },
+            "Audit Rights": {
+              "cases": 17,
+              "hit5": 0.8824,
+              "mrr10": 0.7878
+            },
+            "Cap On Liability": {
+              "cases": 18,
+              "hit5": 0.7778,
+              "mrr10": 0.6116
+            },
+            "Change Of Control": {
+              "cases": 12,
+              "hit5": 1,
+              "mrr10": 0.8125
+            },
+            "Competitive Restriction Exception": {
+              "cases": 8,
+              "hit5": 0.375,
+              "mrr10": 0.3929
+            },
+            "Covenant Not To Sue": {
+              "cases": 8,
+              "hit5": 0.75,
+              "mrr10": 0.4781
+            },
+            "Document Name": {
+              "cases": 25,
+              "hit5": 0.32,
+              "mrr10": 0.1937
+            },
+            "Effective Date": {
+              "cases": 20,
+              "hit5": 0.5,
+              "mrr10": 0.3583
+            },
+            "Exclusivity": {
+              "cases": 11,
+              "hit5": 0.5455,
+              "mrr10": 0.3856
+            },
+            "Expiration Date": {
+              "cases": 20,
+              "hit5": 0.85,
+              "mrr10": 0.6708
+            },
+            "Governing Law": {
+              "cases": 22,
+              "hit5": 0.9545,
+              "mrr10": 0.8182
+            },
+            "Insurance": {
+              "cases": 13,
+              "hit5": 0.9231,
+              "mrr10": 0.9231
+            },
+            "Ip Ownership Assignment": {
+              "cases": 10,
+              "hit5": 0.6,
+              "mrr10": 0.4825
+            },
+            "Irrevocable Or Perpetual License": {
+              "cases": 4,
+              "hit5": 0.5,
+              "mrr10": 0.525
+            },
+            "Joint Ip Ownership": {
+              "cases": 4,
+              "hit5": 0.75,
+              "mrr10": 0.625
+            },
+            "License Grant": {
+              "cases": 16,
+              "hit5": 0.9375,
+              "mrr10": 0.601
+            },
+            "Liquidated Damages": {
+              "cases": 7,
+              "hit5": 0.7143,
+              "mrr10": 0.6071
+            },
+            "Minimum Commitment": {
+              "cases": 11,
+              "hit5": 0.6364,
+              "mrr10": 0.45
+            },
+            "Most Favored Nation": {
+              "cases": 1,
+              "hit5": 0,
+              "mrr10": 0.1667
+            },
+            "No-Solicit Of Customers": {
+              "cases": 2,
+              "hit5": 1,
+              "mrr10": 0.75
+            },
+            "No-Solicit Of Employees": {
+              "cases": 6,
+              "hit5": 1,
+              "mrr10": 0.6583
+            },
+            "Non-Compete": {
+              "cases": 10,
+              "hit5": 0.9,
+              "mrr10": 0.7125
+            },
+            "Non-Disparagement": {
+              "cases": 4,
+              "hit5": 0.75,
+              "mrr10": 0.5625
+            },
+            "Non-Transferable License": {
+              "cases": 8,
+              "hit5": 1,
+              "mrr10": 0.8229
+            },
+            "Notice Period To Terminate Renewal": {
+              "cases": 6,
+              "hit5": 0.8333,
+              "mrr10": 0.4708
+            },
+            "Parties": {
+              "cases": 30,
+              "hit5": 0.3,
+              "mrr10": 0.2332
+            },
+            "Post-Termination Services": {
+              "cases": 12,
+              "hit5": 0.9167,
+              "mrr10": 0.6486
+            },
+            "Price Restrictions": {
+              "cases": 2,
+              "hit5": 0.5,
+              "mrr10": 0.5
+            },
+            "Renewal Term": {
+              "cases": 10,
+              "hit5": 1,
+              "mrr10": 0.8833
+            },
+            "Revenue/Profit Sharing": {
+              "cases": 13,
+              "hit5": 0.3077,
+              "mrr10": 0.2282
+            },
+            "Rofr/Rofo/Rofn": {
+              "cases": 8,
+              "hit5": 0.5,
+              "mrr10": 0.2688
+            },
+            "Termination For Convenience": {
+              "cases": 9,
+              "hit5": 0.6667,
+              "mrr10": 0.4491
+            },
+            "Third Party Beneficiary": {
+              "cases": 4,
+              "hit5": 1,
+              "mrr10": 1
+            },
+            "Uncapped Liability": {
+              "cases": 4,
+              "hit5": 1,
+              "mrr10": 0.5833
+            },
+            "Volume Restriction": {
+              "cases": 5,
+              "hit5": 0.6,
+              "mrr10": 0.3833
+            },
+            "Warranty Duration": {
+              "cases": 3,
+              "hit5": 1,
+              "mrr10": 0.5667
+            }
+          }
+        },
+        {
+          "method": "vector (workers-ai-bge-m3, header)",
+          "all": {
+            "cases": 415,
+            "hit1": 0.347,
+            "hit5": 0.612,
+            "recall5": 0.506,
+            "recall10": 0.6341,
+            "mrr10": 0.4579,
+            "ndcg10": 0.4704
+          },
+          "byClauseType": {
+            "Affiliate License-Licensee": {
+              "cases": 2,
+              "hit5": 1,
+              "mrr10": 0.75
+            },
+            "Affiliate License-Licensor": {
+              "cases": 3,
+              "hit5": 0.3333,
+              "mrr10": 0.3889
+            },
+            "Agreement Date": {
+              "cases": 24,
+              "hit5": 0.4167,
+              "mrr10": 0.2557
+            },
+            "Anti-Assignment": {
+              "cases": 23,
+              "hit5": 0.8261,
+              "mrr10": 0.6729
+            },
+            "Audit Rights": {
+              "cases": 17,
+              "hit5": 0.8824,
+              "mrr10": 0.8431
+            },
+            "Cap On Liability": {
+              "cases": 18,
+              "hit5": 0.7778,
+              "mrr10": 0.3894
+            },
+            "Change Of Control": {
+              "cases": 12,
+              "hit5": 0.8333,
+              "mrr10": 0.7014
+            },
+            "Competitive Restriction Exception": {
+              "cases": 8,
+              "hit5": 0.375,
+              "mrr10": 0.2188
+            },
+            "Covenant Not To Sue": {
+              "cases": 8,
+              "hit5": 0.75,
+              "mrr10": 0.3618
+            },
+            "Document Name": {
+              "cases": 25,
+              "hit5": 0.32,
+              "mrr10": 0.1878
+            },
+            "Effective Date": {
+              "cases": 20,
+              "hit5": 0.45,
+              "mrr10": 0.3963
+            },
+            "Exclusivity": {
+              "cases": 11,
+              "hit5": 0.3636,
+              "mrr10": 0.2731
+            },
+            "Expiration Date": {
+              "cases": 20,
+              "hit5": 0.9,
+              "mrr10": 0.7433
+            },
+            "Governing Law": {
+              "cases": 22,
+              "hit5": 0.9091,
+              "mrr10": 0.7864
+            },
+            "Insurance": {
+              "cases": 13,
+              "hit5": 0.7692,
+              "mrr10": 0.7436
+            },
+            "Ip Ownership Assignment": {
+              "cases": 10,
+              "hit5": 0.5,
+              "mrr10": 0.3667
+            },
+            "Irrevocable Or Perpetual License": {
+              "cases": 4,
+              "hit5": 0.5,
+              "mrr10": 0.375
+            },
+            "Joint Ip Ownership": {
+              "cases": 4,
+              "hit5": 0.75,
+              "mrr10": 0.625
+            },
+            "License Grant": {
+              "cases": 16,
+              "hit5": 0.5,
+              "mrr10": 0.4209
+            },
+            "Liquidated Damages": {
+              "cases": 7,
+              "hit5": 0.5714,
+              "mrr10": 0.4048
+            },
+            "Minimum Commitment": {
+              "cases": 11,
+              "hit5": 0.5455,
+              "mrr10": 0.3115
+            },
+            "Most Favored Nation": {
+              "cases": 1,
+              "hit5": 0,
+              "mrr10": 0
+            },
+            "No-Solicit Of Customers": {
+              "cases": 2,
+              "hit5": 1,
+              "mrr10": 0.6
+            },
+            "No-Solicit Of Employees": {
+              "cases": 6,
+              "hit5": 0.6667,
+              "mrr10": 0.6111
+            },
+            "Non-Compete": {
+              "cases": 10,
+              "hit5": 0.8,
+              "mrr10": 0.7
+            },
+            "Non-Disparagement": {
+              "cases": 4,
+              "hit5": 0.5,
+              "mrr10": 0.5
+            },
+            "Non-Transferable License": {
+              "cases": 8,
+              "hit5": 0.75,
+              "mrr10": 0.4313
+            },
+            "Notice Period To Terminate Renewal": {
+              "cases": 6,
+              "hit5": 0.6667,
+              "mrr10": 0.3389
+            },
+            "Parties": {
+              "cases": 30,
+              "hit5": 0.2333,
+              "mrr10": 0.1791
+            },
+            "Post-Termination Services": {
+              "cases": 12,
+              "hit5": 0.75,
+              "mrr10": 0.6229
+            },
+            "Price Restrictions": {
+              "cases": 2,
+              "hit5": 0.5,
+              "mrr10": 0.5
+            },
+            "Renewal Term": {
+              "cases": 10,
+              "hit5": 0.8,
+              "mrr10": 0.52
+            },
+            "Revenue/Profit Sharing": {
+              "cases": 13,
+              "hit5": 0.3846,
+              "mrr10": 0.1821
+            },
+            "Rofr/Rofo/Rofn": {
+              "cases": 8,
+              "hit5": 0.375,
+              "mrr10": 0.2813
+            },
+            "Termination For Convenience": {
+              "cases": 9,
+              "hit5": 0.4444,
+              "mrr10": 0.1704
+            },
+            "Third Party Beneficiary": {
+              "cases": 4,
+              "hit5": 1,
+              "mrr10": 0.8333
+            },
+            "Uncapped Liability": {
+              "cases": 4,
+              "hit5": 1,
+              "mrr10": 0.4667
+            },
+            "Volume Restriction": {
+              "cases": 5,
+              "hit5": 0.6,
+              "mrr10": 0.2986
+            },
+            "Warranty Duration": {
+              "cases": 3,
+              "hit5": 1,
+              "mrr10": 0.6667
+            }
+          }
+        },
+        {
+          "method": "hybrid RRF (workers-ai-bge-m3, header + FTS5 unicode61)",
+          "all": {
+            "cases": 415,
+            "hit1": 0.4337,
+            "hit5": 0.6699,
+            "recall5": 0.5768,
+            "recall10": 0.6903,
+            "mrr10": 0.5323,
+            "ndcg10": 0.5394
+          },
+          "byClauseType": {
+            "Affiliate License-Licensee": {
+              "cases": 2,
+              "hit5": 1,
+              "mrr10": 1
+            },
+            "Affiliate License-Licensor": {
+              "cases": 3,
+              "hit5": 0.6667,
+              "mrr10": 0.4444
+            },
+            "Agreement Date": {
+              "cases": 24,
+              "hit5": 0.4583,
+              "mrr10": 0.305
+            },
+            "Anti-Assignment": {
+              "cases": 23,
+              "hit5": 0.9565,
+              "mrr10": 0.7645
+            },
+            "Audit Rights": {
+              "cases": 17,
+              "hit5": 0.9412,
+              "mrr10": 0.8623
+            },
+            "Cap On Liability": {
+              "cases": 18,
+              "hit5": 0.7778,
+              "mrr10": 0.5913
+            },
+            "Change Of Control": {
+              "cases": 12,
+              "hit5": 0.9167,
+              "mrr10": 0.8036
+            },
+            "Competitive Restriction Exception": {
+              "cases": 8,
+              "hit5": 0.375,
+              "mrr10": 0.2813
+            },
+            "Covenant Not To Sue": {
+              "cases": 8,
+              "hit5": 0.625,
+              "mrr10": 0.3813
+            },
+            "Document Name": {
+              "cases": 25,
+              "hit5": 0.2,
+              "mrr10": 0.1501
+            },
+            "Effective Date": {
+              "cases": 20,
+              "hit5": 0.55,
+              "mrr10": 0.3563
+            },
+            "Exclusivity": {
+              "cases": 11,
+              "hit5": 0.3636,
+              "mrr10": 0.3413
+            },
+            "Expiration Date": {
+              "cases": 20,
+              "hit5": 0.85,
+              "mrr10": 0.6993
+            },
+            "Governing Law": {
+              "cases": 22,
+              "hit5": 0.9545,
+              "mrr10": 0.8049
+            },
+            "Insurance": {
+              "cases": 13,
+              "hit5": 0.9231,
+              "mrr10": 0.8333
+            },
+            "Ip Ownership Assignment": {
+              "cases": 10,
+              "hit5": 0.6,
+              "mrr10": 0.4667
+            },
+            "Irrevocable Or Perpetual License": {
+              "cases": 4,
+              "hit5": 0.5,
+              "mrr10": 0.5417
+            },
+            "Joint Ip Ownership": {
+              "cases": 4,
+              "hit5": 0.75,
+              "mrr10": 0.625
+            },
+            "License Grant": {
+              "cases": 16,
+              "hit5": 0.75,
+              "mrr10": 0.5376
+            },
+            "Liquidated Damages": {
+              "cases": 7,
+              "hit5": 0.7143,
+              "mrr10": 0.619
+            },
+            "Minimum Commitment": {
+              "cases": 11,
+              "hit5": 0.6364,
+              "mrr10": 0.4706
+            },
+            "Most Favored Nation": {
+              "cases": 1,
+              "hit5": 1,
+              "mrr10": 0.25
+            },
+            "No-Solicit Of Customers": {
+              "cases": 2,
+              "hit5": 1,
+              "mrr10": 0.75
+            },
+            "No-Solicit Of Employees": {
+              "cases": 6,
+              "hit5": 1,
+              "mrr10": 0.7778
+            },
+            "Non-Compete": {
+              "cases": 10,
+              "hit5": 0.8,
+              "mrr10": 0.595
+            },
+            "Non-Disparagement": {
+              "cases": 4,
+              "hit5": 0.5,
+              "mrr10": 0.5
+            },
+            "Non-Transferable License": {
+              "cases": 8,
+              "hit5": 0.75,
+              "mrr10": 0.7083
+            },
+            "Notice Period To Terminate Renewal": {
+              "cases": 6,
+              "hit5": 0.6667,
+              "mrr10": 0.4708
+            },
+            "Parties": {
+              "cases": 30,
+              "hit5": 0.3667,
+              "mrr10": 0.2234
+            },
+            "Post-Termination Services": {
+              "cases": 12,
+              "hit5": 0.8333,
+              "mrr10": 0.7222
+            },
+            "Price Restrictions": {
+              "cases": 2,
+              "hit5": 0.5,
+              "mrr10": 0.5
+            },
+            "Renewal Term": {
+              "cases": 10,
+              "hit5": 0.8,
+              "mrr10": 0.72
+            },
+            "Revenue/Profit Sharing": {
+              "cases": 13,
+              "hit5": 0.2308,
+              "mrr10": 0.2564
+            },
+            "Rofr/Rofo/Rofn": {
+              "cases": 8,
+              "hit5": 0.5,
+              "mrr10": 0.3531
+            },
+            "Termination For Convenience": {
+              "cases": 9,
+              "hit5": 0.7778,
+              "mrr10": 0.3926
+            },
+            "Third Party Beneficiary": {
+              "cases": 4,
+              "hit5": 1,
+              "mrr10": 1
+            },
+            "Uncapped Liability": {
+              "cases": 4,
+              "hit5": 1,
+              "mrr10": 0.7083
+            },
+            "Volume Restriction": {
+              "cases": 5,
+              "hit5": 0.6,
+              "mrr10": 0.375
+            },
+            "Warranty Duration": {
+              "cases": 3,
+              "hit5": 1,
+              "mrr10": 1
+            }
+          }
+        },
+        {
+          "method": "hybrid RRF (workers-ai-bge-m3, header + FTS5 porter unicode61)",
+          "all": {
+            "cases": 415,
+            "hit1": 0.4506,
+            "hit5": 0.706,
+            "recall5": 0.6124,
+            "recall10": 0.7037,
+            "mrr10": 0.5514,
+            "ndcg10": 0.5568
+          },
+          "byClauseType": {
+            "Affiliate License-Licensee": {
+              "cases": 2,
+              "hit5": 1,
+              "mrr10": 1
+            },
+            "Affiliate License-Licensor": {
+              "cases": 3,
+              "hit5": 0.6667,
+              "mrr10": 0.4444
+            },
+            "Agreement Date": {
+              "cases": 24,
+              "hit5": 0.5417,
+              "mrr10": 0.3151
+            },
+            "Anti-Assignment": {
+              "cases": 23,
+              "hit5": 0.9565,
+              "mrr10": 0.8333
+            },
+            "Audit Rights": {
+              "cases": 17,
+              "hit5": 0.9412,
+              "mrr10": 0.8181
+            },
+            "Cap On Liability": {
+              "cases": 18,
+              "hit5": 0.7222,
+              "mrr10": 0.5718
+            },
+            "Change Of Control": {
+              "cases": 12,
+              "hit5": 0.9167,
+              "mrr10": 0.8313
+            },
+            "Competitive Restriction Exception": {
+              "cases": 8,
+              "hit5": 0.5,
+              "mrr10": 0.4
+            },
+            "Covenant Not To Sue": {
+              "cases": 8,
+              "hit5": 0.875,
+              "mrr10": 0.6292
+            },
+            "Document Name": {
+              "cases": 25,
+              "hit5": 0.24,
+              "mrr10": 0.1618
+            },
+            "Effective Date": {
+              "cases": 20,
+              "hit5": 0.5,
+              "mrr10": 0.3408
+            },
+            "Exclusivity": {
+              "cases": 11,
+              "hit5": 0.7273,
+              "mrr10": 0.4061
+            },
+            "Expiration Date": {
+              "cases": 20,
+              "hit5": 0.85,
+              "mrr10": 0.6383
+            },
+            "Governing Law": {
+              "cases": 22,
+              "hit5": 0.9545,
+              "mrr10": 0.8232
+            },
+            "Insurance": {
+              "cases": 13,
+              "hit5": 0.9231,
+              "mrr10": 0.8846
+            },
+            "Ip Ownership Assignment": {
+              "cases": 10,
+              "hit5": 0.6,
+              "mrr10": 0.5225
+            },
+            "Irrevocable Or Perpetual License": {
+              "cases": 4,
+              "hit5": 0.75,
+              "mrr10": 0.55
+            },
+            "Joint Ip Ownership": {
+              "cases": 4,
+              "hit5": 0.75,
+              "mrr10": 0.5833
+            },
+            "License Grant": {
+              "cases": 16,
+              "hit5": 0.9375,
+              "mrr10": 0.6
+            },
+            "Liquidated Damages": {
+              "cases": 7,
+              "hit5": 0.7143,
+              "mrr10": 0.619
+            },
+            "Minimum Commitment": {
+              "cases": 11,
+              "hit5": 0.6364,
+              "mrr10": 0.4621
+            },
+            "Most Favored Nation": {
+              "cases": 1,
+              "hit5": 0,
+              "mrr10": 0.1429
+            },
+            "No-Solicit Of Customers": {
+              "cases": 2,
+              "hit5": 1,
+              "mrr10": 0.75
+            },
+            "No-Solicit Of Employees": {
+              "cases": 6,
+              "hit5": 1,
+              "mrr10": 0.7639
+            },
+            "Non-Compete": {
+              "cases": 10,
+              "hit5": 0.9,
+              "mrr10": 0.775
+            },
+            "Non-Disparagement": {
+              "cases": 4,
+              "hit5": 0.75,
+              "mrr10": 0.5625
+            },
+            "Non-Transferable License": {
+              "cases": 8,
+              "hit5": 0.75,
+              "mrr10": 0.7708
+            },
+            "Notice Period To Terminate Renewal": {
+              "cases": 6,
+              "hit5": 0.8333,
+              "mrr10": 0.5519
+            },
+            "Parties": {
+              "cases": 30,
+              "hit5": 0.3,
+              "mrr10": 0.2093
+            },
+            "Post-Termination Services": {
+              "cases": 12,
+              "hit5": 0.9167,
+              "mrr10": 0.6583
+            },
+            "Price Restrictions": {
+              "cases": 2,
+              "hit5": 0.5,
+              "mrr10": 0.5
+            },
+            "Renewal Term": {
+              "cases": 10,
+              "hit5": 1,
+              "mrr10": 0.85
+            },
+            "Revenue/Profit Sharing": {
+              "cases": 13,
+              "hit5": 0.3077,
+              "mrr10": 0.2464
+            },
+            "Rofr/Rofo/Rofn": {
+              "cases": 8,
+              "hit5": 0.5,
+              "mrr10": 0.3323
+            },
+            "Termination For Convenience": {
+              "cases": 9,
+              "hit5": 0.6667,
+              "mrr10": 0.4537
+            },
+            "Third Party Beneficiary": {
+              "cases": 4,
+              "hit5": 1,
+              "mrr10": 1
+            },
+            "Uncapped Liability": {
+              "cases": 4,
+              "hit5": 1,
+              "mrr10": 0.7083
+            },
+            "Volume Restriction": {
+              "cases": 5,
+              "hit5": 0.6,
+              "mrr10": 0.3452
+            },
+            "Warranty Duration": {
+              "cases": 3,
+              "hit5": 1,
+              "mrr10": 0.6667
+            }
+          }
+        }
+      ],
+      "skipped": [
+        "ollama-bge-m3, plain: embeddings not cached",
+        "ollama-bge-m3, header: embeddings not cached"
+      ],
+      "unlocatedSpans": 78
+    }
+  ]
+}

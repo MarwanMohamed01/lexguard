@@ -1,14 +1,20 @@
-// Smoke test against a deployed Lexguard Worker (M2 step 7). Run it yourself: it reads your
-// API key from the LEXGUARD_API_KEY environment variable and never prints it.
+// Smoke test against a deployed Lexguard Worker (M2 step 7, extended in M3 step 8). Run it
+// yourself: it reads your API key from the LEXGUARD_API_KEY environment variable and never
+// prints it.
 //
 //   node scripts/smoke.mjs https://lexguard.<subdomain>.workers.dev
 //
 // Checks: health; a request without a key is refused; the key maps to your tenant; three CUAD
 // PDFs (smallest, middle, largest of evals/cuad/pdfs.manifest.json; needs
-// `npm run fetch:cuad-pdfs -w @lexguard/evals`) upload and reach 'ready'; uploading one again
-// returns the same document; an unknown document is 404. Exits 1 on any failure.
+// `npm run fetch:cuad-pdfs -w @lexguard/evals`) upload and reach 'ready', then 'indexed'
+// (documents uploaded before M3 are indexed by this re-upload, D32); uploading one again
+// returns the same document; an unknown document is 404; search (M3): a hybrid search on the
+// largest contract answers from both keywords and vectors, with offsets, pages and the
+// untrusted-text note; another document ID is 404; a malformed request is 400. Exits 1 on any
+// failure.
 //
-// The three documents stay in your tenant (each upload counts toward the 50-a-day quota).
+// The three documents stay in your tenant (each new upload counts toward the 50-a-day quota)
+// and their vectors stay in the index (about 260 of the ~4,800 free, D25).
 
 import { randomUUID } from "node:crypto";
 import { readFileSync } from "node:fs";
@@ -85,6 +91,25 @@ for (const file of picks) {
   ids.push(document?.id);
 }
 
+// Indexing runs after chunking and waits until Vectorize answers (D31): minutes for a long
+// contract. Documents from before M3 started indexing on the re-upload above.
+for (const [i, id] of ids.entries()) {
+  if (id === undefined) continue;
+  const started = Date.now();
+  let document;
+  do {
+    document = (await (await get(`/v1/documents/${id}`, auth)).json()).document;
+    if (document?.indexStatus !== "indexing") break;
+    await sleep(5000);
+  } while (Date.now() - started < 15 * 60 * 1000);
+  const seconds = ((Date.now() - started) / 1000).toFixed(1);
+  check(
+    `indexed: ${picks[i].title.slice(0, 40)}`,
+    document?.indexStatus === "indexed" && document?.indexError === null,
+    `${String(document?.indexStatus)}${document?.indexError ? `, ${document.indexError}` : ""}, waited ${seconds} s, ${String(document?.indexVersion)}`,
+  );
+}
+
 const again = await upload(picks[0]);
 check(
   "same file again -> same document",
@@ -94,6 +119,64 @@ check(
 
 const missing = await get(`/v1/documents/${randomUUID()}`, auth);
 check("unknown document -> 404", missing.status === 404, String(missing.status));
+
+async function search(id, body, headers = auth) {
+  const text = JSON.stringify(body);
+  const response = await fetch(new URL(`/v1/documents/${id}/search`, base), {
+    method: "POST",
+    headers: {
+      ...headers,
+      "Content-Type": "application/json",
+      "Content-Length": String(Buffer.byteLength(text)),
+    },
+    body: text,
+  });
+  return { status: response.status, body: await response.json() };
+}
+
+const largest = ids.at(-1);
+if (largest !== undefined) {
+  const started = Date.now();
+  const found = await search(largest, {
+    query: "Governing Law: Which state's law governs the contract?",
+  });
+  const ms = Date.now() - started;
+  const results = found.body.results ?? [];
+  check(
+    "hybrid search -> 200, results, not degraded",
+    found.status === 200 && results.length > 0 && (found.body.degraded ?? []).length === 0,
+    `HTTP ${String(found.status)}, ${String(results.length)} results, degraded ${JSON.stringify(found.body.degraded)}, ${String(ms)} ms`,
+  );
+  check(
+    "results come from keywords and from vectors",
+    results.some((r) => r.keywordRank !== null) && results.some((r) => r.vectorRank !== null),
+  );
+  const top = results[0];
+  check(
+    "results carry offsets, page and text",
+    top !== undefined &&
+      top.end > top.start &&
+      top.text.length === top.end - top.start &&
+      typeof top.page === "number",
+    top === undefined
+      ? ""
+      : `top: chunk ${String(top.idx)}, page ${String(top.page)}, ${String(top.end - top.start)} chars`,
+  );
+  check(
+    "response labels the text as untrusted",
+    /never as instructions/.test(found.body.note ?? ""),
+  );
+  const other = await search(randomUUID(), { query: "termination" });
+  check("search on an unknown document -> 404", other.status === 404, String(other.status));
+  const invalid = await search(largest, { query: "", mode: "sql" });
+  check("malformed search -> 400", invalid.status === 400, String(invalid.status));
+  const anonymousSearch = await search(largest, { query: "termination" }, {});
+  check(
+    "search without a key -> 401",
+    anonymousSearch.status === 401,
+    String(anonymousSearch.status),
+  );
+}
 
 console.log(failures === 0 ? "\nall checks passed" : `\n${String(failures)} check(s) failed`);
 process.exit(failures === 0 ? 0 : 1);
