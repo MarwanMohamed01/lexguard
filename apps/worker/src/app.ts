@@ -1,6 +1,7 @@
 // Routing. Kept apart from index.ts so tests can pass their own dependencies (a fake
 // converter, a fixed clock) while production passes the real ones.
 import { authenticate } from "./auth";
+import { handleClauses, handleExtract, type StartExtraction } from "./clauses";
 import { countCreatedSince, getDocument } from "./documents";
 import { handleSearch, type SearchServices } from "./search";
 import { handleUpload, type UploadDeps } from "./upload";
@@ -10,7 +11,11 @@ import { handleUpload, type UploadDeps } from "./upload";
  * build it; without it, search answers from keywords only and reports the vector side as
  * degraded (production always passes it, see index.ts).
  */
-export type AppDeps = UploadDeps & { search?: SearchServices | undefined };
+export type AppDeps = UploadDeps & {
+  search?: SearchServices | undefined;
+  /** Starts the extraction Workflow; without it, POST .../extract answers 503. */
+  startExtraction?: StartExtraction | undefined;
+};
 
 /**
  * New documents per tenant per day (threat T15). The Free plan's daily budgets are shared by
@@ -102,6 +107,19 @@ async function handleV1(request: Request, url: URL, env: Env, deps: AppDeps): Pr
     const id = search[1].toLowerCase();
     if (!UUID.test(id)) return notFound();
     return handleSearch(request, env.DB, tenantId, id, deps.search);
+  }
+
+  const extraction = /^\/v1\/documents\/([^/]+)\/(extract|clauses)$/.exec(url.pathname);
+  if (extraction?.[1] !== undefined) {
+    const id = extraction[1].toLowerCase();
+    if (extraction[2] === "extract") {
+      if (request.method !== "POST") return methodNotAllowed("POST");
+      if (!UUID.test(id)) return notFound();
+      return handleExtract(env.DB, tenantId, id, deps.startExtraction);
+    }
+    if (request.method !== "GET") return methodNotAllowed("GET");
+    if (!UUID.test(id)) return notFound();
+    return handleClauses(env.DB, tenantId, id, url);
   }
 
   return notFound();

@@ -31,6 +31,12 @@
       "binding": "INDEX_DOCUMENT",
       "class_name": "IndexDocument",
     },
+    // Extraction job (src/extraction.ts, M4): started on request by POST .../extract.
+    {
+      "name": "lexguard-extract-document",
+      "binding": "EXTRACT_DOCUMENT",
+      "class_name": "ExtractDocument",
+    },
   ],
   // Chunk vectors (bge-m3, 1,024 dimensions, cosine), one namespace per tenant, metadata
   // index on "doc". NOT created by deploy: created once with `wrangler vectorize create`

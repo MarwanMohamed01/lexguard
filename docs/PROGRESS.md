@@ -62,8 +62,13 @@ only, document text marked as data, T1/T2); every quote is checked by code again
 3. ✅ The extractor (D36): `packages/extraction`, Zod form with closed type and risk lists,
    nonce-wrapped untrusted text, optional PII redaction with restore, verbatim-quote check
    with exact offsets; 18 tests with a fake model, 0 of 20 mutations survive.
-4. Measure locally on Ollama (llama3.1:8b installed) on a pinned CUAD subset, answers cached.
-5. Extraction Workflow in the Worker: fan-out, per-document budget, clauses in D1 (migration).
+4. ⏳ Measure on a pinned CUAD subset, answers cached (`npm run extract:cuad -w @lexguard/evals`).
+   Ollama on the laptop is too slow (llama3.1:8b ~6-8 min per chunk with 1.5 GB RAM free;
+   llama3.2 3B 336 s per chunk and 0 correct on 3 chunks): run on Groq's free tier
+   (`PROVIDER=groq`, gpt-oss-20b, public CUAD only), key in `evals/.env` (Marwan).
+5. ✅ Extraction Workflow in the Worker (D37): `POST .../extract`, `GET .../clauses`, parallel
+   chunk steps (4), atomic daily Neuron budget, fencing, migration 0007 (not applied remotely
+   yet); 20 tests, 0 of 19 mutations survive.
 6. Reduce / merge.
 7. Cross-reference resolution (definitions).
 8. Security tests (injected instructions in a chunk), real run, deploy, learning log, quiz.
@@ -209,5 +214,5 @@ PICK=3 node scripts/cpu-load.mjs <worker-url>        # one new upload + 20 searc
   CUAD contracts: MRR 0.568 with stemming.
 - Production CPU (D33): search 3-5 ms, status 0 ms, upload 15 ms (655 KB, known since D24),
   indexing ~5 ms per step.
-- Tests: 478 (worker 138, a2a 34, chunker 59, extraction 18, guardrails 72, retrieval 26,
-  router 13, trace 24, evals 94; the live-run and converted-PDF evals skip in CI).
+- Tests: 501 (worker 158, a2a 34, chunker 59, extraction 20, guardrails 72, retrieval 26,
+  router 13, trace 24, evals 95; the live-run and converted-PDF evals skip in CI).

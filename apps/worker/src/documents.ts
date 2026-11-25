@@ -23,14 +23,20 @@ export interface DocumentSummary {
   indexStatus: IndexStatus | null;
   indexVersion: string | null;
   indexError: string | null;
+  /** Clause extraction (D37): null until someone asks for it. */
+  extractStatus: ExtractStatus | null;
+  extractVersion: string | null;
+  extractError: string | null;
 }
 
 export type IndexStatus = "indexing" | "indexed" | "failed";
+export type ExtractStatus = "extracting" | "extracted" | "failed";
 
 const SUMMARY_COLUMNS = `id, filename, mime_type AS mimeType, size_bytes AS sizeBytes, sha256, status,
   chars, hidden_chars_removed AS hiddenCharsRemoved, error, created_at AS createdAt,
   updated_at AS updatedAt, json_array_length(page_starts) AS pages,
-  index_status AS indexStatus, index_version AS indexVersion, index_error AS indexError`;
+  index_status AS indexStatus, index_version AS indexVersion, index_error AS indexError,
+  extract_status AS extractStatus, extract_version AS extractVersion, extract_error AS extractError`;
 
 export interface NewDocument {
   id: string;
@@ -218,6 +224,47 @@ export async function markIndexNotStarted(
        WHERE tenant_id = ? AND id = ? AND index_job = ? AND index_status = 'indexing'`,
     )
     .bind(tenantId, id, indexJob)
+    .run();
+}
+
+/**
+ * Hands a ready document to a new extraction job (ticket `extractJob`, fencing as D29).
+ * Allowed when never extracted, failed, or extracted with another model/prompt version; never
+ * while a job is running. One UPDATE, so two requests cannot both start a job.
+ */
+export async function claimForExtraction(
+  db: D1Database,
+  tenantId: string,
+  id: string,
+  extractJob: string,
+  version: string,
+): Promise<boolean> {
+  const result = await db
+    .prepare(
+      `UPDATE documents SET extract_status = 'extracting', extract_job = ?, extract_error = NULL
+       WHERE tenant_id = ? AND id = ? AND status = 'ready'
+         AND (extract_status IS NULL OR extract_status = 'failed'
+              OR (extract_status = 'extracted' AND extract_version IS NOT ?))`,
+    )
+    .bind(extractJob, tenantId, id, version)
+    .run();
+  return result.meta.changes === 1;
+}
+
+/** Marks extraction failed, only if `extractJob` still owns it. */
+export async function markExtractNotStarted(
+  db: D1Database,
+  tenantId: string,
+  id: string,
+  extractJob: string,
+): Promise<void> {
+  await db
+    .prepare(
+      `UPDATE documents SET extract_status = 'failed', extract_error = 'extraction_not_started',
+         extract_job = NULL
+       WHERE tenant_id = ? AND id = ? AND extract_job = ? AND extract_status = 'extracting'`,
+    )
+    .bind(tenantId, id, extractJob)
     .run();
 }
 

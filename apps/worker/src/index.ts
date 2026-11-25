@@ -6,6 +6,7 @@ import { CONVERSION_OPTIONS } from "./upload";
 
 export { ChunkDocument } from "./chunking";
 export { IndexDocument } from "./indexing";
+export { ExtractDocument } from "./extraction";
 
 export default {
   fetch(request, env): Promise<Response> {
@@ -19,6 +20,9 @@ export default {
         await env.INDEX_DOCUMENT.create({ id: params.jobId, params });
       },
       search: { embed: workersAiEmbedder(env.AI), vectors: vectorIndex(env) },
+      startExtraction: async (params) => {
+        await env.EXTRACT_DOCUMENT.create({ id: params.jobId, params });
+      },
     });
   },
 } satisfies ExportedHandler<Env>;

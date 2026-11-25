@@ -952,8 +952,11 @@ default 10), mode? ("hybrid" | "keyword" | "vector") }`, validated with a strict
   14 breakages, 3 survived the first tests (macro averaging over empty types hidden by the
   empty-case convention, a span touching a chunk edge, a prior that ignores frequency); after
   three new tests **0 of 14 survive**.
-- **Cost:** the corpus run takes about 3.3 minutes (20,910 keyword searches), and runs in CI
-  because CI already downloads CUAD.
+- **Cost:** the full-corpus run makes 20,910 keyword searches: 3.3 minutes alone, over 10
+  minutes during a full `npm run check` on the laptop (it hit the 600 s hook limit, found in
+  step 5). So `npm test` scores only the two pinned subsets (about 1 minute, results in
+  `cuad-extraction-baselines-subsets.json`), and the full run is explicit:
+  `npm run baselines:cuad -w @lexguard/evals` (writes `cuad-extraction-baselines.json`).
 
 ## D36. The extractor and the nightly embedding task (M4 step 3, 2026-11-25)
 
@@ -1000,3 +1003,49 @@ default 10), mode? ("hybrid" | "keyword" | "vector") }`, validated with a strict
   day's last ~950 Neurons, then stopped at the cap; 9,974 texts left (~6,000 Neurons, one
   night). If the clock moves to summer time (UTC+2), 01:10 local is before the reset; by then
   the task should be finished.
+
+## D37. The extraction Workflow and endpoints (M4 step 5, 2026-11-25)
+
+- **Started on request:** `POST /v1/documents/:id/extract` (202 started; 200 when already
+  running or done with this version; 409 not ready; 404 another tenant's; 503 when the job
+  cannot start, recorded as `extraction_not_started`). Extraction spends the shared daily
+  Neurons (T15), so an upload does not trigger it.
+- **`ExtractDocument` Workflow** (`src/extraction.ts`): `load` → `chunk 0..N-1`, 4 at a time
+  (parallel `step.do` calls, no Queues, D34) → `finish`. Fenced by `documents.extract_job` in
+  every statement (D20/D29). Each chunk step:
+  - reserves the worst-case Neurons for its call (prompt characters / 3 at the input price +
+    2,048 output tokens at the output price) in one conditional UPDATE on `neuron_budget`
+    (account-wide, per UTC day, cap 6,000 of the free 10,000); a retry reserves again, which
+    only errs on the safe side;
+  - runs `extractClauses` with a fresh random nonce (`crypto.randomUUID`);
+  - corrects the reservation with the model's reported usage (keeps the estimate if none);
+  - replaces its clauses and its audit row (`extraction_chunks`: outcome, accepted, rejected
+    by reason, Neurons) in one batch, under the ticket;
+  - returns only small counts (D33).
+- **Stops:** more than 400 chunks → `too_many_chunks` before any call; a chunk that cannot
+  reserve → the job stops after its group, `daily_budget`; a lost ticket → stops at once
+  (`superseded`); a model error after the step's retries → `extraction_failed`. `load`
+  deletes the previous run's clauses, so a stopped re-extraction never mixes two versions.
+- **Migration 0007:** `documents.extract_status / extract_job / extract_version /
+extract_error`; `clauses` (tenant-first key, document offsets, details JSON, **no quote
+  column**: the quote is always cut from the stored text, so a stored clause can only point
+  at real document text, T3); `extraction_chunks`; `neuron_budget` (the one account-level
+  table, keyed by day).
+- **`GET /v1/documents/:id/clauses`** (`src/clauses.ts`, optional `?type=` from the 41 names,
+  at most 1,000 per response with `truncated`): type, exact quote, document offsets, PDF page,
+  chunk, details, and the untrusted-text note (T1/T2). 409 before extraction finishes. Quotes
+  are sliced in JavaScript from the chunk rows, because offsets are UTF-16 units and SQLite's
+  `substr` counts characters.
+- **Model:** `EXTRACT_MODEL = @cf/google/gemma-4-26b-a4b-it` is provisional until the step 4
+  eval; `EXTRACT_VERSION = model/prompt version` is stored per document. **Not yet verified
+  against the real Workers AI:** the chat input/output shape (`response_format`, `usage`) is
+  validated with Zod and checked in the real run (step 8).
+- **Tests:** 20 against local D1 with a fake model (offsets, nonces, parallel groups of 4,
+  non-JSON answers, re-extraction, fencing, other tenants, budget reservation and true-up,
+  budget stop, chunk cap, model failure, endpoints). Mutation check: 19 breakages; 3 survived
+  the first tests (a lost ticket that let the job run on through empty steps; old clauses left
+  after a budget-stopped re-extraction; a not-ready document answered 200 instead of 409);
+  after three new tests **0 of 19 survive**.
+- **Open:** a per-tenant daily extraction cap (T15, with M8's rate limits); a job stuck in
+  `extracting` whose instance never ran (as for indexing, D32); deleting a document's clauses
+  with the document (cascade covers `clauses` and `extraction_chunks`).
