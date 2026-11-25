@@ -1,0 +1,2104 @@
+{
+  "sizes": {
+    "subset10": {
+      "contracts": 10,
+      "chunks": 473,
+      "labelledChunks": 140,
+      "characters": 737013
+    },
+    "subset20": {
+      "contracts": 20,
+      "chunks": 924,
+      "labelledChunks": 276,
+      "characters": 1520699
+    }
+  },
+  "subsets": {
+    "subset10": [
+      "DRKOOPCOMINC_04_21_1999-EX-10.28-SPONSORSHIP AGREEMENT",
+      "VEONEER,INC_02_21_2020-EX-10.11-JOINT VENTURE AGREEMENT",
+      "OMINTO,INC_03_29_2004-EX-10-RESELLER AGREEMENT",
+      "ArconicRolledProductsCorp_20191217_10-12B_EX-2.7_11923804_EX-2.7_Trademark License Agreement",
+      "SUNTRONCORP_05_17_2006-EX-10.22-MAINTENANCE AGREEMENT",
+      "BERKELEYLIGHTS,INC_06_26_2020-EX-10.12-COLLABORATION AGREEMENT",
+      "ENTERPRISEPRODUCTSPARTNERSLP_07_08_1998-EX-10.3-TRANSPORTATION CONTRACT",
+      "PACIRA PHARMACEUTICALS, INC. - A_R STRATEGIC LICENSING, DISTRIBUTION AND MARKETING AGREEMENT ",
+      "HPILHOLDING_01_07_2015-EX-99.1-COOPERATION AGREEMENT",
+      "BONTONSTORESINC_04_20_2018-EX-99.3-AGENCY AGREEMENT"
+    ],
+    "subset20": [
+      "DRKOOPCOMINC_04_21_1999-EX-10.28-SPONSORSHIP AGREEMENT",
+      "VEONEER,INC_02_21_2020-EX-10.11-JOINT VENTURE AGREEMENT",
+      "OMINTO,INC_03_29_2004-EX-10-RESELLER AGREEMENT",
+      "ArconicRolledProductsCorp_20191217_10-12B_EX-2.7_11923804_EX-2.7_Trademark License Agreement",
+      "SUNTRONCORP_05_17_2006-EX-10.22-MAINTENANCE AGREEMENT",
+      "BERKELEYLIGHTS,INC_06_26_2020-EX-10.12-COLLABORATION AGREEMENT",
+      "ENTERPRISEPRODUCTSPARTNERSLP_07_08_1998-EX-10.3-TRANSPORTATION CONTRACT",
+      "PACIRA PHARMACEUTICALS, INC. - A_R STRATEGIC LICENSING, DISTRIBUTION AND MARKETING AGREEMENT ",
+      "HPILHOLDING_01_07_2015-EX-99.1-COOPERATION AGREEMENT",
+      "BONTONSTORESINC_04_20_2018-EX-99.3-AGENCY AGREEMENT",
+      "LinkPlusCorp_20050802_8-K_EX-10_3240252_EX-10_Affiliate Agreement",
+      "MusclepharmCorp_20170208_10-KA_EX-10.38_9893581_EX-10.38_Co-Branding Agreement",
+      "ArcGroupInc_20171211_8-K_EX-10.1_10976103_EX-10.1_Sponsorship Agreement",
+      "NETZEEINC_11_14_2002-EX-10.3-MAINTENANCE AGREEMENT",
+      "DigitalCinemaDestinationsCorp_20111220_S-1_EX-10.10_7346719_EX-10.10_Affiliate Agreement",
+      "HOSPITALITYINVESTORSTRUST,INC_04_07_2014-EX-10.26-FRANCHISE AGREEMENT",
+      "WASTE2ENERGYHOLDINGS,INC_06_03_2010-EX-10.2-STRATEGIC ALLIANCE AGREEMENT",
+      "AzulSa_20170303_F-1A_EX-10.3_9943903_EX-10.3_Maintenance Agreement1",
+      "INTERNATIONALFASTFOODCORP_04_04_1997-EX-99-FRANCHISE AGREEMENT",
+      "GridironBionutrientsInc_20171206_8-K_EX-10.2_10972556_EX-10.2_Endorsement Agreement"
+    ]
+  },
+  "results": {
+    "subset10": {
+      "allTypes": {
+        "micro": {
+          "tp": 222,
+          "fp": 19171,
+          "fn": 0,
+          "precision": 0.011447429484865674,
+          "recall": 1,
+          "f1": 0.02263573795564619
+        },
+        "macroF1": 0.02246909299285375,
+        "byType": {
+          "Affiliate License-Licensee": {
+            "tp": 4,
+            "fp": 469,
+            "fn": 0,
+            "precision": 0.008456659619450317,
+            "recall": 1,
+            "f1": 0.016771488469601675
+          },
+          "Affiliate License-Licensor": {
+            "tp": 3,
+            "fp": 470,
+            "fn": 0,
+            "precision": 0.006342494714587738,
+            "recall": 1,
+            "f1": 0.012605042016806721
+          },
+          "Agreement Date": {
+            "tp": 10,
+            "fp": 463,
+            "fn": 0,
+            "precision": 0.021141649048625793,
+            "recall": 1,
+            "f1": 0.041407867494824016
+          },
+          "Anti-Assignment": {
+            "tp": 11,
+            "fp": 462,
+            "fn": 0,
+            "precision": 0.023255813953488372,
+            "recall": 1,
+            "f1": 0.04545454545454545
+          },
+          "Audit Rights": {
+            "tp": 8,
+            "fp": 465,
+            "fn": 0,
+            "precision": 0.016913319238900635,
+            "recall": 1,
+            "f1": 0.033264033264033266
+          },
+          "Cap On Liability": {
+            "tp": 11,
+            "fp": 462,
+            "fn": 0,
+            "precision": 0.023255813953488372,
+            "recall": 1,
+            "f1": 0.04545454545454545
+          },
+          "Change Of Control": {
+            "tp": 4,
+            "fp": 469,
+            "fn": 0,
+            "precision": 0.008456659619450317,
+            "recall": 1,
+            "f1": 0.016771488469601675
+          },
+          "Competitive Restriction Exception": {
+            "tp": 1,
+            "fp": 472,
+            "fn": 0,
+            "precision": 0.0021141649048625794,
+            "recall": 1,
+            "f1": 0.004219409282700422
+          },
+          "Covenant Not To Sue": {
+            "tp": 4,
+            "fp": 469,
+            "fn": 0,
+            "precision": 0.008456659619450317,
+            "recall": 1,
+            "f1": 0.016771488469601675
+          },
+          "Document Name": {
+            "tp": 10,
+            "fp": 463,
+            "fn": 0,
+            "precision": 0.021141649048625793,
+            "recall": 1,
+            "f1": 0.041407867494824016
+          },
+          "Effective Date": {
+            "tp": 9,
+            "fp": 464,
+            "fn": 0,
+            "precision": 0.019027484143763214,
+            "recall": 1,
+            "f1": 0.03734439834024896
+          },
+          "Exclusivity": {
+            "tp": 7,
+            "fp": 466,
+            "fn": 0,
+            "precision": 0.014799154334038054,
+            "recall": 1,
+            "f1": 0.029166666666666667
+          },
+          "Expiration Date": {
+            "tp": 11,
+            "fp": 462,
+            "fn": 0,
+            "precision": 0.023255813953488372,
+            "recall": 1,
+            "f1": 0.04545454545454545
+          },
+          "Governing Law": {
+            "tp": 10,
+            "fp": 463,
+            "fn": 0,
+            "precision": 0.021141649048625793,
+            "recall": 1,
+            "f1": 0.041407867494824016
+          },
+          "Insurance": {
+            "tp": 9,
+            "fp": 464,
+            "fn": 0,
+            "precision": 0.019027484143763214,
+            "recall": 1,
+            "f1": 0.03734439834024896
+          },
+          "Ip Ownership Assignment": {
+            "tp": 5,
+            "fp": 468,
+            "fn": 0,
+            "precision": 0.010570824524312896,
+            "recall": 1,
+            "f1": 0.020920502092050212
+          },
+          "Irrevocable Or Perpetual License": {
+            "tp": 4,
+            "fp": 469,
+            "fn": 0,
+            "precision": 0.008456659619450317,
+            "recall": 1,
+            "f1": 0.016771488469601675
+          },
+          "Joint Ip Ownership": {
+            "tp": 1,
+            "fp": 472,
+            "fn": 0,
+            "precision": 0.0021141649048625794,
+            "recall": 1,
+            "f1": 0.004219409282700422
+          },
+          "License Grant": {
+            "tp": 15,
+            "fp": 458,
+            "fn": 0,
+            "precision": 0.03171247357293869,
+            "recall": 1,
+            "f1": 0.06147540983606557
+          },
+          "Liquidated Damages": {
+            "tp": 3,
+            "fp": 470,
+            "fn": 0,
+            "precision": 0.006342494714587738,
+            "recall": 1,
+            "f1": 0.012605042016806721
+          },
+          "Minimum Commitment": {
+            "tp": 14,
+            "fp": 459,
+            "fn": 0,
+            "precision": 0.02959830866807611,
+            "recall": 1,
+            "f1": 0.05749486652977413
+          },
+          "Most Favored Nation": {
+            "tp": 1,
+            "fp": 472,
+            "fn": 0,
+            "precision": 0.0021141649048625794,
+            "recall": 1,
+            "f1": 0.004219409282700422
+          },
+          "No-Solicit Of Customers": {
+            "tp": 0,
+            "fp": 473,
+            "fn": 0,
+            "precision": 0,
+            "recall": 1,
+            "f1": 0
+          },
+          "No-Solicit Of Employees": {
+            "tp": 1,
+            "fp": 472,
+            "fn": 0,
+            "precision": 0.0021141649048625794,
+            "recall": 1,
+            "f1": 0.004219409282700422
+          },
+          "Non-Compete": {
+            "tp": 3,
+            "fp": 470,
+            "fn": 0,
+            "precision": 0.006342494714587738,
+            "recall": 1,
+            "f1": 0.012605042016806721
+          },
+          "Non-Disparagement": {
+            "tp": 1,
+            "fp": 472,
+            "fn": 0,
+            "precision": 0.0021141649048625794,
+            "recall": 1,
+            "f1": 0.004219409282700422
+          },
+          "Non-Transferable License": {
+            "tp": 4,
+            "fp": 469,
+            "fn": 0,
+            "precision": 0.008456659619450317,
+            "recall": 1,
+            "f1": 0.016771488469601675
+          },
+          "Notice Period To Terminate Renewal": {
+            "tp": 2,
+            "fp": 471,
+            "fn": 0,
+            "precision": 0.004228329809725159,
+            "recall": 1,
+            "f1": 0.008421052631578947
+          },
+          "Parties": {
+            "tp": 11,
+            "fp": 462,
+            "fn": 0,
+            "precision": 0.023255813953488372,
+            "recall": 1,
+            "f1": 0.04545454545454545
+          },
+          "Post-Termination Services": {
+            "tp": 12,
+            "fp": 461,
+            "fn": 0,
+            "precision": 0.02536997885835095,
+            "recall": 1,
+            "f1": 0.049484536082474224
+          },
+          "Price Restrictions": {
+            "tp": 1,
+            "fp": 472,
+            "fn": 0,
+            "precision": 0.0021141649048625794,
+            "recall": 1,
+            "f1": 0.004219409282700422
+          },
+          "Renewal Term": {
+            "tp": 4,
+            "fp": 469,
+            "fn": 0,
+            "precision": 0.008456659619450317,
+            "recall": 1,
+            "f1": 0.016771488469601675
+          },
+          "Revenue/Profit Sharing": {
+            "tp": 4,
+            "fp": 469,
+            "fn": 0,
+            "precision": 0.008456659619450317,
+            "recall": 1,
+            "f1": 0.016771488469601675
+          },
+          "Rofr/Rofo/Rofn": {
+            "tp": 0,
+            "fp": 473,
+            "fn": 0,
+            "precision": 0,
+            "recall": 1,
+            "f1": 0
+          },
+          "Source Code Escrow": {
+            "tp": 0,
+            "fp": 473,
+            "fn": 0,
+            "precision": 0,
+            "recall": 1,
+            "f1": 0
+          },
+          "Termination For Convenience": {
+            "tp": 9,
+            "fp": 464,
+            "fn": 0,
+            "precision": 0.019027484143763214,
+            "recall": 1,
+            "f1": 0.03734439834024896
+          },
+          "Third Party Beneficiary": {
+            "tp": 1,
+            "fp": 472,
+            "fn": 0,
+            "precision": 0.0021141649048625794,
+            "recall": 1,
+            "f1": 0.004219409282700422
+          },
+          "Uncapped Liability": {
+            "tp": 4,
+            "fp": 469,
+            "fn": 0,
+            "precision": 0.008456659619450317,
+            "recall": 1,
+            "f1": 0.016771488469601675
+          },
+          "Unlimited/All-You-Can-Eat-License": {
+            "tp": 0,
+            "fp": 473,
+            "fn": 0,
+            "precision": 0,
+            "recall": 1,
+            "f1": 0
+          },
+          "Volume Restriction": {
+            "tp": 10,
+            "fp": 463,
+            "fn": 0,
+            "precision": 0.021141649048625793,
+            "recall": 1,
+            "f1": 0.041407867494824016
+          },
+          "Warranty Duration": {
+            "tp": 0,
+            "fp": 473,
+            "fn": 0,
+            "precision": 0,
+            "recall": 1,
+            "f1": 0
+          }
+        }
+      },
+      "prior": {
+        "micro": {
+          "tp": 5,
+          "fp": 242,
+          "fn": 217,
+          "precision": 0.020242914979757085,
+          "recall": 0.02252252252252252,
+          "f1": 0.02132196162046908
+        },
+        "macroF1": 0.011834149972975298,
+        "byType": {
+          "Affiliate License-Licensee": {
+            "tp": 0,
+            "fp": 5,
+            "fn": 4,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "Affiliate License-Licensor": {
+            "tp": 0,
+            "fp": 2,
+            "fn": 3,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "Agreement Date": {
+            "tp": 0,
+            "fp": 17,
+            "fn": 10,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "Anti-Assignment": {
+            "tp": 1,
+            "fp": 9,
+            "fn": 10,
+            "precision": 0.1,
+            "recall": 0.09090909090909091,
+            "f1": 0.09523809523809525
+          },
+          "Audit Rights": {
+            "tp": 0,
+            "fp": 10,
+            "fn": 8,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "Cap On Liability": {
+            "tp": 1,
+            "fp": 7,
+            "fn": 10,
+            "precision": 0.125,
+            "recall": 0.09090909090909091,
+            "f1": 0.10526315789473685
+          },
+          "Change Of Control": {
+            "tp": 0,
+            "fp": 4,
+            "fn": 4,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "Competitive Restriction Exception": {
+            "tp": 0,
+            "fp": 3,
+            "fn": 1,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "Covenant Not To Sue": {
+            "tp": 0,
+            "fp": 5,
+            "fn": 4,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "Document Name": {
+            "tp": 0,
+            "fp": 16,
+            "fn": 10,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "Effective Date": {
+            "tp": 0,
+            "fp": 19,
+            "fn": 9,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "Exclusivity": {
+            "tp": 0,
+            "fp": 6,
+            "fn": 7,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "Expiration Date": {
+            "tp": 1,
+            "fp": 11,
+            "fn": 10,
+            "precision": 0.08333333333333333,
+            "recall": 0.09090909090909091,
+            "f1": 0.08695652173913043
+          },
+          "Governing Law": {
+            "tp": 1,
+            "fp": 16,
+            "fn": 9,
+            "precision": 0.058823529411764705,
+            "recall": 0.1,
+            "f1": 0.07407407407407408
+          },
+          "Insurance": {
+            "tp": 0,
+            "fp": 5,
+            "fn": 9,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "Ip Ownership Assignment": {
+            "tp": 0,
+            "fp": 4,
+            "fn": 5,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "Irrevocable Or Perpetual License": {
+            "tp": 0,
+            "fp": 1,
+            "fn": 4,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "Joint Ip Ownership": {
+            "tp": 0,
+            "fp": 2,
+            "fn": 1,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "License Grant": {
+            "tp": 0,
+            "fp": 11,
+            "fn": 15,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "Liquidated Damages": {
+            "tp": 0,
+            "fp": 2,
+            "fn": 3,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "Minimum Commitment": {
+            "tp": 1,
+            "fp": 5,
+            "fn": 13,
+            "precision": 0.16666666666666666,
+            "recall": 0.07142857142857142,
+            "f1": 0.1
+          },
+          "Most Favored Nation": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 1,
+            "precision": 1,
+            "recall": 0,
+            "f1": 0
+          },
+          "No-Solicit Of Customers": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1,
+            "recall": 1,
+            "f1": 1
+          },
+          "No-Solicit Of Employees": {
+            "tp": 0,
+            "fp": 2,
+            "fn": 1,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "Non-Compete": {
+            "tp": 0,
+            "fp": 4,
+            "fn": 3,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "Non-Disparagement": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 1,
+            "precision": 1,
+            "recall": 0,
+            "f1": 0
+          },
+          "Non-Transferable License": {
+            "tp": 0,
+            "fp": 7,
+            "fn": 4,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "Notice Period To Terminate Renewal": {
+            "tp": 0,
+            "fp": 3,
+            "fn": 2,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "Parties": {
+            "tp": 0,
+            "fp": 20,
+            "fn": 11,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "Post-Termination Services": {
+            "tp": 0,
+            "fp": 13,
+            "fn": 12,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "Price Restrictions": {
+            "tp": 0,
+            "fp": 1,
+            "fn": 1,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "Renewal Term": {
+            "tp": 0,
+            "fp": 3,
+            "fn": 4,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "Revenue/Profit Sharing": {
+            "tp": 0,
+            "fp": 6,
+            "fn": 4,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "Rofr/Rofo/Rofn": {
+            "tp": 0,
+            "fp": 5,
+            "fn": 0,
+            "precision": 0,
+            "recall": 1,
+            "f1": 0
+          },
+          "Source Code Escrow": {
+            "tp": 0,
+            "fp": 1,
+            "fn": 0,
+            "precision": 0,
+            "recall": 1,
+            "f1": 0
+          },
+          "Termination For Convenience": {
+            "tp": 0,
+            "fp": 4,
+            "fn": 9,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "Third Party Beneficiary": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 1,
+            "precision": 1,
+            "recall": 0,
+            "f1": 0
+          },
+          "Uncapped Liability": {
+            "tp": 0,
+            "fp": 4,
+            "fn": 4,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "Unlimited/All-You-Can-Eat-License": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1,
+            "recall": 1,
+            "f1": 1
+          },
+          "Volume Restriction": {
+            "tp": 0,
+            "fp": 5,
+            "fn": 10,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "Warranty Duration": {
+            "tp": 0,
+            "fp": 4,
+            "fn": 0,
+            "precision": 0,
+            "recall": 1,
+            "f1": 0
+          }
+        }
+      },
+      "keywordTop1": {
+        "micro": {
+          "tp": 55,
+          "fp": 355,
+          "fn": 167,
+          "precision": 0.13414634146341464,
+          "recall": 0.24774774774774774,
+          "f1": 0.17405063291139242
+        },
+        "macroF1": 0.1521022914763004,
+        "byType": {
+          "Affiliate License-Licensee": {
+            "tp": 1,
+            "fp": 9,
+            "fn": 3,
+            "precision": 0.1,
+            "recall": 0.25,
+            "f1": 0.14285714285714288
+          },
+          "Affiliate License-Licensor": {
+            "tp": 2,
+            "fp": 8,
+            "fn": 1,
+            "precision": 0.2,
+            "recall": 0.6666666666666666,
+            "f1": 0.30769230769230765
+          },
+          "Agreement Date": {
+            "tp": 1,
+            "fp": 9,
+            "fn": 9,
+            "precision": 0.1,
+            "recall": 0.1,
+            "f1": 0.10000000000000002
+          },
+          "Anti-Assignment": {
+            "tp": 7,
+            "fp": 3,
+            "fn": 4,
+            "precision": 0.7,
+            "recall": 0.6363636363636364,
+            "f1": 0.6666666666666666
+          },
+          "Audit Rights": {
+            "tp": 3,
+            "fp": 7,
+            "fn": 5,
+            "precision": 0.3,
+            "recall": 0.375,
+            "f1": 0.33333333333333326
+          },
+          "Cap On Liability": {
+            "tp": 3,
+            "fp": 7,
+            "fn": 8,
+            "precision": 0.3,
+            "recall": 0.2727272727272727,
+            "f1": 0.28571428571428564
+          },
+          "Change Of Control": {
+            "tp": 2,
+            "fp": 8,
+            "fn": 2,
+            "precision": 0.2,
+            "recall": 0.5,
+            "f1": 0.28571428571428575
+          },
+          "Competitive Restriction Exception": {
+            "tp": 0,
+            "fp": 10,
+            "fn": 1,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "Covenant Not To Sue": {
+            "tp": 1,
+            "fp": 9,
+            "fn": 3,
+            "precision": 0.1,
+            "recall": 0.25,
+            "f1": 0.14285714285714288
+          },
+          "Document Name": {
+            "tp": 0,
+            "fp": 10,
+            "fn": 10,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "Effective Date": {
+            "tp": 1,
+            "fp": 9,
+            "fn": 8,
+            "precision": 0.1,
+            "recall": 0.1111111111111111,
+            "f1": 0.10526315789473685
+          },
+          "Exclusivity": {
+            "tp": 1,
+            "fp": 9,
+            "fn": 6,
+            "precision": 0.1,
+            "recall": 0.14285714285714285,
+            "f1": 0.11764705882352941
+          },
+          "Expiration Date": {
+            "tp": 4,
+            "fp": 6,
+            "fn": 7,
+            "precision": 0.4,
+            "recall": 0.36363636363636365,
+            "f1": 0.380952380952381
+          },
+          "Governing Law": {
+            "tp": 9,
+            "fp": 1,
+            "fn": 1,
+            "precision": 0.9,
+            "recall": 0.9,
+            "f1": 0.9
+          },
+          "Insurance": {
+            "tp": 2,
+            "fp": 8,
+            "fn": 7,
+            "precision": 0.2,
+            "recall": 0.2222222222222222,
+            "f1": 0.2105263157894737
+          },
+          "Ip Ownership Assignment": {
+            "tp": 0,
+            "fp": 10,
+            "fn": 5,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "Irrevocable Or Perpetual License": {
+            "tp": 1,
+            "fp": 9,
+            "fn": 3,
+            "precision": 0.1,
+            "recall": 0.25,
+            "f1": 0.14285714285714288
+          },
+          "Joint Ip Ownership": {
+            "tp": 0,
+            "fp": 10,
+            "fn": 1,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "License Grant": {
+            "tp": 3,
+            "fp": 7,
+            "fn": 12,
+            "precision": 0.3,
+            "recall": 0.2,
+            "f1": 0.24
+          },
+          "Liquidated Damages": {
+            "tp": 1,
+            "fp": 9,
+            "fn": 2,
+            "precision": 0.1,
+            "recall": 0.3333333333333333,
+            "f1": 0.15384615384615383
+          },
+          "Minimum Commitment": {
+            "tp": 3,
+            "fp": 7,
+            "fn": 11,
+            "precision": 0.3,
+            "recall": 0.21428571428571427,
+            "f1": 0.25
+          },
+          "Most Favored Nation": {
+            "tp": 0,
+            "fp": 10,
+            "fn": 1,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "No-Solicit Of Customers": {
+            "tp": 0,
+            "fp": 10,
+            "fn": 0,
+            "precision": 0,
+            "recall": 1,
+            "f1": 0
+          },
+          "No-Solicit Of Employees": {
+            "tp": 1,
+            "fp": 9,
+            "fn": 0,
+            "precision": 0.1,
+            "recall": 1,
+            "f1": 0.18181818181818182
+          },
+          "Non-Compete": {
+            "tp": 0,
+            "fp": 10,
+            "fn": 3,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "Non-Disparagement": {
+            "tp": 1,
+            "fp": 9,
+            "fn": 0,
+            "precision": 0.1,
+            "recall": 1,
+            "f1": 0.18181818181818182
+          },
+          "Non-Transferable License": {
+            "tp": 2,
+            "fp": 8,
+            "fn": 2,
+            "precision": 0.2,
+            "recall": 0.5,
+            "f1": 0.28571428571428575
+          },
+          "Notice Period To Terminate Renewal": {
+            "tp": 0,
+            "fp": 10,
+            "fn": 2,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "Parties": {
+            "tp": 0,
+            "fp": 10,
+            "fn": 11,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "Post-Termination Services": {
+            "tp": 0,
+            "fp": 10,
+            "fn": 12,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "Price Restrictions": {
+            "tp": 0,
+            "fp": 10,
+            "fn": 1,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "Renewal Term": {
+            "tp": 2,
+            "fp": 8,
+            "fn": 2,
+            "precision": 0.2,
+            "recall": 0.5,
+            "f1": 0.28571428571428575
+          },
+          "Revenue/Profit Sharing": {
+            "tp": 0,
+            "fp": 10,
+            "fn": 4,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "Rofr/Rofo/Rofn": {
+            "tp": 0,
+            "fp": 10,
+            "fn": 0,
+            "precision": 0,
+            "recall": 1,
+            "f1": 0
+          },
+          "Source Code Escrow": {
+            "tp": 0,
+            "fp": 10,
+            "fn": 0,
+            "precision": 0,
+            "recall": 1,
+            "f1": 0
+          },
+          "Termination For Convenience": {
+            "tp": 2,
+            "fp": 8,
+            "fn": 7,
+            "precision": 0.2,
+            "recall": 0.2222222222222222,
+            "f1": 0.2105263157894737
+          },
+          "Third Party Beneficiary": {
+            "tp": 1,
+            "fp": 9,
+            "fn": 0,
+            "precision": 0.1,
+            "recall": 1,
+            "f1": 0.18181818181818182
+          },
+          "Uncapped Liability": {
+            "tp": 1,
+            "fp": 9,
+            "fn": 3,
+            "precision": 0.1,
+            "recall": 0.25,
+            "f1": 0.14285714285714288
+          },
+          "Unlimited/All-You-Can-Eat-License": {
+            "tp": 0,
+            "fp": 10,
+            "fn": 0,
+            "precision": 0,
+            "recall": 1,
+            "f1": 0
+          },
+          "Volume Restriction": {
+            "tp": 0,
+            "fp": 10,
+            "fn": 10,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "Warranty Duration": {
+            "tp": 0,
+            "fp": 10,
+            "fn": 0,
+            "precision": 0,
+            "recall": 1,
+            "f1": 0
+          }
+        }
+      }
+    },
+    "subset20": {
+      "allTypes": {
+        "micro": {
+          "tp": 438,
+          "fp": 37446,
+          "fn": 0,
+          "precision": 0.011561609122584733,
+          "recall": 1,
+          "f1": 0.022858932206043528
+        },
+        "macroF1": 0.02271203602898287,
+        "byType": {
+          "Affiliate License-Licensee": {
+            "tp": 4,
+            "fp": 920,
+            "fn": 0,
+            "precision": 0.004329004329004329,
+            "recall": 1,
+            "f1": 0.008620689655172414
+          },
+          "Affiliate License-Licensor": {
+            "tp": 3,
+            "fp": 921,
+            "fn": 0,
+            "precision": 0.003246753246753247,
+            "recall": 1,
+            "f1": 0.006472491909385114
+          },
+          "Agreement Date": {
+            "tp": 17,
+            "fp": 907,
+            "fn": 0,
+            "precision": 0.0183982683982684,
+            "recall": 1,
+            "f1": 0.036131774707757705
+          },
+          "Anti-Assignment": {
+            "tp": 19,
+            "fp": 905,
+            "fn": 0,
+            "precision": 0.020562770562770564,
+            "recall": 1,
+            "f1": 0.040296924708377514
+          },
+          "Audit Rights": {
+            "tp": 25,
+            "fp": 899,
+            "fn": 0,
+            "precision": 0.027056277056277056,
+            "recall": 1,
+            "f1": 0.05268703898840885
+          },
+          "Cap On Liability": {
+            "tp": 17,
+            "fp": 907,
+            "fn": 0,
+            "precision": 0.0183982683982684,
+            "recall": 1,
+            "f1": 0.036131774707757705
+          },
+          "Change Of Control": {
+            "tp": 10,
+            "fp": 914,
+            "fn": 0,
+            "precision": 0.010822510822510822,
+            "recall": 1,
+            "f1": 0.021413276231263382
+          },
+          "Competitive Restriction Exception": {
+            "tp": 5,
+            "fp": 919,
+            "fn": 0,
+            "precision": 0.005411255411255411,
+            "recall": 1,
+            "f1": 0.010764262648008612
+          },
+          "Covenant Not To Sue": {
+            "tp": 12,
+            "fp": 912,
+            "fn": 0,
+            "precision": 0.012987012987012988,
+            "recall": 1,
+            "f1": 0.025641025641025647
+          },
+          "Document Name": {
+            "tp": 20,
+            "fp": 904,
+            "fn": 0,
+            "precision": 0.021645021645021644,
+            "recall": 1,
+            "f1": 0.0423728813559322
+          },
+          "Effective Date": {
+            "tp": 18,
+            "fp": 906,
+            "fn": 0,
+            "precision": 0.01948051948051948,
+            "recall": 1,
+            "f1": 0.03821656050955414
+          },
+          "Exclusivity": {
+            "tp": 13,
+            "fp": 911,
+            "fn": 0,
+            "precision": 0.01406926406926407,
+            "recall": 1,
+            "f1": 0.02774813233724653
+          },
+          "Expiration Date": {
+            "tp": 21,
+            "fp": 903,
+            "fn": 0,
+            "precision": 0.022727272727272728,
+            "recall": 1,
+            "f1": 0.044444444444444446
+          },
+          "Governing Law": {
+            "tp": 17,
+            "fp": 907,
+            "fn": 0,
+            "precision": 0.0183982683982684,
+            "recall": 1,
+            "f1": 0.036131774707757705
+          },
+          "Insurance": {
+            "tp": 20,
+            "fp": 904,
+            "fn": 0,
+            "precision": 0.021645021645021644,
+            "recall": 1,
+            "f1": 0.0423728813559322
+          },
+          "Ip Ownership Assignment": {
+            "tp": 11,
+            "fp": 913,
+            "fn": 0,
+            "precision": 0.011904761904761904,
+            "recall": 1,
+            "f1": 0.023529411764705882
+          },
+          "Irrevocable Or Perpetual License": {
+            "tp": 4,
+            "fp": 920,
+            "fn": 0,
+            "precision": 0.004329004329004329,
+            "recall": 1,
+            "f1": 0.008620689655172414
+          },
+          "Joint Ip Ownership": {
+            "tp": 3,
+            "fp": 921,
+            "fn": 0,
+            "precision": 0.003246753246753247,
+            "recall": 1,
+            "f1": 0.006472491909385114
+          },
+          "License Grant": {
+            "tp": 28,
+            "fp": 896,
+            "fn": 0,
+            "precision": 0.030303030303030304,
+            "recall": 1,
+            "f1": 0.05882352941176471
+          },
+          "Liquidated Damages": {
+            "tp": 7,
+            "fp": 917,
+            "fn": 0,
+            "precision": 0.007575757575757576,
+            "recall": 1,
+            "f1": 0.015037593984962407
+          },
+          "Minimum Commitment": {
+            "tp": 21,
+            "fp": 903,
+            "fn": 0,
+            "precision": 0.022727272727272728,
+            "recall": 1,
+            "f1": 0.044444444444444446
+          },
+          "Most Favored Nation": {
+            "tp": 1,
+            "fp": 923,
+            "fn": 0,
+            "precision": 0.0010822510822510823,
+            "recall": 1,
+            "f1": 0.002162162162162162
+          },
+          "No-Solicit Of Customers": {
+            "tp": 1,
+            "fp": 923,
+            "fn": 0,
+            "precision": 0.0010822510822510823,
+            "recall": 1,
+            "f1": 0.002162162162162162
+          },
+          "No-Solicit Of Employees": {
+            "tp": 4,
+            "fp": 920,
+            "fn": 0,
+            "precision": 0.004329004329004329,
+            "recall": 1,
+            "f1": 0.008620689655172414
+          },
+          "Non-Compete": {
+            "tp": 11,
+            "fp": 913,
+            "fn": 0,
+            "precision": 0.011904761904761904,
+            "recall": 1,
+            "f1": 0.023529411764705882
+          },
+          "Non-Disparagement": {
+            "tp": 4,
+            "fp": 920,
+            "fn": 0,
+            "precision": 0.004329004329004329,
+            "recall": 1,
+            "f1": 0.008620689655172414
+          },
+          "Non-Transferable License": {
+            "tp": 10,
+            "fp": 914,
+            "fn": 0,
+            "precision": 0.010822510822510822,
+            "recall": 1,
+            "f1": 0.021413276231263382
+          },
+          "Notice Period To Terminate Renewal": {
+            "tp": 3,
+            "fp": 921,
+            "fn": 0,
+            "precision": 0.003246753246753247,
+            "recall": 1,
+            "f1": 0.006472491909385114
+          },
+          "Parties": {
+            "tp": 27,
+            "fp": 897,
+            "fn": 0,
+            "precision": 0.02922077922077922,
+            "recall": 1,
+            "f1": 0.05678233438485804
+          },
+          "Post-Termination Services": {
+            "tp": 21,
+            "fp": 903,
+            "fn": 0,
+            "precision": 0.022727272727272728,
+            "recall": 1,
+            "f1": 0.044444444444444446
+          },
+          "Price Restrictions": {
+            "tp": 2,
+            "fp": 922,
+            "fn": 0,
+            "precision": 0.0021645021645021645,
+            "recall": 1,
+            "f1": 0.004319654427645788
+          },
+          "Renewal Term": {
+            "tp": 7,
+            "fp": 917,
+            "fn": 0,
+            "precision": 0.007575757575757576,
+            "recall": 1,
+            "f1": 0.015037593984962407
+          },
+          "Revenue/Profit Sharing": {
+            "tp": 13,
+            "fp": 911,
+            "fn": 0,
+            "precision": 0.01406926406926407,
+            "recall": 1,
+            "f1": 0.02774813233724653
+          },
+          "Rofr/Rofo/Rofn": {
+            "tp": 7,
+            "fp": 917,
+            "fn": 0,
+            "precision": 0.007575757575757576,
+            "recall": 1,
+            "f1": 0.015037593984962407
+          },
+          "Source Code Escrow": {
+            "tp": 0,
+            "fp": 924,
+            "fn": 0,
+            "precision": 0,
+            "recall": 1,
+            "f1": 0
+          },
+          "Termination For Convenience": {
+            "tp": 11,
+            "fp": 913,
+            "fn": 0,
+            "precision": 0.011904761904761904,
+            "recall": 1,
+            "f1": 0.023529411764705882
+          },
+          "Third Party Beneficiary": {
+            "tp": 1,
+            "fp": 923,
+            "fn": 0,
+            "precision": 0.0010822510822510823,
+            "recall": 1,
+            "f1": 0.002162162162162162
+          },
+          "Uncapped Liability": {
+            "tp": 5,
+            "fp": 919,
+            "fn": 0,
+            "precision": 0.005411255411255411,
+            "recall": 1,
+            "f1": 0.010764262648008612
+          },
+          "Unlimited/All-You-Can-Eat-License": {
+            "tp": 0,
+            "fp": 924,
+            "fn": 0,
+            "precision": 0,
+            "recall": 1,
+            "f1": 0
+          },
+          "Volume Restriction": {
+            "tp": 14,
+            "fp": 910,
+            "fn": 0,
+            "precision": 0.015151515151515152,
+            "recall": 1,
+            "f1": 0.02985074626865672
+          },
+          "Warranty Duration": {
+            "tp": 1,
+            "fp": 923,
+            "fn": 0,
+            "precision": 0.0010822510822510823,
+            "recall": 1,
+            "f1": 0.002162162162162162
+          }
+        }
+      },
+      "prior": {
+        "micro": {
+          "tp": 6,
+          "fp": 461,
+          "fn": 432,
+          "precision": 0.01284796573875803,
+          "recall": 0.0136986301369863,
+          "f1": 0.013259668508287291
+        },
+        "macroF1": 0.007227969887853608,
+        "byType": {
+          "Affiliate License-Licensee": {
+            "tp": 0,
+            "fp": 5,
+            "fn": 4,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "Affiliate License-Licensor": {
+            "tp": 0,
+            "fp": 2,
+            "fn": 3,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "Agreement Date": {
+            "tp": 0,
+            "fp": 31,
+            "fn": 17,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "Anti-Assignment": {
+            "tp": 1,
+            "fp": 19,
+            "fn": 18,
+            "precision": 0.05,
+            "recall": 0.05263157894736842,
+            "f1": 0.05128205128205128
+          },
+          "Audit Rights": {
+            "tp": 0,
+            "fp": 27,
+            "fn": 25,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "Cap On Liability": {
+            "tp": 1,
+            "fp": 19,
+            "fn": 16,
+            "precision": 0.05,
+            "recall": 0.058823529411764705,
+            "f1": 0.05405405405405405
+          },
+          "Change Of Control": {
+            "tp": 0,
+            "fp": 6,
+            "fn": 10,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "Competitive Restriction Exception": {
+            "tp": 0,
+            "fp": 3,
+            "fn": 5,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "Covenant Not To Sue": {
+            "tp": 0,
+            "fp": 10,
+            "fn": 12,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "Document Name": {
+            "tp": 0,
+            "fp": 23,
+            "fn": 20,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "Effective Date": {
+            "tp": 1,
+            "fp": 33,
+            "fn": 17,
+            "precision": 0.029411764705882353,
+            "recall": 0.05555555555555555,
+            "f1": 0.03846153846153846
+          },
+          "Exclusivity": {
+            "tp": 0,
+            "fp": 14,
+            "fn": 13,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "Expiration Date": {
+            "tp": 1,
+            "fp": 26,
+            "fn": 20,
+            "precision": 0.037037037037037035,
+            "recall": 0.047619047619047616,
+            "f1": 0.041666666666666664
+          },
+          "Governing Law": {
+            "tp": 1,
+            "fp": 25,
+            "fn": 16,
+            "precision": 0.038461538461538464,
+            "recall": 0.058823529411764705,
+            "f1": 0.04651162790697675
+          },
+          "Insurance": {
+            "tp": 0,
+            "fp": 7,
+            "fn": 20,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "Ip Ownership Assignment": {
+            "tp": 0,
+            "fp": 12,
+            "fn": 11,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "Irrevocable Or Perpetual License": {
+            "tp": 0,
+            "fp": 5,
+            "fn": 4,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "Joint Ip Ownership": {
+            "tp": 0,
+            "fp": 7,
+            "fn": 3,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "License Grant": {
+            "tp": 0,
+            "fp": 22,
+            "fn": 28,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "Liquidated Damages": {
+            "tp": 0,
+            "fp": 3,
+            "fn": 7,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "Minimum Commitment": {
+            "tp": 1,
+            "fp": 13,
+            "fn": 20,
+            "precision": 0.07142857142857142,
+            "recall": 0.047619047619047616,
+            "f1": 0.057142857142857134
+          },
+          "Most Favored Nation": {
+            "tp": 0,
+            "fp": 1,
+            "fn": 1,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "No-Solicit Of Customers": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 1,
+            "precision": 1,
+            "recall": 0,
+            "f1": 0
+          },
+          "No-Solicit Of Employees": {
+            "tp": 0,
+            "fp": 3,
+            "fn": 4,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "Non-Compete": {
+            "tp": 0,
+            "fp": 7,
+            "fn": 11,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "Non-Disparagement": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 4,
+            "precision": 1,
+            "recall": 0,
+            "f1": 0
+          },
+          "Non-Transferable License": {
+            "tp": 0,
+            "fp": 13,
+            "fn": 10,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "Notice Period To Terminate Renewal": {
+            "tp": 0,
+            "fp": 4,
+            "fn": 3,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "Parties": {
+            "tp": 0,
+            "fp": 37,
+            "fn": 27,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "Post-Termination Services": {
+            "tp": 0,
+            "fp": 19,
+            "fn": 21,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "Price Restrictions": {
+            "tp": 0,
+            "fp": 1,
+            "fn": 2,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "Renewal Term": {
+            "tp": 0,
+            "fp": 7,
+            "fn": 7,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "Revenue/Profit Sharing": {
+            "tp": 0,
+            "fp": 12,
+            "fn": 13,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "Rofr/Rofo/Rofn": {
+            "tp": 0,
+            "fp": 9,
+            "fn": 7,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "Source Code Escrow": {
+            "tp": 0,
+            "fp": 3,
+            "fn": 0,
+            "precision": 0,
+            "recall": 1,
+            "f1": 0
+          },
+          "Termination For Convenience": {
+            "tp": 0,
+            "fp": 8,
+            "fn": 11,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "Third Party Beneficiary": {
+            "tp": 0,
+            "fp": 1,
+            "fn": 1,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "Uncapped Liability": {
+            "tp": 0,
+            "fp": 7,
+            "fn": 5,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "Unlimited/All-You-Can-Eat-License": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1,
+            "recall": 1,
+            "f1": 1
+          },
+          "Volume Restriction": {
+            "tp": 0,
+            "fp": 7,
+            "fn": 14,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "Warranty Duration": {
+            "tp": 0,
+            "fp": 10,
+            "fn": 1,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          }
+        }
+      },
+      "keywordTop1": {
+        "micro": {
+          "tp": 127,
+          "fp": 693,
+          "fn": 311,
+          "precision": 0.1548780487804878,
+          "recall": 0.2899543378995434,
+          "f1": 0.20190779014308424
+        },
+        "macroF1": 0.18104025965124335,
+        "byType": {
+          "Affiliate License-Licensee": {
+            "tp": 1,
+            "fp": 19,
+            "fn": 3,
+            "precision": 0.05,
+            "recall": 0.25,
+            "f1": 0.08333333333333334
+          },
+          "Affiliate License-Licensor": {
+            "tp": 1,
+            "fp": 19,
+            "fn": 2,
+            "precision": 0.05,
+            "recall": 0.3333333333333333,
+            "f1": 0.08695652173913045
+          },
+          "Agreement Date": {
+            "tp": 2,
+            "fp": 18,
+            "fn": 15,
+            "precision": 0.1,
+            "recall": 0.11764705882352941,
+            "f1": 0.1081081081081081
+          },
+          "Anti-Assignment": {
+            "tp": 12,
+            "fp": 8,
+            "fn": 7,
+            "precision": 0.6,
+            "recall": 0.631578947368421,
+            "f1": 0.6153846153846154
+          },
+          "Audit Rights": {
+            "tp": 7,
+            "fp": 13,
+            "fn": 18,
+            "precision": 0.35,
+            "recall": 0.28,
+            "f1": 0.3111111111111111
+          },
+          "Cap On Liability": {
+            "tp": 6,
+            "fp": 14,
+            "fn": 11,
+            "precision": 0.3,
+            "recall": 0.35294117647058826,
+            "f1": 0.3243243243243243
+          },
+          "Change Of Control": {
+            "tp": 5,
+            "fp": 15,
+            "fn": 5,
+            "precision": 0.25,
+            "recall": 0.5,
+            "f1": 0.3333333333333333
+          },
+          "Competitive Restriction Exception": {
+            "tp": 2,
+            "fp": 18,
+            "fn": 3,
+            "precision": 0.1,
+            "recall": 0.4,
+            "f1": 0.16000000000000003
+          },
+          "Covenant Not To Sue": {
+            "tp": 3,
+            "fp": 17,
+            "fn": 9,
+            "precision": 0.15,
+            "recall": 0.25,
+            "f1": 0.18749999999999997
+          },
+          "Document Name": {
+            "tp": 1,
+            "fp": 19,
+            "fn": 19,
+            "precision": 0.05,
+            "recall": 0.05,
+            "f1": 0.05000000000000001
+          },
+          "Effective Date": {
+            "tp": 4,
+            "fp": 16,
+            "fn": 14,
+            "precision": 0.2,
+            "recall": 0.2222222222222222,
+            "f1": 0.2105263157894737
+          },
+          "Exclusivity": {
+            "tp": 2,
+            "fp": 18,
+            "fn": 11,
+            "precision": 0.1,
+            "recall": 0.15384615384615385,
+            "f1": 0.12121212121212123
+          },
+          "Expiration Date": {
+            "tp": 7,
+            "fp": 13,
+            "fn": 14,
+            "precision": 0.35,
+            "recall": 0.3333333333333333,
+            "f1": 0.3414634146341463
+          },
+          "Governing Law": {
+            "tp": 13,
+            "fp": 7,
+            "fn": 4,
+            "precision": 0.65,
+            "recall": 0.7647058823529411,
+            "f1": 0.7027027027027027
+          },
+          "Insurance": {
+            "tp": 7,
+            "fp": 13,
+            "fn": 13,
+            "precision": 0.35,
+            "recall": 0.35,
+            "f1": 0.35
+          },
+          "Ip Ownership Assignment": {
+            "tp": 2,
+            "fp": 18,
+            "fn": 9,
+            "precision": 0.1,
+            "recall": 0.18181818181818182,
+            "f1": 0.12903225806451613
+          },
+          "Irrevocable Or Perpetual License": {
+            "tp": 1,
+            "fp": 19,
+            "fn": 3,
+            "precision": 0.05,
+            "recall": 0.25,
+            "f1": 0.08333333333333334
+          },
+          "Joint Ip Ownership": {
+            "tp": 1,
+            "fp": 19,
+            "fn": 2,
+            "precision": 0.05,
+            "recall": 0.3333333333333333,
+            "f1": 0.08695652173913045
+          },
+          "License Grant": {
+            "tp": 9,
+            "fp": 11,
+            "fn": 19,
+            "precision": 0.45,
+            "recall": 0.32142857142857145,
+            "f1": 0.375
+          },
+          "Liquidated Damages": {
+            "tp": 2,
+            "fp": 18,
+            "fn": 5,
+            "precision": 0.1,
+            "recall": 0.2857142857142857,
+            "f1": 0.14814814814814817
+          },
+          "Minimum Commitment": {
+            "tp": 5,
+            "fp": 15,
+            "fn": 16,
+            "precision": 0.25,
+            "recall": 0.23809523809523808,
+            "f1": 0.24390243902439024
+          },
+          "Most Favored Nation": {
+            "tp": 0,
+            "fp": 20,
+            "fn": 1,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "No-Solicit Of Customers": {
+            "tp": 1,
+            "fp": 19,
+            "fn": 0,
+            "precision": 0.05,
+            "recall": 1,
+            "f1": 0.09523809523809523
+          },
+          "No-Solicit Of Employees": {
+            "tp": 3,
+            "fp": 17,
+            "fn": 1,
+            "precision": 0.15,
+            "recall": 0.75,
+            "f1": 0.24999999999999997
+          },
+          "Non-Compete": {
+            "tp": 2,
+            "fp": 18,
+            "fn": 9,
+            "precision": 0.1,
+            "recall": 0.18181818181818182,
+            "f1": 0.12903225806451613
+          },
+          "Non-Disparagement": {
+            "tp": 2,
+            "fp": 18,
+            "fn": 2,
+            "precision": 0.1,
+            "recall": 0.5,
+            "f1": 0.16666666666666669
+          },
+          "Non-Transferable License": {
+            "tp": 4,
+            "fp": 16,
+            "fn": 6,
+            "precision": 0.2,
+            "recall": 0.4,
+            "f1": 0.26666666666666666
+          },
+          "Notice Period To Terminate Renewal": {
+            "tp": 1,
+            "fp": 19,
+            "fn": 2,
+            "precision": 0.05,
+            "recall": 0.3333333333333333,
+            "f1": 0.08695652173913045
+          },
+          "Parties": {
+            "tp": 3,
+            "fp": 17,
+            "fn": 24,
+            "precision": 0.15,
+            "recall": 0.1111111111111111,
+            "f1": 0.12765957446808512
+          },
+          "Post-Termination Services": {
+            "tp": 2,
+            "fp": 18,
+            "fn": 19,
+            "precision": 0.1,
+            "recall": 0.09523809523809523,
+            "f1": 0.0975609756097561
+          },
+          "Price Restrictions": {
+            "tp": 1,
+            "fp": 19,
+            "fn": 1,
+            "precision": 0.05,
+            "recall": 0.5,
+            "f1": 0.09090909090909091
+          },
+          "Renewal Term": {
+            "tp": 6,
+            "fp": 14,
+            "fn": 1,
+            "precision": 0.3,
+            "recall": 0.8571428571428571,
+            "f1": 0.4444444444444444
+          },
+          "Revenue/Profit Sharing": {
+            "tp": 1,
+            "fp": 19,
+            "fn": 12,
+            "precision": 0.05,
+            "recall": 0.07692307692307693,
+            "f1": 0.060606060606060615
+          },
+          "Rofr/Rofo/Rofn": {
+            "tp": 2,
+            "fp": 18,
+            "fn": 5,
+            "precision": 0.1,
+            "recall": 0.2857142857142857,
+            "f1": 0.14814814814814817
+          },
+          "Source Code Escrow": {
+            "tp": 0,
+            "fp": 20,
+            "fn": 0,
+            "precision": 0,
+            "recall": 1,
+            "f1": 0
+          },
+          "Termination For Convenience": {
+            "tp": 3,
+            "fp": 17,
+            "fn": 8,
+            "precision": 0.15,
+            "recall": 0.2727272727272727,
+            "f1": 0.19354838709677416
+          },
+          "Third Party Beneficiary": {
+            "tp": 1,
+            "fp": 19,
+            "fn": 0,
+            "precision": 0.05,
+            "recall": 1,
+            "f1": 0.09523809523809523
+          },
+          "Uncapped Liability": {
+            "tp": 0,
+            "fp": 20,
+            "fn": 5,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "Unlimited/All-You-Can-Eat-License": {
+            "tp": 0,
+            "fp": 20,
+            "fn": 0,
+            "precision": 0,
+            "recall": 1,
+            "f1": 0
+          },
+          "Volume Restriction": {
+            "tp": 2,
+            "fp": 18,
+            "fn": 12,
+            "precision": 0.1,
+            "recall": 0.14285714285714285,
+            "f1": 0.11764705882352941
+          },
+          "Warranty Duration": {
+            "tp": 0,
+            "fp": 20,
+            "fn": 1,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          }
+        }
+      }
+    }
+  }
+}

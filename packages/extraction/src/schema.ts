@@ -20,17 +20,36 @@ export const RISK_FLAGS = [
 
 const shortText = (max: number) => z.string().trim().min(1).max(max);
 
+/**
+ * A list of details where each item must pass `item`. Items that do not are DROPPED, not
+ * repaired, and the list is cut to `max`; anything that is not a list becomes []. Type and
+ * quote are the clause; details are extras. Found in step 4: llama3.2 left `action` out of
+ * obligations, and rejecting the whole clause for it threw away 3 of its 39 entries (30 more
+ * had an empty quote, rightly rejected). Dropping is as safe as rejecting: nothing outside the
+ * form ever gets through.
+ */
+const details = <T extends z.ZodType>(item: T, max: number) =>
+  z
+    .unknown()
+    .default([])
+    .transform((value): z.output<T>[] =>
+      (Array.isArray(value) ? value : []).flatMap((v: unknown) => {
+        const parsed = item.safeParse(v);
+        return parsed.success ? [parsed.data] : [];
+      }),
+    )
+    .transform((list) => list.slice(0, max));
+
 export const ExtractedClause = z.object({
   clauseType: z.enum(CLAUSE_TYPE_NAMES),
   // Not trimmed: the quote must match the chunk character for character.
   quote: z.string().min(1).max(MAX_QUOTE_CHARS),
-  parties: z.array(shortText(200)).max(6).default([]),
-  obligations: z
-    .array(z.object({ party: shortText(200), action: shortText(300) }))
-    .max(5)
-    .default([]),
-  dates: z.array(shortText(100)).max(5).default([]),
-  riskFlags: z.array(z.enum(RISK_FLAGS)).max(RISK_FLAGS.length).default([]),
+  parties: details(shortText(200), 6),
+  obligations: details(z.object({ party: shortText(200), action: shortText(300) }), 5),
+  dates: details(shortText(100), 5),
+  riskFlags: details(z.enum(RISK_FLAGS), RISK_FLAGS.length).transform((flags) => [
+    ...new Set(flags),
+  ]),
 });
 export type ExtractedClause = z.infer<typeof ExtractedClause>;
 

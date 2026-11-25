@@ -9,6 +9,7 @@ import {
   type ExtractionChunk,
   type ExtractionDoc,
 } from "./dataset";
+import { parseWait } from "./models";
 import { checkQuote, occurrences, scoreChunk, TypeTally } from "./score";
 import { CLAUSE_TYPES } from "@lexguard/extraction";
 
@@ -196,6 +197,18 @@ describe("dataset", () => {
   });
 });
 
+describe("rate-limit waits", () => {
+  it("reads Groq reset values and retry-after seconds", () => {
+    expect(parseWait("7.66s")).toBeCloseTo(7_660);
+    expect(parseWait("2m59.5s")).toBeCloseTo(179_500);
+    expect(parseWait("120ms")).toBe(120);
+    expect(parseWait("1h")).toBe(3_600_000);
+    expect(parseWait("12")).toBe(12_000);
+    expect(parseWait(null)).toBeNull();
+    expect(parseWait("soon")).toBeNull();
+  });
+});
+
 describe("baselines", () => {
   const doc: ExtractionDoc = {
     title: "T",
@@ -246,6 +259,11 @@ function evaluate(docs: readonly ExtractionDoc[], predictions: Predictions, type
   return tally.report();
 }
 
+// The full 510-contract run makes 20,910 keyword searches (3-10 minutes on a laptop): too
+// slow for every `npm test`, so it runs on purpose (npm run baselines:cuad, which sets
+// EXTRACTION_FULL=1). The normal run scores the two pinned subsets the models are run on.
+const FULL = process.env.EXTRACTION_FULL === "1";
+
 describe.skipIf(!cuadAvailable())("CUAD extraction baselines", () => {
   type Report = ReturnType<typeof evaluate>;
   const results: Record<string, Record<string, Report>> = {};
@@ -255,7 +273,7 @@ describe.skipIf(!cuadAvailable())("CUAD extraction baselines", () => {
     const types = [...queries.keys()].sort();
     const full = extractionCorpus(loadCuad());
     const sets: Record<string, ExtractionDoc[]> = {
-      all: full,
+      ...(FULL ? { all: full } : {}),
       subset10: pinnedSubset(full, 10),
       subset20: pinnedSubset(full, 20),
     };
@@ -275,7 +293,12 @@ describe.skipIf(!cuadAvailable())("CUAD extraction baselines", () => {
       characters: docs.reduce((n, d) => n + d.text.length, 0),
     });
     writeFileSync(
-      new URL("../results/cuad-extraction-baselines.json", import.meta.url),
+      new URL(
+        FULL
+          ? "../results/cuad-extraction-baselines.json"
+          : "../results/cuad-extraction-baselines-subsets.json",
+        import.meta.url,
+      ),
       `${JSON.stringify(
         {
           sizes: Object.fromEntries(Object.entries(sets).map(([k, v]) => [k, size(v)])),
@@ -298,13 +321,15 @@ describe.skipIf(!cuadAvailable())("CUAD extraction baselines", () => {
   });
 
   it("all-types reaches recall 1 with low precision", () => {
-    expect(results["all"]?.["allTypes"]?.micro.recall).toBe(1);
-    expect(results["all"]?.["allTypes"]?.micro.precision).toBeLessThan(0.05);
+    const set = FULL ? "all" : "subset10";
+    expect(results[set]?.["allTypes"]?.micro.recall).toBe(1);
+    expect(results[set]?.["allTypes"]?.micro.precision).toBeLessThan(0.05);
   });
 
   it("keyword search beats guessing by frequency", () => {
-    const keyword = results["all"]?.["keywordTop1"]?.micro.f1 ?? 0;
-    const guess = results["all"]?.["prior"]?.micro.f1 ?? 1;
+    const set = FULL ? "all" : "subset10";
+    const keyword = results[set]?.["keywordTop1"]?.micro.f1 ?? 0;
+    const guess = results[set]?.["prior"]?.micro.f1 ?? 1;
     expect(keyword).toBeGreaterThan(guess);
   });
 });

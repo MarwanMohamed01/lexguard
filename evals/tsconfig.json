@@ -4,5 +4,14 @@
     // Evals run on your machine and in CI under Node, never inside a Worker.
     "types": ["node"]
   },
-  "include": ["shared", "gretel", "cuad", "retrieval", "extraction", "vitest.embed.config.ts"]
+  "include": [
+    "shared",
+    "gretel",
+    "cuad",
+    "retrieval",
+    "extraction",
+    "vitest.embed.config.ts",
+    "vitest.extract.config.ts",
+    "vitest.baselines.config.ts"
+  ]
 }

@@ -23,6 +23,8 @@
     "fetch:gretel": "node gretel/fetch.mjs",
     "fetch:cuad": "node cuad/fetch.mjs",
     "fetch:cuad-pdfs": "node cuad/fetch-pdfs.mjs",
-    "embed:cuad": "vitest run --config vitest.embed.config.ts"
+    "embed:cuad": "vitest run --config vitest.embed.config.ts",
+    "extract:cuad": "vitest run --config vitest.extract.config.ts",
+    "baselines:cuad": "vitest run --config vitest.baselines.config.ts"
   }
 }
