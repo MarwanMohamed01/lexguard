@@ -20,12 +20,13 @@ _Last updated: 2026-11-25._
 | M8 A2A & observability               | Not started                                     |
 | M9 Evals in CI & write-up            | Not started                                     |
 
-Deployed Worker: https://lexguard.marwan-dev.workers.dev, version `201237a6` (M2 ingestion +
-M3 indexing and search: upload, status, chunking and indexing Workflows,
-`POST /v1/documents/:id/search`; smoke test `scripts/smoke.mjs`, D23/D32). Cloudflare
-resources: D1 `lexguard` (migrations 0001-0006 applied remotely), Vectorize index
-`lexguard-chunks` (1,024 dims, cosine, metadata index `doc`), Workers AI, Workflows
-`lexguard-chunk-document` and `lexguard-index-document`, secret `TENANT_KEYS`. Repo:
+Deployed Worker: https://lexguard.marwan-dev.workers.dev, version `ce4c803b` (2026-11-25:
+M2 ingestion + M3 indexing and search + M4 extraction: upload, status, chunking, indexing
+and extraction Workflows, `POST /v1/documents/:id/search`, `POST .../extract`,
+`GET .../clauses`; smoke test `scripts/smoke.mjs`, D23/D32/D41). Cloudflare resources: D1
+`lexguard` (migrations 0001-0007 applied remotely), Vectorize index `lexguard-chunks` (1,024
+dims, cosine, metadata index `doc`), Workers AI, Workflows `lexguard-chunk-document`,
+`lexguard-index-document` and `lexguard-extract-document`, secret `TENANT_KEYS`. Repo:
 https://github.com/MarwanMohamed01/lexguard (public).
 
 ## Open items (carry into M4)
@@ -79,8 +80,10 @@ only, document text marked as data, T1/T2); every quote is checked by code again
    - ✅ Injection test (D41): BIPIA's 75 public attacks planted in real CUAD chunks, Groq
      gpt-oss-20b, 65 of 75 so far (last 10 by the nightly task): the model visibly obeyed in
      4 (6%), **0 reached the stored result**; cost is availability (F1 0.61 -> 0.55).
-   - Next: apply migration 0007 remotely and deploy the extraction Workflow (Marwan's OK),
-     real run on a smoke contract, CPU check, learning log, quiz.
+   - ✅ Migration 0007 applied remotely and the extraction Workflow deployed (version
+     `ce4c803b`, Marwan's OK, 2026-11-25); `/health` 200, new routes 401 without a key.
+   - Next: real run (`scripts/smoke.mjs`, now with extraction on the smallest contract; run
+     it after the nightly task, when Neurons are left), CPU check, learning log, quiz.
 
 ## M2 plan
 

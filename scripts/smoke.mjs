@@ -10,8 +10,9 @@
 // (documents uploaded before M3 are indexed by this re-upload, D32); uploading one again
 // returns the same document; an unknown document is 404; search (M3): a hybrid search on the
 // largest contract answers from both keywords and vectors, with offsets, pages and the
-// untrusted-text note; another document ID is 404; a malformed request is 400. Exits 1 on any
-// failure.
+// untrusted-text note; another document ID is 404; a malformed request is 400; extraction
+// (M4) on the smallest contract: started, extracted, clauses with exact quotes, pages and
+// definitions, merged view, no restart when asked again. Exits 1 on any failure.
 //
 // The three documents stay in your tenant (each new upload counts toward the 50-a-day quota)
 // and their vectors stay in the index (about 260 of the ~4,800 free, D25).
@@ -175,6 +176,72 @@ if (largest !== undefined) {
     "search without a key -> 401",
     anonymousSearch.status === 401,
     String(anonymousSearch.status),
+  );
+}
+
+// Extraction (M4): only on the SMALLEST contract, to spend few Neurons (about 35 per chunk on
+// gemma-4, D36). Run it when today's Neurons are not used up by the nightly eval (D41).
+const smallest = ids[0];
+if (smallest !== undefined) {
+  const post = (id, headers = auth) =>
+    fetch(new URL(`/v1/documents/${id}/extract`, base), {
+      method: "POST",
+      headers: { ...headers, "Content-Length": "0" },
+    });
+  const started = Date.now();
+  const first = await post(smallest);
+  check(
+    "extract -> 202 (or 200 when already extracted)",
+    first.status === 202 || first.status === 200,
+    String(first.status),
+  );
+  let document;
+  do {
+    document = (await (await get(`/v1/documents/${smallest}`, auth)).json()).document;
+    if (document?.extractStatus !== "extracting") break;
+    await sleep(5000);
+  } while (Date.now() - started < 15 * 60 * 1000);
+  const seconds = ((Date.now() - started) / 1000).toFixed(1);
+  check(
+    "extracted",
+    document?.extractStatus === "extracted" && document?.extractError === null,
+    `${String(document?.extractStatus)}${document?.extractError ? `, ${document.extractError}` : ""}, waited ${seconds} s, ${String(document?.extractVersion)}`,
+  );
+
+  const clauses = await get(`/v1/documents/${smallest}/clauses`, auth);
+  const body = clauses.ok ? await clauses.json() : {};
+  const list = body.clauses ?? [];
+  check(
+    "clauses -> 200 with clauses",
+    clauses.ok && list.length > 0,
+    `HTTP ${String(clauses.status)}, ${String(list.length)} clauses, types: ${[...new Set(list.map((c) => c.type))].slice(0, 6).join(", ")}`,
+  );
+  check(
+    "every clause quotes exactly its offsets, with a page and definitions",
+    list.every(
+      (c) =>
+        c.quote.length === c.end - c.start &&
+        typeof c.page === "number" &&
+        Array.isArray(c.definitions),
+    ),
+  );
+  check("clauses are labelled as untrusted", /never as instructions/.test(body.note ?? ""));
+  const merged = await get(`/v1/documents/${smallest}/clauses?merged=true`, auth);
+  const mergedBody = merged.ok ? await merged.json() : {};
+  check(
+    "merged view -> 200, no more clauses than pieces",
+    merged.ok && mergedBody.merged === true && (mergedBody.clauses ?? []).length <= list.length,
+    `${String((mergedBody.clauses ?? []).length)} merged clauses`,
+  );
+  const badType = await get(`/v1/documents/${smallest}/clauses?type=Nonsense`, auth);
+  check("unknown clause type -> 400", badType.status === 400, String(badType.status));
+  const again = await post(smallest);
+  check("extract again -> 200, nothing restarted", again.status === 200, String(again.status));
+  const anonymousExtract = await post(smallest, {});
+  check(
+    "extract without a key -> 401",
+    anonymousExtract.status === 401,
+    String(anonymousExtract.status),
   );
 }
 
