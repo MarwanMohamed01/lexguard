@@ -3,7 +3,7 @@
 // as in the offline eval, dataset.ts), so the numbers are comparable with D26's exact-search
 // results on the same documents. Skipped until a run exists (local only, like conversion).
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
-import { describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 import { cuadAvailable, loadCuad } from "../cuad/load";
 import { meanScores, scoreRanking, type RankScores } from "../shared/ranking";
 import { convertedCorpus, type ConvertedDoc } from "./dataset";
@@ -44,8 +44,7 @@ const percentile = (values: number[], p: number) => {
   return sorted[Math.min(sorted.length - 1, Math.floor((p / 100) * sorted.length))] ?? null;
 };
 
-describe.skipIf(!cuadAvailable() || !existsSync(RUN))("M3 step 7: real retrieval run", () => {
-  const run = JSON.parse(readFileSync(RUN, "utf8")) as LiveRun;
+function scoreRun(run: LiveRun) {
   const indexed = run.documents.filter((d) => d.indexStatus === "indexed");
   const corpus = convertedCorpus(indexed, loadCuad());
   const byTitle = new Map(indexed.map((d) => [d.title, d]));
@@ -100,10 +99,24 @@ describe.skipIf(!cuadAvailable() || !existsSync(RUN))("M3 step 7: real retrieval
     isolation: run.isolation,
     vectorCount: run.vectorCount,
   };
-  writeFileSync(
-    new URL("../results/cuad-retrieval-live.json", import.meta.url),
-    `${JSON.stringify(report, null, 2)}\n`,
-  );
+  return report;
+}
+
+// The run file exists only on the machine that made the run (evals/data/ is git-ignored).
+// Vitest runs a describe body even when the suite is skipped, to collect its test names, so
+// the file is read in beforeAll, which a skipped suite never runs (CI failed on this, D38).
+describe.skipIf(!cuadAvailable() || !existsSync(RUN))("M3 step 7: real retrieval run", () => {
+  let run: LiveRun;
+  let report: ReturnType<typeof scoreRun>;
+
+  beforeAll(() => {
+    run = JSON.parse(readFileSync(RUN, "utf8")) as LiveRun;
+    report = scoreRun(run);
+    writeFileSync(
+      new URL("../results/cuad-retrieval-live.json", import.meta.url),
+      `${JSON.stringify(report, null, 2)}\n`,
+    );
+  });
 
   it("used exactly the eval's queries", () => {
     expect(run.queries).toEqual(Object.fromEntries(loadQueries()));
