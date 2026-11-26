@@ -1553,3 +1553,11 @@ extract_error`; `clauses` (tenant-first key, document offsets, details JSON, **n
   rulebook-mcp 58 (4 new); removing the trim or stripping inner spaces fails them.
 - **Redeployed with the trim** (Marwan's OK): `lexguard-rulebook` version `f7d3784a`; `/mcp`
   still 401 without a token, registration still advertised.
+- **Demo passed (2026-11-26, Marwan's screen recording, 11.5 s):** MCP Inspector 2.16 with a
+  fresh server entry registered itself, opened our consent page ("This app registered itself;
+  its name is not verified", "This sends access to an app on your computer", scope
+  `rules:read`), Marwan pasted his key and clicked Allow, and the Inspector showed
+  "Authorization complete" and Connected (about 9.5 s including sign-in), then `initialize` and
+  `tools/list` answered OK (111 ms and 183 ms). The Inspector spoke the 2025-11-25 protocol
+  (our stateless handler serves both eras, D46). A tool call (`get_rule`) is not in this
+  recording.

@@ -123,7 +123,10 @@ supervisor (budgets, stop conditions); no LLM decides what runs.
    - ✅ 4c (D48): the first demo showed MCP Inspector needs dynamic registration; turned on with
      guards (localhost redirect URIs only, 1-day expiry, 5 a minute); redeployed `lexguard-rulebook`
      `9fbb4cfd`; live checks passed. Residual: a script can use up a day of KV writes (M7 cap).
-   - Next: Marwan repeats the demo with MCP Inspector (sign-in needs his key).
+   - ✅ Demo (2026-11-26, Marwan's recording): MCP Inspector registered, consent page, key,
+     Allow, "Authorization complete", Connected, `tools/list` OK. Two findings on the way
+     (stale saved discovery state in the client; whitespace in the pasted key, now trimmed,
+     `f7d3784a`). Still to record for the README GIF: a `get_rule` call.
    - The client pins the tool-schema hash (rug-pull check): M7.
 5. Checker (quarantined): clause + rule -> verdict, clause quote(s), rule quote, short reason;
    fake model first, real model on ContractNLI when Neurons are free (after the nightly task).
