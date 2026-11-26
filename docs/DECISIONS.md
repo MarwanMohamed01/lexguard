@@ -1827,3 +1827,6 @@ herein..."`), copied despite the prompt. **Fix in code, not the prompt:** a lead
 - **Tests:** guardrails +16 (detector), checker +2 (screen), verifier +1, worker +1 (an on-topic
   planted line withheld, never seen by an obedient model, counted in the report), evals +3.
   Mutation check of the detector: 7 breakages, all caught.
+- **Deployed (2026-11-26, Marwan's OK):** migration 0009 applied to the remote D1 (the
+  `review_claims.withheld` column checked afterwards); Worker version `41e1d114` (282 KB gzip,
+  startup 54 ms). Live: `/health` 200, review and report 401 without a key.

@@ -20,13 +20,13 @@ _Last updated: 2026-11-26._
 | M8 A2A & observability                   | Not started                                         |
 | M9 Evals in CI & write-up                | Not started                                         |
 
-Deployed Worker: https://lexguard.marwan-dev.workers.dev, version `bcca83bf` (2026-11-26: M5 review
-pipeline, migration 0008, Workflow `lexguard-review-document`, D52; before: `b2acbd6c` with the
+Deployed Worker: https://lexguard.marwan-dev.workers.dev, version `41e1d114` (2026-11-26: M5 review
+pipeline with the instruction screen, migrations 0008-0009, D53; before: `bcca83bf`, Workflow `lexguard-review-document`, D52; before: `b2acbd6c` with the
 private `TenantAuth` entrypoint, D47; before that: `ce4c803b`, 2026-11-25:
 M2 ingestion + M3 indexing and search + M4 extraction: upload, status, chunking, indexing
 and extraction Workflows, `POST /v1/documents/:id/search`, `POST .../extract`,
 `GET .../clauses`; smoke test `scripts/smoke.mjs`, D23/D32/D41). Cloudflare resources: D1
-`lexguard` (migrations 0001-0008 applied remotely), Vectorize index `lexguard-chunks` (1,024
+`lexguard` (migrations 0001-0009 applied remotely), Vectorize index `lexguard-chunks` (1,024
 dims, cosine, metadata index `doc`), Workers AI, Workflows `lexguard-chunk-document`,
 `lexguard-index-document` and `lexguard-extract-document`, secret `TENANT_KEYS`.
 
@@ -43,7 +43,7 @@ https://github.com/MarwanMohamed01/lexguard (public).
 (F1 0.56 on 222 chunks vs keyword 0.20; final number when the nightly run ends).
 
 Done on 2026-11-26: end-of-M4 quiz (5/8, in LEARNING_LOG) and the M5 plan draft (below).
-M5 steps 1-4, 6, 7 done, rulebook server deployed (D43-D51); step 5 real runs pending (D49); step 8 deployed and smoke-tested (D52); step 9 done locally (D53). Next: M5 step 5 (the checker).
+M5 steps 1-4, 6, 7 done, rulebook server deployed (D43-D51); step 5 real runs pending (D49); step 8 deployed and smoke-tested (D52); step 9 done and deployed (D53). Next: M5 step 5 (the checker).
 
 Originally planned for the new chat:
 
@@ -154,7 +154,7 @@ supervisor (budgets, stop conditions); no LLM decides what runs.
 9. ✅ Security (D53): worst case with a model that always obeys planted attacks: 340/340 flipped
    verdicts without defences, **30/340** with the screen + verifier rule; screen 92% recall, 0.26%
    / 0.09% false alarms on held-out data; rulebook bytes pinned in CI; threat model T1, T19, T22;
-   learning log. **To do:** apply migration 0009 remotely + deploy (Marwan's OK), the quiz.
+   learning log; quiz 7/8. ✅ Deployed: 0009 applied remotely, Worker `41e1d114`.
 
 ## M4 plan (draft, explained to Marwan on 2026-11-25; explain each step again before starting)
 
