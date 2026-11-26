@@ -3,6 +3,7 @@ import ndaFile from "../data/nda.json";
 import { parseRulebook, type Rulebook } from "./rulebook";
 
 export { parseOjRegulation, type ParsedRegulation, type ParsedRule } from "./parse-oj";
+export { searchRules, terms, type SearchHit } from "./search";
 export {
   getRule,
   parseRulebook,

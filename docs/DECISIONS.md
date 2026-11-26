@@ -1403,3 +1403,44 @@ extract_error`; `clauses` (tenant-first key, document offsets, details JSON, **n
   Mutation check: 26 breakages; 7 first survived (paragraph numbers stripped from later blocks
   and points, the paragraph not reset after it ends, unbalanced or unclosed tags accepted,
   empty blocks kept, a no-break-space entity dropped), all caught after new tests.
+
+## D46. The rulebook MCP server: SDK, tools and search (M5 step 4a, 2026-11-26)
+
+- **Login: full OAuth** (Marwan's choice over a scoped token we check ourselves), with
+  `@cloudflare/workers-oauth-provider` 1.4.0 (MIT). Read in its own docs (shipped in the npm
+  package): tokens, codes and client secrets are stored in KV **only as hashes**, the user's
+  `props` are encrypted with a key only the token can unwrap; one Worker can be both the
+  authorization server and its only resource (`OAuthProvider`), or two Workers can share the
+  roles over a service binding. **There is no client-credentials grant:** every token comes
+  from a person approving on our consent page, so Lexguard's own pipeline cannot get a token
+  by itself (design for that in step 4b).
+- **MCP SDK: `@modelcontextprotocol/server` 2.4.0 directly** (MCP spec 2026-07-28). It ships
+  its own stateless `createMcpHandler` (a web-standard `fetch`, a fresh server per request,
+  also serving 2025-era clients), so the Cloudflare `agents` package (many optional peers,
+  Babel plugins) is not needed. No Durable Object. `@modelcontextprotocol/client` 2.4.0 for
+  tests and, later, for our own agents.
+- **Three read-only tools** (`apps/rulebook-mcp/src/server.ts`), all annotated read-only,
+  non-destructive, closed-world (pinned data, no web):
+  - `get_rule {id}`: one rule's exact text and citation. The ID must match the rule-ID
+    pattern (`gdpr:28(3)(a)`, `nda:11`), so free text never reaches a lookup or an error
+    message.
+  - `list_rules {source, article}`: an article's rules in order.
+  - `search_rules {query, source?, limit <= 10}`: keyword search. Bodies over 16 KB get `413`
+    before parsing. Unknown rules answer as tool errors, not crashes.
+- **Search (`packages/rulebook/src/search.ts`):** BM25 (FTS5's scoring family, k1 1.2, b 0.75)
+  over rule text and title, small stop list, plural stripping. **Found while testing:** scores
+  from two separately indexed books are not comparable. "Confidential" is in nearly every NDA
+  rule, so it counts little there and a lot in the GDPR; merging per-book scores dropped
+  every NDA rule from a "confidential information" search. Same lesson as bm25 vs cosine in
+  M3 (D27). Fix: one combined search corpus over all rulebooks, so every rule is scored with
+  the same statistics.
+- **Not measured, on purpose:** search quality has unit tests but no eval, because no public
+  labelled queries exist for these rules and Lexguard's pipeline never decides by search: code
+  maps a clause type to rule IDs and calls `get_rule` (exact, tested).
+- **Tests:** rulebook 24 (search 9 new), rulebook-mcp 12. A real MCP client sends real HTTP
+  messages straight into `handler.fetch`, with an older (2025) and a current (2026-07-28)
+  client. Mutation check: 23 breakages; 9 first survived (idf, length normalisation,
+  repeated query words, title search, the book prefix in `get_rule`, leading zeros, the
+  cross-book merge, the result limit). All are caught now except one equivalent change (the
+  line break between books in the combined text, which changes no result). A tie-breaker in
+  the sort was removed as redundant: `Array.prototype.sort` is stable.

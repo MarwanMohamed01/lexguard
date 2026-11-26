@@ -37,7 +37,7 @@ https://github.com/MarwanMohamed01/lexguard (public).
 (F1 0.56 on 222 chunks vs keyword 0.20; final number when the nightly run ends).
 
 Done on 2026-11-26: end-of-M4 quiz (5/8, in LEARNING_LOG) and the M5 plan draft (below).
-M5 steps 1-3 done (D43-D45). Next: M5 step 4 (rulebook MCP server).
+M5 steps 1-3 and 4a done (D43-D46). Next: M5 step 4b (OAuth login for the MCP server).
 
 Originally planned for the new chat:
 
@@ -103,8 +103,13 @@ supervisor (budgets, stop conditions); no LLM decides what runs.
    as 786 rules with legal-citation IDs (`gdpr:28(3)(a)`), and the 17 ContractNLI rules as
    an NDA playbook; committed data, identical rebuild; hidden-character check widened to
    space look-alikes; 15 tests, 0 of 26 mutations survive.
-4. Rulebook MCP server on Workers: read-only tools `get_rule(id)` and `search_rules(query)`,
-   scoped token, Zod arguments; the client pins the tool-schema hash (rug-pull check).
+4. Rulebook MCP server on Workers (`apps/rulebook-mcp`), full OAuth (Marwan's choice).
+   - ✅ 4a (D46): MCP SDK 2.4.0's stateless `createMcpHandler` (no `agents` package, no
+     Durable Object); tools `get_rule`, `list_rules`, `search_rules` (BM25 over one combined
+     corpus, so scores compare); 36 tests with a real MCP client; 1 equivalent mutation left.
+   - 4b: OAuth login (`OAuthProvider`, KV `OAUTH_KV`), consent page, how our own pipeline
+     calls the server (no client-credentials grant); design to confirm with Marwan first.
+   - The client pins the tool-schema hash (rug-pull check): M7.
 5. Checker (quarantined): clause + rule -> verdict, clause quote(s), rule quote, short reason;
    fake model first, real model on ContractNLI when Neurons are free (after the nightly task).
 6. Verifier (code): every quote must be found in the contract at its offsets and in the rule
@@ -304,6 +309,6 @@ PICK=3 node scripts/cpu-load.mjs <worker-url>        # one new upload + 20 searc
   indexing ~5 ms per step.
 - ContractNLI test split (2,091 pairs, D44): majority label macro F1 0.211, majority per
   hypothesis 0.617 (the checker's bar); keyword top 10 spans hold expert evidence for 89%.
-- Tests: 595 (worker 162, a2a 34, chunker 68, extraction 51, guardrails 72, retrieval 26,
-  router 13, rulebook 15, trace 24, evals 130; the live-run, converted-PDF and hybrid-gate evals skip in
+- Tests: 616 (worker 162, rulebook-mcp 12, a2a 34, chunker 68, extraction 51, guardrails 72,
+  retrieval 26, router 13, rulebook 24, trace 24, evals 130; the live-run, converted-PDF and hybrid-gate evals skip in
   CI).

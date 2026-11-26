@@ -1,0 +1,10 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    // Node's types for the tests' web globals (URL, Request) for now; the Worker entry and
+    // its runtime types come with the OAuth step (M5 step 4b).
+    "types": ["node"],
+    "resolveJsonModule": true
+  },
+  "include": ["src", "test"]
+}
