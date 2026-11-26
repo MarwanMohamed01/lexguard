@@ -1672,3 +1672,42 @@ herein..."`), copied despite the prompt. **Fix in code, not the prompt:** a lead
 - **Tests:** verifier 23; evals 3 new. Mutation check: 18 breakages; 1 first survived (an
   external reference was "not resolved" in the test only because that number did not exist in
   the contract; now tested with a number that does).
+
+## D51. The report and redline (M5 step 7, 2026-11-26)
+
+- **Built only from verified claims (`packages/report`):** one finding per rule in the review's
+  scope, in scope order. A rule with no verified claim is "missing" (not addressed), never
+  guessed. When several claims concern one rule, a break outweighs a meet.
+- **Policy per rule:** `require` (the contract should state it) or `forbid` (it should not).
+  require: agrees = meets, conflicts = breaks (high risk), silent = missing (medium); forbid:
+  agrees = breaks (high), conflicts or silent = meets.
+  - **Open, found while reading the example report:** policies depend on which side the
+    reviewer represents. "Confidential Information shall only include technical information"
+    (`nda:2`) narrows the discloser's protection, so a discloser would `forbid` it. The review
+    request (step 8) must carry the scope and the policy per rule; the eval treats all 17
+    playbook rules as `require` so statuses map onto ContractNLI's labels.
+- **Redlines come from the rulebook, never from a model:** missing and required: insert the
+  rule's own text; contradicted and required: replace the first evidence passage with it;
+  stated and forbidden: delete the passage. Marked as a template to adapt. No contract text
+  reaches a writer, so no injection path into the suggestions (T1). A model-drafted redline
+  (adapted to the contract's terms) would need its own quarantined writer and eval: later.
+- **What a finding carries:** citation ("GDPR Art. 28(3)(a)", "NDA playbook rule 11"), the
+  rule's text, verdict, status, risk, evidence with offsets and the PDF page (page map, D21),
+  resolved section references (D50), the checker's reason as an **unverified model note**, and
+  the redline. The report records versions (checker prompt, model), rulebook sources with
+  their SHA-256, and the verifier's rejected claims with problem counts.
+- **Markdown for people, escaped:** contract text and the model's note are untrusted output: a
+  contract may contain `<img onerror=...>`, `[click](javascript:...)` or a fake `# heading`.
+  Everything untrusted is HTML-escaped and Markdown-escaped, control characters are dropped,
+  and every quoted line starts with `> ` so a passage cannot leave its quote. Findings are
+  ordered breaks, missing, meets.
+- **Eval on real claims (`evals/contractnli/report.test.ts`):** for the 20 pinned test NDAs,
+  all 17 rules -> checker -> verifier -> report. Every report: 17 findings, statuses add up,
+  every quote equal to the NDA's text, unchanged after a JSON round trip, no raw `<` in the
+  Markdown. Oracle claims: 340 findings, 93.2% match the expert's label. Cached Groq claims (9
+  NDAs fully answered so far): 153 findings, 76.5% match. Example report (public ContractNLI
+  text): `evals/results/contractnli-example-report.md`.
+- **Tests:** report 14, evals 2 new. Mutation check: 17 breakages; 4 first survived (every
+  test quote on page 1; an empty model note never tested; the block quote unchecked because
+  escaping already defused the fake heading; the order check matched the summary table instead
+  of the findings); all caught after new tests.

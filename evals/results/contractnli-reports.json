@@ -1,0 +1,11 @@
+{
+  "oracle": {
+    "findings": 340,
+    "matchExpert": 0.9324
+  },
+  "groq": {
+    "ndas": 9,
+    "findings": 153,
+    "matchExpert": 0.7647
+  }
+}
