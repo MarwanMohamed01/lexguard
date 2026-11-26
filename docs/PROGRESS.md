@@ -37,7 +37,7 @@ https://github.com/MarwanMohamed01/lexguard (public).
 (F1 0.56 on 222 chunks vs keyword 0.20; final number when the nightly run ends).
 
 Done on 2026-11-26: end-of-M4 quiz (5/8, in LEARNING_LOG) and the M5 plan draft (below).
-M5 step 1 done (D43). Next: M5 step 2 (ContractNLI eval first).
+M5 steps 1-2 done (D43, D44). Next: M5 step 3 (rulebook data).
 
 Originally planned for the new chat:
 
@@ -95,10 +95,10 @@ supervisor (budgets, stop conditions); no LLM decides what runs.
    is deprecated); OAuth needs a KV namespace (1,000 writes a day); **Workflows 3,000 steps a
    day on Free** (new), so checks are grouped per step; ContractNLI CC BY 4.0; EUR-Lex texts
    reusable, pinned once, no web access at run time.
-2. Eval first (D10, public data only): candidate **ContractNLI** (607 NDAs, 17 rule-like
-   hypotheses, labels entailed / contradicted / not mentioned, evidence spans). Pinned subset,
-   SHA-256, scorer (label accuracy and macro F1, evidence-span precision / recall), baselines
-   (majority label, keyword top span). Licence checked first.
+2. ✅ Eval first (D44): **ContractNLI** pinned and hashed, 2,091 test pairs; scorer (macro F1,
+   evidence P/R/F1, coverage@k). Bar to beat: majority label per hypothesis, macro F1
+   **0.617** (overall majority 0.211); keyword top 10 spans hold some expert evidence for 89%
+   of addressed pairs. Pinned subset 20 NDAs / 340 pairs; 9 tests, 0 of 11 mutations survive.
 3. Rulebook data: the official GDPR text (Art. 28 processor terms first) and ContractNLI's 17
    hypotheses as a public NDA playbook, split into articles / paragraphs with exact offsets
    and stable IDs (`gdpr:28(3)(a)`), hashed.
@@ -301,6 +301,8 @@ PICK=3 node scripts/cpu-load.mjs <worker-url>        # one new upload + 20 searc
   CUAD contracts: MRR 0.568 with stemming.
 - Production CPU (D33): search 3-5 ms, status 0 ms, upload 15 ms (655 KB, known since D24),
   indexing ~5 ms per step.
-- Tests: 571 (worker 162, a2a 34, chunker 68, extraction 51, guardrails 72, retrieval 26,
-  router 13, trace 24, evals 121; the live-run, converted-PDF and hybrid-gate evals skip in
+- ContractNLI test split (2,091 pairs, D44): majority label macro F1 0.211, majority per
+  hypothesis 0.617 (the checker's bar); keyword top 10 spans hold expert evidence for 89%.
+- Tests: 580 (worker 162, a2a 34, chunker 68, extraction 51, guardrails 72, retrieval 26,
+  router 13, trace 24, evals 130; the live-run, converted-PDF and hybrid-gate evals skip in
   CI).

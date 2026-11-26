@@ -1,0 +1,190 @@
+{
+  "split": "test",
+  "pairs": 2091,
+  "addressedPairs": 1188,
+  "majorityLabel": "Entailment",
+  "labels": {
+    "majority": {
+      "cases": 2091,
+      "accuracy": 0.4629,
+      "perClass": {
+        "Entailment": {
+          "tp": 968,
+          "fp": 1123,
+          "fn": 0,
+          "precision": 0.4629,
+          "recall": 1,
+          "f1": 0.6329
+        },
+        "Contradiction": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 220,
+          "precision": 1,
+          "recall": 0,
+          "f1": 0
+        },
+        "NotMentioned": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 903,
+          "precision": 1,
+          "recall": 0,
+          "f1": 0
+        }
+      },
+      "macroF1": 0.211,
+      "confusion": {
+        "Entailment": {
+          "Entailment": 968,
+          "Contradiction": 0,
+          "NotMentioned": 0
+        },
+        "Contradiction": {
+          "Entailment": 220,
+          "Contradiction": 0,
+          "NotMentioned": 0
+        },
+        "NotMentioned": {
+          "Entailment": 903,
+          "Contradiction": 0,
+          "NotMentioned": 0
+        }
+      }
+    },
+    "perHypothesis": {
+      "cases": 2091,
+      "accuracy": 0.6595,
+      "perClass": {
+        "Entailment": {
+          "tp": 757,
+          "fp": 350,
+          "fn": 211,
+          "precision": 0.6838,
+          "recall": 0.782,
+          "f1": 0.7296
+        },
+        "Contradiction": {
+          "tp": 118,
+          "fp": 128,
+          "fn": 102,
+          "precision": 0.4797,
+          "recall": 0.5364,
+          "f1": 0.5064
+        },
+        "NotMentioned": {
+          "tp": 504,
+          "fp": 234,
+          "fn": 399,
+          "precision": 0.6829,
+          "recall": 0.5581,
+          "f1": 0.6143
+        }
+      },
+      "macroF1": 0.6168,
+      "confusion": {
+        "Entailment": {
+          "Entailment": 757,
+          "Contradiction": 39,
+          "NotMentioned": 172
+        },
+        "Contradiction": {
+          "Entailment": 40,
+          "Contradiction": 118,
+          "NotMentioned": 62
+        },
+        "NotMentioned": {
+          "Entailment": 310,
+          "Contradiction": 89,
+          "NotMentioned": 504
+        }
+      }
+    }
+  },
+  "keywordEvidence": {
+    "top1": {
+      "tp": 586,
+      "fp": 602,
+      "fn": 1818,
+      "precision": 0.4933,
+      "recall": 0.2438,
+      "f1": 0.3263,
+      "pairs": 1188,
+      "hit": 0.4933
+    },
+    "top2": {
+      "tp": 812,
+      "fp": 1564,
+      "fn": 1592,
+      "precision": 0.3418,
+      "recall": 0.3378,
+      "f1": 0.3397,
+      "pairs": 1188,
+      "hit": 0.6296
+    },
+    "top3": {
+      "tp": 956,
+      "fp": 2608,
+      "fn": 1448,
+      "precision": 0.2682,
+      "recall": 0.3977,
+      "f1": 0.3204,
+      "pairs": 1188,
+      "hit": 0.702
+    }
+  },
+  "keywordCoverage": [
+    {
+      "k": 1,
+      "any": 0.4933,
+      "all": 0.1818,
+      "spans": 0.2438
+    },
+    {
+      "k": 3,
+      "any": 0.702,
+      "all": 0.3081,
+      "spans": 0.3977
+    },
+    {
+      "k": 5,
+      "any": 0.7955,
+      "all": 0.3796,
+      "spans": 0.4763
+    },
+    {
+      "k": 10,
+      "any": 0.8939,
+      "all": 0.4907,
+      "spans": 0.5911
+    },
+    {
+      "k": 20,
+      "any": 0.9722,
+      "all": 0.6734,
+      "spans": 0.7404
+    }
+  ],
+  "pinnedSubsetIds": [
+    606,
+    83,
+    5,
+    433,
+    129,
+    22,
+    564,
+    412,
+    289,
+    25,
+    521,
+    584,
+    165,
+    400,
+    43,
+    389,
+    8,
+    395,
+    585,
+    1
+  ]
+}

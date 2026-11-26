@@ -1326,3 +1326,39 @@ extract_error`; `clauses` (tenant-first key, document offsets, details JSON, **n
 - **Consequences for the plan:** no Durable Objects and no web access at run time (the
   rulebook is pinned data served by our own MCP server, so T5's web risk does not open in M5);
   checks grouped per step; the step count joins Neurons in the review's budget.
+
+## D44. Checker eval on ContractNLI: answer key, scoring and baselines (M5 step 2, 2026-11-26)
+
+- **Dataset (D10, public only):** ContractNLI at a pinned commit, zip and files SHA-256
+  checked (`evals/contractnli/`). 607 real NDAs; each is checked by experts against the same
+  17 hypotheses, which act as a public **NDA playbook**: rule-like statements such as "Receiving
+  Party shall not reverse engineer ...". Label per pair: Entailment (the contract says so),
+  Contradiction (it says the opposite), NotMentioned; evidence spans (sentences or list items,
+  exact offsets) for the first two. Only the JSON is unpacked, never the PDFs.
+- **Why this data:** it is exactly the checker's job (clause text + rule -> meets / breaks /
+  silent, with evidence), labelled by experts, and the hypotheses double as rulebook entries.
+  The checker answers with quotes (production); the eval maps a quote to the spans it overlaps.
+- **Unit and scoring:** one (NDA, hypothesis) pair; test split 123 NDAs x 17 = **2,091 pairs**,
+  1,188 that the contract addresses. Label: accuracy, per-class P/R/F1, **macro F1** (the mean
+  over the three classes, so the rare Contradiction class, the one a reviewer cares most
+  about, counts as much as the common ones), confusion matrix. Evidence, on addressed pairs:
+  micro P/R/F1 over spans and "at least one right". Coverage@k: if the checker reads only
+  the top k spans of a search, how often it sees the expert's evidence.
+- **Baselines on the test split (no model):**
+  - Majority label of train (Entailment): accuracy 0.463, macro F1 **0.211**.
+  - Majority label **per hypothesis** (knows the rule, never reads the contract): accuracy
+    0.660, macro F1 **0.617**, Contradiction F1 0.506. **This is the bar**: some rules are
+    almost always met (Limited use, 103 of 123) or almost never mentioned (No reverse
+    engineering, 110 of 123), so a checker must beat a guess that knows these habits.
+  - Keyword evidence (M3's FTS5 porter + bm25, hypothesis as query): top 1 P 0.49 / R 0.24,
+    top 2 F1 0.34. Coverage, at least one / all expert spans in the top k: k=3 0.70 / 0.31,
+    k=10 **0.89 / 0.49**, k=20 0.97 / 0.67.
+- **Consequences:** the checker will read the top ~10 spans for a rule, not the whole NDA
+  (median 72 spans, ~10k characters), so retrieval alone loses about 11% of addressed pairs
+  at k=10; hybrid search would need embeddings of ContractNLI (Neurons) and is measured only
+  if the checker's misses point to retrieval. Pinned subset for model runs: 20 test NDAs by
+  SHA-256 of `contractnli-<id>` (340 pairs), ids in `results/contractnli-baselines.json`.
+- **Tests:** 9 (scoring, coverage, parsing refusals, data size, baselines). Mutation check: 11
+  breakages of `score.ts` / `load.ts`; 4 first survived (an empty span, a negative start, an
+  evidence index one past the end, top k+1 instead of k), all caught after new tests. CI
+  downloads the data (cached by commit) and runs the baselines.
