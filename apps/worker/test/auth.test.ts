@@ -1,6 +1,8 @@
-import { exports } from "cloudflare:workers";
+import { createExecutionContext } from "cloudflare:test";
+import { env, exports } from "cloudflare:workers";
 import { describe, expect, it } from "vitest";
 import { authenticate, sha256Hex } from "../src/auth";
+import { TenantAuth } from "../src/tenant-auth";
 import { TEST_KEYS } from "./fixtures";
 
 const whoami = (headers: HeadersInit = {}) =>
@@ -80,5 +82,35 @@ describe("authenticate (configuration)", () => {
     expect(await sha256Hex("abc")).toBe(
       "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad",
     );
+  });
+});
+
+describe("TenantAuth entrypoint (private, for the rulebook server's consent page, D47)", () => {
+  it("returns the tenant of a valid key over RPC", async () => {
+    expect(await exports.TenantAuth.tenantForKey(TEST_KEYS.acme)).toBe("acme");
+    expect(await exports.TenantAuth.tenantForKey(TEST_KEYS.globex)).toBe("globex");
+  });
+
+  it("returns null for an unknown, malformed or non-string key", async () => {
+    expect(await exports.TenantAuth.tenantForKey(`lg_${"C".repeat(43)}`)).toBeNull();
+    expect(await exports.TenantAuth.tenantForKey(`${TEST_KEYS.acme} `)).toBeNull();
+    expect(await exports.TenantAuth.tenantForKey("x".repeat(10_000))).toBeNull();
+    // A caller could send anything over RPC; a number is not a key.
+    expect(await exports.TenantAuth.tenantForKey(42 as unknown as string)).toBeNull();
+  });
+
+  it("is not reachable from the public URL", async () => {
+    const response = await exports.default.fetch("http://example.com/tenantForKey", {
+      method: "POST",
+      body: TEST_KEYS.acme,
+    });
+    expect(response.status).toBe(404);
+  });
+});
+
+describe("TenantAuth with a broken TENANT_KEYS secret", () => {
+  it("throws instead of answering (fail closed)", async () => {
+    const broken = new TenantAuth(createExecutionContext(), { ...env, TENANT_KEYS: "{not json" });
+    await expect(broken.tenantForKey(TEST_KEYS.acme)).rejects.toThrow("server_misconfigured");
   });
 });

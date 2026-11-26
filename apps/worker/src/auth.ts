@@ -49,17 +49,19 @@ function parseTenantKeys(raw: string | undefined): ReadonlyMap<string, string> |
   return cache.byHash;
 }
 
-export async function authenticate(
-  request: Request,
+/**
+ * API key -> tenant. Used by `authenticate` (the HTTP API) and by the `TenantAuth` entrypoint
+ * (the rulebook server's consent page, over a service binding, D47).
+ */
+export async function checkKey(
+  key: string | undefined,
   tenantKeys: string | undefined,
 ): Promise<AuthResult> {
   // Fail closed: a missing or broken secret refuses everyone instead of letting anyone in.
   const byHash = parseTenantKeys(tenantKeys);
   if (byHash === null) return { ok: false, status: 500, error: "server_misconfigured" };
 
-  const match = /^Bearer ([^\s]+)$/.exec(request.headers.get("Authorization") ?? "");
-  const key = match?.[1];
-  // The format check rejects junk (and huge headers) before any hashing work.
+  // The format check rejects junk (and huge inputs) before any hashing work.
   if (key === undefined || !KEY_PATTERN.test(key)) {
     return { ok: false, status: 401, error: "missing_or_malformed_api_key" };
   }
@@ -68,4 +70,12 @@ export async function authenticate(
   return tenantId === undefined
     ? { ok: false, status: 401, error: "invalid_api_key" }
     : { ok: true, tenantId };
+}
+
+export async function authenticate(
+  request: Request,
+  tenantKeys: string | undefined,
+): Promise<AuthResult> {
+  const match = /^Bearer ([^\s]+)$/.exec(request.headers.get("Authorization") ?? "");
+  return checkKey(match?.[1], tenantKeys);
 }

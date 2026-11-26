@@ -37,7 +37,7 @@ https://github.com/MarwanMohamed01/lexguard (public).
 (F1 0.56 on 222 chunks vs keyword 0.20; final number when the nightly run ends).
 
 Done on 2026-11-26: end-of-M4 quiz (5/8, in LEARNING_LOG) and the M5 plan draft (below).
-M5 steps 1-3 and 4a done (D43-D46). Next: M5 step 4b (OAuth login for the MCP server).
+M5 steps 1-4 done (D43-D47; rulebook server not deployed yet). Next: M5 step 5 (the checker).
 
 Originally planned for the new chat:
 
@@ -107,8 +107,13 @@ supervisor (budgets, stop conditions); no LLM decides what runs.
    - ✅ 4a (D46): MCP SDK 2.4.0's stateless `createMcpHandler` (no `agents` package, no
      Durable Object); tools `get_rule`, `list_rules`, `search_rules` (BM25 over one combined
      corpus, so scores compare); 36 tests with a real MCP client; 1 equivalent mutation left.
-   - 4b: OAuth login (`OAuthProvider`, KV `OAUTH_KV`), consent page, how our own pipeline
-     calls the server (no client-credentials grant); design to confirm with Marwan first.
+   - ✅ 4b (D47): full OAuth on public `/mcp` (`OAuthProvider`, CIMD clients, no dynamic
+     registration), consent page with sign-in by Lexguard API key via the main Worker's private
+     `TenantAuth`; private service-binding door `RulebookInternal` for the pipeline (option A);
+     threat model T9 tested, T21 added; 30 + 19 tests; 1 equivalent mutation left.
+   - **Deploy later, with Marwan's OK:** create KV `OAUTH_KV` (add its id to
+     `apps/rulebook-mcp/wrangler.jsonc`), redeploy the main Worker (`TenantAuth`), deploy
+     `lexguard-rulebook`; then demo with a real MCP client.
    - The client pins the tool-schema hash (rug-pull check): M7.
 5. Checker (quarantined): clause + rule -> verdict, clause quote(s), rule quote, short reason;
    fake model first, real model on ContractNLI when Neurons are free (after the nightly task).
@@ -309,6 +314,6 @@ PICK=3 node scripts/cpu-load.mjs <worker-url>        # one new upload + 20 searc
   indexing ~5 ms per step.
 - ContractNLI test split (2,091 pairs, D44): majority label macro F1 0.211, majority per
   hypothesis 0.617 (the checker's bar); keyword top 10 spans hold expert evidence for 89%.
-- Tests: 616 (worker 162, rulebook-mcp 12, a2a 34, chunker 68, extraction 51, guardrails 72,
+- Tests: 638 (worker 166, rulebook-mcp 30, a2a 34, chunker 68, extraction 51, guardrails 72,
   retrieval 26, router 13, rulebook 24, trace 24, evals 130; the live-run, converted-PDF and hybrid-gate evals skip in
   CI).

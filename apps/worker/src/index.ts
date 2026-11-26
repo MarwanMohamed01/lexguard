@@ -7,6 +7,7 @@ import { CONVERSION_OPTIONS } from "./upload";
 export { ChunkDocument } from "./chunking";
 export { IndexDocument } from "./indexing";
 export { ExtractDocument } from "./extraction";
+export { TenantAuth } from "./tenant-auth";
 
 export default {
   fetch(request, env): Promise<Response> {

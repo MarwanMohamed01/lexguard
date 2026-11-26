@@ -4,13 +4,17 @@
   "type": "module",
   "version": "0.0.0",
   "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "types": "wrangler types",
     "typecheck": "tsc --noEmit -p .",
     "test": "vitest run"
   },
   "dependencies": {
     "@lexguard/rulebook": "0.0.0",
     "@modelcontextprotocol/server": "2.4.0",
-    "zod": "4.6.7"
+    "zod": "4.6.7",
+    "@cloudflare/workers-oauth-provider": "1.4.0"
   },
   "devDependencies": {
     "@modelcontextprotocol/client": "2.4.0"

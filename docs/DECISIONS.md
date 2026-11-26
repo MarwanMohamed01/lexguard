@@ -1444,3 +1444,57 @@ extract_error`; `clauses` (tenant-first key, document offsets, details JSON, **n
   cross-book merge, the result limit). All are caught now except one equivalent change (the
   line break between books in the combined text, which changes no result). A tie-breaker in
   the sort was removed as redundant: `Array.prototype.sort` is stable.
+
+## D47. OAuth login for the rulebook MCP server, and a private door for the pipeline (M5 step 4b, 2026-11-26)
+
+- **The choice (Marwan, after comparing both for the project's CV value):** the public `/mcp`
+  uses full OAuth 2.1; Lexguard's own pipeline calls the same MCP server through a **private
+  service-binding entrypoint**, not with a stored OAuth token. The library has no
+  client-credentials grant, so a stored token would be one person's refresh token. It rotates
+  on every use (needs storage and locking), it is a long-lived credential, and every tenant's
+  review would run under one person's grant, against the tenant isolation built since M2.
+  Edge OAuth plus service identity inside is the usual production shape.
+- **Public door, one Worker (`OAuthProvider`, the library's combined mode)** at
+  `lexguard-rulebook.<subdomain>.workers.dev`:
+  - Discovery: `/mcp` without a token returns 401 with `resource_metadata` and
+    `scope="rules:read"`; RFC 9728 and RFC 8414 metadata are published.
+  - Clients identify by a **Client ID Metadata Document** (an HTTPS URL, MCP 2026-07-28).
+    **Dynamic registration is off:** each registration would be a KV write anyone could
+    trigger (1,000 a day free, A5/T15). If a demo client supports only dynamic registration,
+    that is decided then, with a limit.
+  - **Consent page** (`src/consent.ts`), following the library's guide: client name, verified
+    domain or "not verified", redirect host, a warning for apps on this computer, the scope.
+    Everything from the client is escaped; framing is forbidden (the library's headers); the
+    form carries a one-use handle bound to a browser cookie.
+  - **Sign-in = the person's Lexguard API key**, checked by the main Worker's new private
+    `TenantAuth.tenantForKey` over a service binding, so `TENANT_KEYS` stays in one Worker.
+    The key is checked **before** the handle is used, so a wrong key leaves the form usable.
+    The rulebook side also refuses keys over 100 characters and tenant IDs of the wrong
+    format, without trusting the other Worker blindly.
+  - **What a token is:** authorization code + PKCE (S256), access token 1 hour, grant at most
+    7 days, bound to the `/mcp` resource, scope `rules:read` only (granted even when a client
+    asks for more), grant `userId` = the tenant. Tokens, codes and secrets are stored only as
+    hashes in KV `OAUTH_KV`. The handler enforces the scope (403 `insufficient_scope`), because
+    the library only advertises it.
+  - Error handling as in the guide: redirect to the client only when the library validated the
+    client and redirect URI, otherwise render locally (never redirect to an unknown URI).
+- **Private door `RulebookInternal`:** a `WorkerEntrypoint` whose `fetch` serves the same MCP
+  handler, for `X-Lexguard-Tenant: <tenant>` (format-checked) on `/mcp` only. Reachable only by
+  a service binding from a Worker in this account; the public URL never reaches it. Threat
+  model T21 records the trust assumption.
+- **Runtime:** `nodejs_compat` (the MCP SDK imports `node:process`) and
+  `global_fetch_strictly_public` (safe CIMD fetches). **Not created yet:** the KV namespace
+  `OAUTH_KV` and the Worker itself; both come at deploy, with Marwan's OK. The main Worker
+  must be redeployed first (the new `TenantAuth` export).
+- **Tests (in workerd, with a stand-in main Worker):** rulebook-mcp 30 (18 new OAuth and
+  door tests), worker auth 19 (4 new). The whole flow runs: discovery, consent page, wrong and
+  right key, code + PKCE, token, MCP calls; also deny, a forged form, a reused handle, a code
+  used twice, a wrong verifier, a made-up token, a token without the scope, a wrong redirect
+  URI, extra scopes, and both doors. Found while testing: the library does not burn a code
+  after a failed PKCE check. The holder of the verifier can still redeem it, once, which is
+  allowed (the attacker lacks the verifier). Also, the test runtime follows redirects unless
+  told not to.
+- **Mutation check:** 21 breakages; 3 first survived (the tenant-format re-check, the key
+  length limit, the approval's scope list), and the stand-in main Worker now answers wrongly
+  on purpose to prove the first two. The third is equivalent: the grant's scope is set by
+  `completeAuthorization`, and a test shows extra requested scopes are never granted.
