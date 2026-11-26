@@ -582,5 +582,14 @@ guardrails 88, a2a 34, chunker 68, extraction 51, retrieval 26, router 13, trace
 
 ### Quiz score
 
-- During M5: 7 check questions asked, not answered yet (folded into the end-of-M5 quiz).
-- End-of-M5 quiz: see below.
+- During M5: 7 check questions asked along the way, folded into the end-of-M5 quiz.
+- End of M5 (2026-11-26): **7/8** (M3 3/8, M4 5/8). Right: the quarantined checker (no tools,
+  code picks rules, verifier drops unproven claims), the bar (0.60 < 0.617 is not yet useful),
+  the oracle ceiling (search, not the checker), one BM25 collection, the private service
+  binding, screening against a flipped verdict that quotes a real sentence, tuning vs held-out
+  measurement. Missed:
+  - **The first Groq score was low because the model copied our own `[n]` passage labels into
+    its quotes**, so 55 of 58 unfound quotes were really there and 36 verdicts were wrongly
+    downgraded. Rate limits only made the run slow (median 7.7 s per call, waits up to 8
+    minutes); they never cut an answer short (0 empty answers). Lesson: before blaming the
+    model or the provider, look at why our own code rejected the answers (D49).
