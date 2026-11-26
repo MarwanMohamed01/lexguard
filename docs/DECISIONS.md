@@ -1362,3 +1362,44 @@ extract_error`; `clauses` (tenant-first key, document offsets, details JSON, **n
   breakages of `score.ts` / `load.ts`; 4 first survived (an empty span, a negative start, an
   evidence index one past the end, top k+1 instead of k), all caught after new tests. CI
   downloads the data (cached by commit) and runs the baselines.
+
+## D45. The rulebook data: GDPR and the NDA playbook (M5 step 3, 2026-11-26)
+
+- **New package `packages/rulebook`** (standard JS only, runs in Workers): a rulebook is one
+  pinned source text split into **rules**, each one line of the text with exact offsets and
+  a stable, citable ID. The verifier (step 6) will accept a rule quote only if it is found in
+  that rule's text, the same idea as contract quotes (D36).
+- **GDPR source:** the Official Journal text (CELEX 32016R0679, OJ L 119, 4.5.2016) as XHTML
+  from the Publications Office's **Cellar** endpoint, pinned by URL and SHA-256. The EUR-Lex
+  website answers scripts with an empty HTTP 202 page, so it is not used. The consolidated
+  version (which applies later corrigenda) was rejected: it carries `►C` markers inside the
+  text and says it "has no legal effect". **Limitation:** the 2018 and 2021 corrigenda are
+  not applied (stated in the rulebook's attribution).
+- **Rule IDs follow legal citation:** `gdpr:28(3)(a)` = Article 28, paragraph 3, point (a);
+  `gdpr:4(1)` = Article 4's definition (1); a second block of text at the same level (a
+  subparagraph) is `/2` (`gdpr:28(3)/2`); unnumbered "—" items (indents) are `-1`, `-2`
+  (`gdpr:53(1)-2`). Paragraph numbers are removed from the text (they are in the ID); recitals,
+  annexes, footnote markers and the footer are left out.
+- **Result:** 99 articles, **786 rules**, 290k characters. Checked independently (a separate
+  script over the source): 786 text blocks inside articles, every one found as a rule, none
+  dropped. The parser throws on anything it does not understand (unknown point label,
+  paragraph of another article, unbalanced tags) instead of skipping text; the first real run
+  found the "—" indents that way.
+- **NDA playbook:** ContractNLI's 17 hypotheses (D44), one rule each (`nda:11` "No reverse
+  engineering"), with their short descriptions. CC BY 4.0, attributed.
+- **Data files are committed** (`packages/rulebook/data/*.json`, the Worker will serve them),
+  built by `npm run build:data -w @lexguard/rulebook` from the pinned sources; a rebuild gives
+  identical bytes. The loader validates shape, unique prefixed IDs, and offsets in order,
+  non-empty and non-overlapping.
+- **Invisible characters again (M1 lesson):** an escaped no-break space in a regex ended up as
+  the literal invisible character, and the hidden-character check did not catch it because it
+  only knew zero-width and direction characters. The check now also refuses characters that
+  look like a space but are not (U+00A0, U+2000-200A, U+202F, U+205F, U+3000); the 15 no-break
+  spaces in CUAD's verbatim clause descriptions (`packages/extraction/src/types.ts`) are now
+  written as `\u00A0` escapes (same string at runtime, the CUAD comparison test still passes);
+  `evals/results/` (generated from downloaded data) is skipped. In code, `\s` already matches
+  no-break spaces, so the parser uses `/\s+/`.
+- **Tests:** 15 (parser on small XHTML pieces, loader refusals, the real GDPR and NDA data).
+  Mutation check: 26 breakages; 7 first survived (paragraph numbers stripped from later blocks
+  and points, the paragraph not reset after it ends, unbalanced or unclosed tags accepted,
+  empty blocks kept, a no-break-space entity dropped), all caught after new tests.

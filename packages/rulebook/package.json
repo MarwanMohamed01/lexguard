@@ -1,0 +1,17 @@
+{
+  "name": "@lexguard/rulebook",
+  "private": true,
+  "type": "module",
+  "version": "0.0.0",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit -p . && tsc --noEmit -p scripts",
+    "test": "vitest run",
+    "build:data": "vitest run --config scripts/vitest.config.ts"
+  },
+  "dependencies": {
+    "zod": "4.6.7"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "extends": "../../../tsconfig.base.json",
+  "compilerOptions": {
+    // The data build runs under Node (downloads, files, hashing); the package itself does not.
+    "types": ["node"],
+    "resolveJsonModule": true
+  },
+  "include": ["."]
+}

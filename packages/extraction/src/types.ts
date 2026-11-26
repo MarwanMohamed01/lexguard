@@ -18,7 +18,7 @@ export const CLAUSE_TYPES = [
   ],
   [
     "Audit Rights",
-    "Does a party have the right to  audit the books, records, or physical locations of the counterparty to ensure compliance with the contract?",
+    "Does a party have the right to\u00A0 audit the books, records, or physical locations of the counterparty to ensure compliance with the contract?",
   ],
   [
     "Cap On Liability",
@@ -40,7 +40,7 @@ export const CLAUSE_TYPES = [
   ["Effective Date", "The date when the contract is effective"],
   [
     "Exclusivity",
-    "Is there an exclusive dealing  commitment with the counterparty? This includes a commitment to procure all “requirements” from one party of certain technology, goods, or services or a prohibition on licensing or selling technology, goods or services to third parties, or a prohibition on  collaborating or working with other parties), whether during the contract or  after the contract ends (or both).",
+    "Is there an exclusive dealing\u00A0 commitment with the counterparty? This includes a commitment to procure all “requirements” from one party of certain technology, goods, or services or a prohibition on licensing or selling technology, goods or services to third parties, or a prohibition on\u00A0 collaborating or working with other parties), whether during the contract or\u00A0 after the contract ends (or both).",
   ],
   ["Expiration Date", "On what date will the contract's initial term expire?"],
   ["Governing Law", "Which state/country's law governs the interpretation of the contract?"],
@@ -50,11 +50,11 @@ export const CLAUSE_TYPES = [
   ],
   [
     "Ip Ownership Assignment",
-    "Does intellectual property created  by one party become the property of the counterparty, either per the terms of the contract or upon the occurrence of certain events?",
+    "Does intellectual property created\u00A0 by one party become the property of the counterparty, either per the terms of the contract or upon the occurrence of certain events?",
   ],
   [
     "Irrevocable Or Perpetual License",
-    "Does the contract contain a  license grant that is irrevocable or perpetual?",
+    "Does the contract contain a\u00A0 license grant that is irrevocable or perpetual?",
   ],
   [
     "Joint Ip Ownership",
@@ -82,7 +82,7 @@ export const CLAUSE_TYPES = [
   ],
   [
     "No-Solicit Of Employees",
-    "Is there a restriction on a party’s soliciting or hiring employees and/or contractors from the  counterparty, whether during the contract or after the contract ends (or both)?",
+    "Is there a restriction on a party’s soliciting or hiring employees and/or contractors from the\u00A0 counterparty, whether during the contract or after the contract ends (or both)?",
   ],
   [
     "Non-Compete",
@@ -104,7 +104,7 @@ export const CLAUSE_TYPES = [
   ],
   [
     "Price Restrictions",
-    "Is there a restriction on the  ability of a party to raise or reduce prices of technology, goods, or  services provided?",
+    "Is there a restriction on the\u00A0 ability of a party to raise or reduce prices of technology, goods, or\u00A0 services provided?",
   ],
   [
     "Renewal Term",
@@ -112,7 +112,7 @@ export const CLAUSE_TYPES = [
   ],
   [
     "Revenue/Profit Sharing",
-    "Is one party required to share revenue or profit with the counterparty for any technology, goods, or services?",
+    "Is one party required to share revenue or profit with the counterparty for any technology, goods, or\u00A0services?",
   ],
   [
     "Rofr/Rofo/Rofn",
@@ -120,11 +120,11 @@ export const CLAUSE_TYPES = [
   ],
   [
     "Source Code Escrow",
-    "Is one party required to deposit its source code into escrow with a third party, which can be released to the counterparty upon the occurrence of certain events (bankruptcy,  insolvency, etc.)?",
+    "Is one party required to deposit its source code into escrow with a third party, which can be released to the counterparty upon the occurrence of certain events (bankruptcy,\u00A0 insolvency, etc.)?",
   ],
   [
     "Termination For Convenience",
-    "Can a party terminate this  contract without cause (solely by giving a notice and allowing a waiting  period to expire)?",
+    "Can a party terminate this\u00A0 contract without cause (solely by giving a notice and allowing a waiting\u00A0 period to expire)?",
   ],
   [
     "Third Party Beneficiary",
@@ -144,7 +144,7 @@ export const CLAUSE_TYPES = [
   ],
   [
     "Warranty Duration",
-    "What is the duration of any  warranty against defects or errors in technology, products, or services  provided under the contract?",
+    "What is the duration of any\u00A0 warranty against defects or errors in technology, products, or services\u00A0 provided under the contract?",
   ],
 ] as const;
 
