@@ -31,8 +31,7 @@ https://github.com/MarwanMohamed01/lexguard (public).
 
 ## Open items (carry into M4)
 
-- **Full-corpus retrieval eval (M3 step 2):** 9,974 of 37,675 texts left to embed (about one
-  more night). **Automated** (D36): the scheduled task "Lexguard nightly embedding" runs
+- **Full-corpus retrieval eval (M3 step 2):** every text embedded (night of 2026-11-26). **Automated** (D36): the scheduled task "Lexguard nightly embedding" runs
   `scripts/nightly-embed.ps1` at 01:10 local (00:10 UTC); log in
   `evals/data/retrieval/nightly-embed.log`; it disables itself when done. Then decide hybrid vs keyword and the contextual
   header with a per-case paired comparison, and set the CI gate (D26). Live = offline (D31),
@@ -82,8 +81,12 @@ only, document text marked as data, T1/T2); every quote is checked by code again
      4 (6%), **0 reached the stored result**; cost is availability (F1 0.61 -> 0.55).
    - ✅ Migration 0007 applied remotely and the extraction Workflow deployed (version
      `ce4c803b`, Marwan's OK, 2026-11-25); `/health` 200, new routes 401 without a key.
-   - Next: real run (`scripts/smoke.mjs`, now with extraction on the smallest contract; run
-     it after the nightly task, when Neurons are left), CPU check, learning log, quiz.
+   - ✅ Real run (2026-11-26, Marwan ran `scripts/smoke.mjs`): all 28 checks passed;
+     extraction of the smallest contract (1 page) on gemma-4 took 15.9 s, 4 clauses (Document
+     Name, Renewal Term, Effective Date, Parties), exact quotes, merged view, no restart.
+   - Nightly results so far: M3 corpus fully embedded; gemma-4 222 of 473 subset chunks, F1
+     0.56 vs keyword 0.20 on the same chunks; injection 73 of 75, still 0 stored.
+   - Next: CPU check of an extraction run, learning log, quiz.
 
 ## M2 plan
 
