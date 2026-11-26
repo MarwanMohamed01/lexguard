@@ -20,12 +20,13 @@ _Last updated: 2026-11-26._
 | M8 A2A & observability                   | Not started                                         |
 | M9 Evals in CI & write-up                | Not started                                         |
 
-Deployed Worker: https://lexguard.marwan-dev.workers.dev, version `b2acbd6c` (2026-11-26, adds the
-private `TenantAuth` entrypoint, D47; before: `ce4c803b`, 2026-11-25:
+Deployed Worker: https://lexguard.marwan-dev.workers.dev, version `bcca83bf` (2026-11-26: M5 review
+pipeline, migration 0008, Workflow `lexguard-review-document`, D52; before: `b2acbd6c` with the
+private `TenantAuth` entrypoint, D47; before that: `ce4c803b`, 2026-11-25:
 M2 ingestion + M3 indexing and search + M4 extraction: upload, status, chunking, indexing
 and extraction Workflows, `POST /v1/documents/:id/search`, `POST .../extract`,
 `GET .../clauses`; smoke test `scripts/smoke.mjs`, D23/D32/D41). Cloudflare resources: D1
-`lexguard` (migrations 0001-0007 applied remotely), Vectorize index `lexguard-chunks` (1,024
+`lexguard` (migrations 0001-0008 applied remotely), Vectorize index `lexguard-chunks` (1,024
 dims, cosine, metadata index `doc`), Workers AI, Workflows `lexguard-chunk-document`,
 `lexguard-index-document` and `lexguard-extract-document`, secret `TENANT_KEYS`.
 
@@ -147,8 +148,8 @@ supervisor (budgets, stop conditions); no LLM decides what runs.
 8. ⏳ Review pipeline (D52): `POST .../review` (scope + policy per rule), `ReviewDocument`
    Workflow (4 rules per step; hybrid search -> top 10 sentences -> checker -> verifier on the
    loaded chunks), `GET .../report` (JSON / Markdown), migration 0008; tested locally with a
-   fake model (11 tests, 0 of 17 mutations survive). **To do with Marwan's OK:** apply 0008
-   remotely, deploy, real review of a smoke contract.
+   fake model (11 tests, 0 of 17 mutations survive). ✅ Deployed 2026-11-26: 0008 applied
+   remotely, Worker `bcca83bf`. **To do:** Marwan runs the smoke test (review stage added).
 9. Security tests (BIPIA on the checker, MCP token scope, poisoned rule text), real run,
    deploy (Marwan's OK), learning log, quiz.
 

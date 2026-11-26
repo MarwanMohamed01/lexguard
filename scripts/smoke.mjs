@@ -12,7 +12,9 @@
 // largest contract answers from both keywords and vectors, with offsets, pages and the
 // untrusted-text note; another document ID is 404; a malformed request is 400; extraction
 // (M4) on the smallest contract: started, extracted, clauses with exact quotes, pages and
-// definitions, merged view, no restart when asked again. Exits 1 on any failure.
+// definitions, merged view, no restart when asked again; review (M5) of 4 NDA playbook rules on
+// the smallest contract: started, a second request refused while it runs, a report with one
+// finding per rule as JSON and Markdown. Exits 1 on any failure.
 //
 // The three documents stay in your tenant (each new upload counts toward the 50-a-day quota)
 // and their vectors stay in the index (about 260 of the ~4,800 free, D25).
@@ -242,6 +244,83 @@ if (smallest !== undefined) {
     "extract without a key -> 401",
     anonymousExtract.status === 401,
     String(anonymousExtract.status),
+  );
+}
+
+// Review (M5, D52): 4 NDA playbook rules that commercial contracts often address, on the
+// SMALLEST contract: one Workflow step, about 15 Neurons per rule (a worst case of about 60 is
+// reserved first and corrected). Rule IDs and the report never contain your key.
+if (smallest !== undefined) {
+  const SCOPE = [
+    { id: "nda:4" }, // limited use
+    { id: "nda:5" }, // sharing with employees
+    { id: "nda:19" }, // survival of obligations
+    { id: "nda:16", policy: "require" }, // return or destruction
+  ];
+  const postReview = (body, headers = auth) => {
+    const text = JSON.stringify(body);
+    return fetch(new URL(`/v1/documents/${smallest}/review`, base), {
+      method: "POST",
+      headers: {
+        ...headers,
+        "Content-Type": "application/json",
+        "Content-Length": String(Buffer.byteLength(text)),
+      },
+      body: text,
+    });
+  };
+  const unknownRule = await postReview({ rules: [{ id: "nda:99" }] });
+  check(
+    "review with an unknown rule -> 400",
+    unknownRule.status === 400,
+    String(unknownRule.status),
+  );
+  const started = Date.now();
+  const first = await postReview({ rules: SCOPE });
+  check("review -> 202", first.status === 202, String(first.status));
+  const twice = await postReview({ rules: SCOPE });
+  check("review while one runs -> 409", twice.status === 409, String(twice.status));
+
+  let report;
+  for (;;) {
+    report = await get(`/v1/documents/${smallest}/report`, auth);
+    if (report.status !== 409) break;
+    const state = await report.json();
+    if (state.reviewStatus !== "reviewing" || Date.now() - started > 10 * 60 * 1000) break;
+    await sleep(5000);
+  }
+  const seconds = ((Date.now() - started) / 1000).toFixed(1);
+  const body = report.ok ? await report.json() : await report.json().catch(() => ({}));
+  const findings = body.report?.findings ?? [];
+  check(
+    "report -> 200 with one finding per rule",
+    report.ok && findings.length === SCOPE.length,
+    `HTTP ${String(report.status)}${body.reviewError ? `, ${body.reviewError}` : ""}, waited ${seconds} s, ` +
+      `summary ${JSON.stringify(body.report?.summary ?? null)}, unusable answers ${String(body.review?.failedAnswers)}, ` +
+      `${Number(body.review?.neurons ?? 0).toFixed(1)} Neurons`,
+  );
+  check(
+    "every evidence quote has its offsets' length and a page",
+    findings.every((f) =>
+      f.evidence.every((e) => e.text.length === e.end - e.start && typeof e.page === "number"),
+    ),
+  );
+  for (const f of findings) {
+    console.log(
+      `      ${f.status.padEnd(7)} ${f.citation} (${f.ruleTitle}): ${f.evidence.length} quote(s)`,
+    );
+  }
+  const markdown = await get(`/v1/documents/${smallest}/report?format=markdown`, auth);
+  check(
+    "report as Markdown -> 200 text/markdown",
+    markdown.ok && (markdown.headers.get("Content-Type") ?? "").startsWith("text/markdown"),
+    String(markdown.status),
+  );
+  const anonymousReport = await get(`/v1/documents/${smallest}/report`);
+  check(
+    "report without a key -> 401",
+    anonymousReport.status === 401,
+    String(anonymousReport.status),
   );
 }
 

@@ -1761,3 +1761,10 @@ herein..."`), copied despite the prompt. **Fix in code, not the prompt:** a lead
 - **Not done yet, needs Marwan's OK:** apply migration 0008 to the remote D1, deploy the Worker
   (new Workflow `lexguard-review-document` is created on deploy), then a real review of a smoke
   contract. The Worker bundle grows to 281 KB gzip (was 217 KB) with the rulebook data.
+- **Deployed (2026-11-26, Marwan's OK):** migration 0008 applied to the remote D1 (7 statements;
+  `review_claims` and the 5 `review_*` columns checked read-only afterwards); Worker version
+  `bcca83bf`, Workflow `lexguard-review-document` created on deploy, startup 29 ms. Live checks
+  without a key: `/health` 200; review and report 401 without a key and with a wrong key; the
+  rulebook MCP server still 401 without a token. The smoke test (`scripts/smoke.mjs`) gained a
+  review stage on the smallest contract (4 NDA rules, about 60 Neurons); Marwan runs it with his
+  key.
