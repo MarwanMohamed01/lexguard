@@ -110,9 +110,13 @@ async function answerConsent(request: Request, env: Env): Promise<Response> {
   }
 
   // Sign-in first, without consuming the handle: a wrong key leaves the form usable (Back).
-  const key = form.get("api_key");
+  // Trimmed: a pasted key often carries a space or line break (seen in the first live demo,
+  // D48; the same lesson as M2's indented keys). Keys never contain whitespace, so nothing
+  // valid is lost and nothing invalid is let in.
+  const raw = form.get("api_key");
+  const key = typeof raw === "string" ? raw.trim() : null;
   const tenantId =
-    typeof key === "string" && key.length <= 100 ? await tenantAuth(env).tenantForKey(key) : null;
+    key !== null && key.length <= 100 ? await tenantAuth(env).tenantForKey(key) : null;
   if (tenantId === null || !TENANT_ID.test(tenantId)) {
     return messagePage(401, "That API key is not valid. Go back and try again.");
   }

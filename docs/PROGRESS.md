@@ -324,6 +324,6 @@ PICK=3 node scripts/cpu-load.mjs <worker-url>        # one new upload + 20 searc
   indexing ~5 ms per step.
 - ContractNLI test split (2,091 pairs, D44): majority label macro F1 0.211, majority per
   hypothesis 0.617 (the checker's bar); keyword top 10 spans hold expert evidence for 89%.
-- Tests: 662 (worker 166, rulebook-mcp 54, a2a 34, chunker 68, extraction 51, guardrails 72,
+- Tests: 666 (worker 166, rulebook-mcp 58, a2a 34, chunker 68, extraction 51, guardrails 72,
   retrieval 26, router 13, rulebook 24, trace 24, evals 130; the live-run, converted-PDF and hybrid-gate evals skip in
   CI).

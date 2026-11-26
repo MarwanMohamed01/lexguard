@@ -1538,3 +1538,16 @@ extract_error`; `clauses` (tenant-first key, document offsets, details JSON, **n
   password alone, because the test URL had both), 0 after new tests.
 - **Live (2026-11-26):** registration endpoint advertised next to CIMD; a remote redirect URI
   refused with 400; a localhost one accepted (201, a public client); `/mcp` still 401.
+- **Second live demo (2026-11-26):** MCP Inspector still said "does not support dynamic client
+  registration". Cause, found in the MCP client SDK: after a first attempt a client keeps a
+  saved "discovery state" (the login server and its metadata) and reuses it without fetching
+  again; the Inspector had saved our metadata from before registration was switched on. A
+  fresh server URL (`/mcp?fresh=1`, accepted because the library maps a query to the same
+  resource) skipped the stale copy: the Inspector registered and opened the consent page.
+  Lesson for the write-up: changing a server's login options can leave earlier clients stuck
+  until they clear their saved state.
+- **Then the key was refused:** the pasted key carried 2 invisible extra characters (the
+  hidden prompt showed 48 stars for a 46-character key; the same key trimmed works on
+  `/v1/whoami`). The consent page now **trims whitespace around the key** before checking it.
+  Keys never contain whitespace, and a space inside a key is still refused (tested). Tests:
+  rulebook-mcp 58 (4 new); removing the trim or stripping inner spaces fails them.

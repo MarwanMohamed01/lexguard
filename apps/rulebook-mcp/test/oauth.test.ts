@@ -249,6 +249,27 @@ describe("signing in and getting a token", () => {
     expect(grants.items.some((g) => g.clientId === clientId)).toBe(true);
   });
 
+  it.each([
+    ["a leading space", ` ${TEST_KEY}`],
+    ["a trailing line break", `${TEST_KEY}\r\n`],
+    ["tabs and spaces around it", `\t ${TEST_KEY} \t`],
+  ])("accepts a pasted key with %s (trimmed)", async (_label, pasted) => {
+    const clientId = await registerClient();
+    const { handle, cookie } = await openConsent(clientId, (await pkce()).challenge);
+    const approved = await submit(cookie, { handle, decision: "approve", api_key: pasted });
+    expect(approved.status).toBe(302);
+    expect(new URL(approved.headers.get("Location") ?? "").searchParams.get("code")).not.toBeNull();
+  });
+
+  it("does not trim inside the key: a space in the middle is still wrong", async () => {
+    const clientId = await registerClient();
+    const { handle, cookie } = await openConsent(clientId, (await pkce()).challenge);
+    const broken = `${TEST_KEY.slice(0, 10)} ${TEST_KEY.slice(10)}`;
+    expect((await submit(cookie, { handle, decision: "approve", api_key: broken })).status).toBe(
+      401,
+    );
+  });
+
   it("checks the main Worker's answer too: a malformed tenant or an overlong key is refused", async () => {
     const clientId = await registerClient();
     const { handle, cookie } = await openConsent(clientId, (await pkce()).challenge);
