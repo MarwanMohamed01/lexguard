@@ -1551,3 +1551,5 @@ extract_error`; `clauses` (tenant-first key, document offsets, details JSON, **n
   `/v1/whoami`). The consent page now **trims whitespace around the key** before checking it.
   Keys never contain whitespace, and a space inside a key is still refused (tested). Tests:
   rulebook-mcp 58 (4 new); removing the trim or stripping inner spaces fails them.
+- **Redeployed with the trim** (Marwan's OK): `lexguard-rulebook` version `f7d3784a`; `/mcp`
+  still 401 without a token, registration still advertised.

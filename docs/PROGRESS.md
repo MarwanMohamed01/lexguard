@@ -29,7 +29,7 @@ and extraction Workflows, `POST /v1/documents/:id/search`, `POST .../extract`,
 dims, cosine, metadata index `doc`), Workers AI, Workflows `lexguard-chunk-document`,
 `lexguard-index-document` and `lexguard-extract-document`, secret `TENANT_KEYS`.
 
-Rulebook MCP server: https://lexguard-rulebook.marwan-dev.workers.dev/mcp, version `9fbb4cfd`
+Rulebook MCP server: https://lexguard-rulebook.marwan-dev.workers.dev/mcp, version `f7d3784a`
 (2026-11-26, D46/D47): OAuth 2.1, KV `OAUTH_KV` (`b2317d0c...`), service binding to
 `lexguard#TenantAuth`, private entrypoint `RulebookInternal`. Repo:
 https://github.com/MarwanMohamed01/lexguard (public).
