@@ -20,13 +20,18 @@ _Last updated: 2026-11-26._
 | M8 A2A & observability                   | Not started                                         |
 | M9 Evals in CI & write-up                | Not started                                         |
 
-Deployed Worker: https://lexguard.marwan-dev.workers.dev, version `ce4c803b` (2026-11-25:
+Deployed Worker: https://lexguard.marwan-dev.workers.dev, version `b2acbd6c` (2026-11-26, adds the
+private `TenantAuth` entrypoint, D47; before: `ce4c803b`, 2026-11-25:
 M2 ingestion + M3 indexing and search + M4 extraction: upload, status, chunking, indexing
 and extraction Workflows, `POST /v1/documents/:id/search`, `POST .../extract`,
 `GET .../clauses`; smoke test `scripts/smoke.mjs`, D23/D32/D41). Cloudflare resources: D1
 `lexguard` (migrations 0001-0007 applied remotely), Vectorize index `lexguard-chunks` (1,024
 dims, cosine, metadata index `doc`), Workers AI, Workflows `lexguard-chunk-document`,
-`lexguard-index-document` and `lexguard-extract-document`, secret `TENANT_KEYS`. Repo:
+`lexguard-index-document` and `lexguard-extract-document`, secret `TENANT_KEYS`.
+
+Rulebook MCP server: https://lexguard-rulebook.marwan-dev.workers.dev/mcp, version `4511c133`
+(2026-11-26, D46/D47): OAuth 2.1, KV `OAUTH_KV` (`b2317d0c...`), service binding to
+`lexguard#TenantAuth`, private entrypoint `RulebookInternal`. Repo:
 https://github.com/MarwanMohamed01/lexguard (public).
 
 ## Resume here (next chat: start M5)
@@ -37,7 +42,7 @@ https://github.com/MarwanMohamed01/lexguard (public).
 (F1 0.56 on 222 chunks vs keyword 0.20; final number when the nightly run ends).
 
 Done on 2026-11-26: end-of-M4 quiz (5/8, in LEARNING_LOG) and the M5 plan draft (below).
-M5 steps 1-4 done (D43-D47; rulebook server not deployed yet). Next: M5 step 5 (the checker).
+M5 steps 1-4 done and the rulebook server deployed (D43-D47). Next: M5 step 5 (the checker).
 
 Originally planned for the new chat:
 
@@ -111,9 +116,12 @@ supervisor (budgets, stop conditions); no LLM decides what runs.
      registration), consent page with sign-in by Lexguard API key via the main Worker's private
      `TenantAuth`; private service-binding door `RulebookInternal` for the pipeline (option A);
      threat model T9 tested, T21 added; 30 + 19 tests; 1 equivalent mutation left.
-   - **Deploy later, with Marwan's OK:** create KV `OAUTH_KV` (add its id to
-     `apps/rulebook-mcp/wrangler.jsonc`), redeploy the main Worker (`TenantAuth`), deploy
-     `lexguard-rulebook`; then demo with a real MCP client.
+   - ✅ Deployed 2026-11-26 with Marwan's OK: KV `OAUTH_KV` created, main Worker `b2acbd6c`,
+     `lexguard-rulebook` `4511c133`; 8 live checks from outside passed (401 + discovery, tenant
+     header ignored, made-up token 401, metadata with CIMD on and no registration, unknown
+     client rendered not redirected, `TenantAuth` 404 publicly).
+   - Next: Marwan demos with a real MCP client (sign-in needs his key); if the client supports
+     only dynamic registration, decide on it with a limit (D47).
    - The client pins the tool-schema hash (rug-pull check): M7.
 5. Checker (quarantined): clause + rule -> verdict, clause quote(s), rule quote, short reason;
    fake model first, real model on ContractNLI when Neurons are free (after the nightly task).

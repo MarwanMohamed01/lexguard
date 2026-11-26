@@ -12,9 +12,9 @@
   // are bound to `${PUBLIC_ORIGIN}/mcp`. Tests override it.
   "vars": { "PUBLIC_ORIGIN": "https://lexguard-rulebook.marwan-dev.workers.dev" },
   // OAuth grants, client records and token hashes (never tokens themselves). Free KV: 1,000
-  // writes a day (D43). NOT created yet: created once with `wrangler kv namespace create
-  // OAUTH_KV`, with Marwan's OK, before the first deploy; its id is then added here.
-  "kv_namespaces": [{ "binding": "OAUTH_KV" }],
+  // writes a day (D43). Created 2026-11-26 with Marwan's OK (`wrangler kv namespace create
+  // OAUTH_KV`). The ID is not a secret: only code deployed to this account can use it.
+  "kv_namespaces": [{ "binding": "OAUTH_KV", "id": "b2317d0c438543098fdced8a8e981dfa" }],
   // The main Worker's private TenantAuth entrypoint: checks the API key a person signs in with
   // on the consent page (D47). A service binding, not a URL: never on the public internet.
   "services": [{ "binding": "TENANT_AUTH", "service": "lexguard", "entrypoint": "TenantAuth" }],

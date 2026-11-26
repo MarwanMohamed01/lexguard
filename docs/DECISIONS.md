@@ -1498,3 +1498,11 @@ extract_error`; `clauses` (tenant-first key, document offsets, details JSON, **n
   length limit, the approval's scope list), and the stand-in main Worker now answers wrongly
   on purpose to prove the first two. The third is equivalent: the grant's scope is set by
   `completeAuthorization`, and a test shows extra requested scopes are never granted.
+- **Deployed (2026-11-26, Marwan's OK):** KV `OAUTH_KV` created; main Worker redeployed as
+  `b2acbd6c` (only change: `TenantAuth` and the key-check refactor, no migration); rulebook
+  Worker `4511c133` at https://lexguard-rulebook.marwan-dev.workers.dev (320 KB gzip, startup
+  46 ms). Live checks from outside, no key needed, all passed: `/mcp` 401 with
+  `resource_metadata` and `scope="rules:read"`; a tenant header without a token 401; a made-up
+  token 401; resource and authorization-server metadata correct (CIMD on, no registration
+  endpoint, PKCE S256); `/authorize` for an unknown client rendered as a 400 page, not
+  redirected; the main Worker's `/tenantForKey` 404 from the public URL.
