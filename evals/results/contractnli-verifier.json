@@ -1,0 +1,22 @@
+{
+  "oracle": {
+    "claims": 2091,
+    "verified": 2091,
+    "nonSilent": 1044,
+    "tampered": 5223,
+    "tamperRejected": 5223,
+    "withReferences": 36,
+    "references": 61,
+    "resolvedReferences": 56
+  },
+  "groq": {
+    "claims": 152,
+    "verified": 152,
+    "nonSilent": 86,
+    "tampered": 561,
+    "tamperRejected": 561,
+    "withReferences": 3,
+    "references": 9,
+    "resolvedReferences": 7
+  }
+}

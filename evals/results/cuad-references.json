@@ -1,0 +1,32 @@
+{
+  "contracts": 510,
+  "withReferences": 420,
+  "references": 15888,
+  "external": 722,
+  "internal": 15166,
+  "resolved": 13374,
+  "externalShare": 0.0454,
+  "internalResolvedShare": 0.8818,
+  "byKind": {
+    "section": {
+      "internal": 12828,
+      "resolved": 11309,
+      "resolvedShare": 0.8816
+    },
+    "clause": {
+      "internal": 417,
+      "resolved": 373,
+      "resolvedShare": 0.8945
+    },
+    "article": {
+      "internal": 1532,
+      "resolved": 1347,
+      "resolvedShare": 0.8792
+    },
+    "paragraph": {
+      "internal": 389,
+      "resolved": 345,
+      "resolvedShare": 0.8869
+    }
+  }
+}

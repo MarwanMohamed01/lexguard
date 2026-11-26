@@ -1635,3 +1635,40 @@ herein..."`), copied despite the prompt. **Fix in code, not the prompt:** a lead
     / recall 0.382. Final numbers when all 340 pairs are answered.
   - `LIMIT=0` now scores the cache without calling a model and without loading the key file,
     so a run in progress can be scored by anyone.
+
+## D50. The verifier and section cross-references (M5 step 6, 2026-11-26)
+
+- **What it checks (`packages/verifier`, plain code, no model):** a finished claim (rule ID,
+  verdict, evidence spans in the stored contract's offsets, optional rule quote) against the
+  system of record: the stored contract text and the pinned rulebook.
+  - Each evidence span must be in range and **equal to the contract's text at its offsets**.
+  - "agrees"/"conflicts" need evidence; "silent" must have none; at most 8 spans; each of at
+    least 3 words (the checker's rule, D49).
+  - The rule must exist in a rulebook, the verdict must be one of the three; a rule quote, if
+    given, must equal the rule's text at its offsets.
+  - Any problem rejects the whole claim, never repaired (claims come from our own code, so a
+    mismatch is a bug or tampering), and every problem is listed and counted.
+- **Section references (open since D40):** `findSectionReferences` finds "Section 5.3",
+  "Clause 9.1(b)(ii)", "Article IV" and lists ("Sections 3, 4 and 9.1(b)", one reference per
+  item, each with its own offsets). A reference followed by "of the Supply Agreement", "of the
+  Code", "of Exhibit B" is **external** and never resolved here; "of this Agreement" and "of
+  the Agreement" mean the contract itself. `resolveReference` finds the chunker's section with
+  exactly that number (heading labels like "1.1 Grant", "ARTICLE IV Payment", "Section 5.3.
+  Term"). Verified claims carry their references, resolved, in contract offsets.
+  - **Found by tests:** "Section 10.6.1.2.3.4" was read as "Section 1", and "Section
+    Liability" could read as Roman numeral L: a number may not be followed by a digit,
+    ".digit" or a letter.
+- **Measured on all 510 CUAD contracts (`evals/cuad/references.test.ts`; properties, since
+  CUAD has no reference labels, D10):** 15,888 references in 420 contracts; 4.5% external;
+  **88.2% of internal references resolve** to a section with exactly that number (a first
+  probe that read only single numbers and arabic labels resolved 62%). By kind: section 88.2%,
+  clause 89.5%, article 87.9%, paragraph 88.7%. CI gate: >= 0.87.
+- **On real checker claims (`evals/contractnli/verifier.test.ts`):** checker results become
+  document claims (passage offsets + the span's start). Oracle claims on all 2,091 test pairs:
+  **2,091 of 2,091 verify**, and **5,223 of 5,223 tampered copies are rejected** (offsets moved
+  by one, one character edited, proof removed, a rule that does not exist, rule quote edited).
+  Cached Groq claims (151 so far): 151 of 151 verify, 556 of 556 tampered copies rejected.
+  References in evidence: 61 in the oracle claims, 56 resolved.
+- **Tests:** verifier 23; evals 3 new. Mutation check: 18 breakages; 1 first survived (an
+  external reference was "not resolved" in the test only because that number did not exist in
+  the contract; now tested with a number that does).

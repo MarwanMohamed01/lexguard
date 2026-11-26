@@ -1,0 +1,9 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    // No ambient runtime types: the package must only use standard JS, so it runs in
+    // Workers, Node and tests alike.
+    "types": []
+  },
+  "include": ["src", "test"]
+}

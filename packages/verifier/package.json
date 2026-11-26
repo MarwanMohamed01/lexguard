@@ -1,0 +1,17 @@
+{
+  "name": "@lexguard/verifier",
+  "private": true,
+  "type": "module",
+  "version": "0.0.0",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit -p .",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@lexguard/chunker": "0.0.0",
+    "@lexguard/rulebook": "0.0.0"
+  }
+}
