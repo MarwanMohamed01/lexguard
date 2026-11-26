@@ -35,31 +35,37 @@ Rulebook MCP server: https://lexguard-rulebook.marwan-dev.workers.dev/mcp, versi
 `lexguard#TenantAuth`, private entrypoint `RulebookInternal`. Repo:
 https://github.com/MarwanMohamed01/lexguard (public).
 
-## Resume here (next chat: start M5)
+## Resume here (next chat: start M6, planned for 2026-11-27)
 
-**M5 is not blocked by anything still open in M4.** M5 builds on the deployed extraction
-(`GET /v1/documents/:id/clauses`: typed clauses, exact quotes, pages, definitions) and search
-(`POST .../search`). The production extractor model stays `@cf/google/gemma-4-26b-a4b-it`
-(F1 0.56 on 222 chunks vs keyword 0.20; final number when the nightly run ends).
+**M5 is built and deployed** (D43-D53): rulebook + MCP server with OAuth, checker, verifier,
+report, review pipeline in the Worker, instruction screen. End-of-M5 quiz 7/8. M6 is not
+blocked by the M5 leftovers below; they are runs that finish on their own plus short follow-ups.
 
-Done on 2026-11-26: end-of-M4 quiz (5/8, in LEARNING_LOG) and the M5 plan draft (below).
-M5 steps 1-4, 6, 7 done, rulebook server deployed (D43-D51); step 5 real runs pending (D49); step 8 deployed and smoke-tested (D52); step 9 done and deployed (D53). Next: M5 step 5 (the checker).
+First in the new chat:
 
-Originally planned for the new chat:
+1. **Check the overnight runs and close what they finished** (a few minutes each):
+   - Nightly task (log: `evals/data/retrieval/nightly-embed.log`): if the gemma-4 extraction
+     subset (473 chunks) and the 75 injection cases are complete, close **M4 step 4** (re-score
+     with `PROVIDER=workers-ai LIMIT=0 npm run extract:cuad -w @lexguard/evals`, compare
+     gemma-4 vs Groq vs keyword, confirm the model) and update **D41** (`LIMIT=0 npm run
+injection:cuad -w @lexguard/evals`).
+   - Marwan's Groq checker run (cache: `evals/data/contractnli/answers/`, 172 of 340 on
+     2026-11-26): re-score with `LIMIT=0 npm run check:contractnli -w @lexguard/evals` (no key
+     needed, D49) and record the final macro F1 vs the bar 0.617 and the oracle 0.925.
+2. **Start M6 (routing & caching)**: explain M6 simply with small examples, draft the plan, verify
+   free-tier limits in the official docs first (AI Gateway caching, Workers AI models and
+   prices), design the M6 eval before building (D10: public data only). Build with fake models
+   first; leave the choice of the cheap and strong model open until the gemma-4 checker numbers
+   exist (M5 leftover below).
 
-1. The **end-of-M4 quiz** (multiple choice, about 8 questions; LEARNING_LOG has what M4
-   taught and the M3 misses). Record the score in LEARNING_LOG ("Quiz score" under M4).
-2. **Draft the M5 plan** (PROJECT.md: researcher swarm, rulebook MCP server, verifier,
-   report/redline output), explain M5 and each step simply with small examples, verify
-   free-tier limits in official docs first (MCP on Workers, Durable Objects / Agents SDK if
-   used, any web search for researchers), and design the M5 eval before building (D10: public
-   data only).
+## Open items (carry into M6)
 
-**Neurons during M5:** until the nightly task disables itself (1-2 more nights), it uses up
-to 9,000 of the 10,000 free daily Neurons, so real Workers AI calls in M5 have about 1,000 a
-day. Build M5 with fake models and evals first; real runs after the task is done.
-
-## Open items (carry into M5)
+- **M5 leftovers (D49, D53, D52):** the gemma-4 checker run on the 340 ContractNLI pairs once the
+  nightly task frees the Neurons (~4,000-5,000 Neurons, through the probe Worker, ask Marwan
+  first); a real-model run of planted attacks against the checker; a live review that quotes
+  something (Marwan, smoke test on a larger contract); the screen's false alarms on list items
+  after "shall not:" (read the previous sentence, measure on fresh data).
+- **Marwan:** `git push` (24+ local commits); rotate the API key (open since M3).
 
 - **M4 finishing by itself (nightly task, D36):** the scheduled task "Lexguard nightly
   embedding" runs `scripts/nightly-embed.ps1` at 01:10 local (00:10 UTC): the gemma-4
