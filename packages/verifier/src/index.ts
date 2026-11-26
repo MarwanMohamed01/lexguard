@@ -5,6 +5,7 @@ export {
   type SectionReference,
 } from "./references";
 export {
+  chunkedText,
   MIN_EVIDENCE_WORDS,
   VERDICTS,
   verifyClaim,
@@ -13,6 +14,7 @@ export {
   type Problem,
   type ResolvedReference,
   type Span,
+  type TextSource,
   type Verdict,
   type Verification,
   type VerificationReport,

@@ -13,6 +13,7 @@
   "dependencies": {
     "@lexguard/extraction": "0.0.0",
     "@lexguard/guardrails": "0.0.0",
+    "@lexguard/rulebook": "0.0.0",
     "zod": "4.6.7"
   }
 }

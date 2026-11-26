@@ -1711,3 +1711,53 @@ herein..."`), copied despite the prompt. **Fix in code, not the prompt:** a lead
   test quote on page 1; an empty model note never tested; the block quote unchecked because
   escaping already defused the fake heading; the order check matched the summary table instead
   of the findings); all caught after new tests.
+
+## D52. The review pipeline in the Worker (M5 step 8, 2026-11-26)
+
+- **Endpoints (`apps/worker/src/review.ts`):**
+  - `POST /v1/documents/:id/review` `{"rules": [{"id": "gdpr:28(3)(a)", "policy"?: "require" |
+"forbid"}]}`: 1 to 40 known, distinct rules (unknown IDs answer 400, listing only
+    well-formed ones, never echoing junk); the document must be ready and indexed (409
+    otherwise); the validated scope is stored with a fencing ticket and the Workflow started
+    (202); a second request while one runs answers 409. **The scope and policy come with the
+    request** because what is good depends on the reviewer's side (D51).
+  - `GET /v1/documents/:id/report` (`?format=markdown` for people): the report (D51) built on
+    read from the stored claims; 409 before a review, 404 for another tenant's document.
+- **The Workflow (`ReviewDocument`, `src/reviewing.ts`):** load (ticket, scope, delete the old
+  claims) -> groups of **4 rules per step**, 2 groups at a time (3,000 steps a day, D43: a
+  19-rule GDPR Art. 28 review is 7 steps) -> finish. Per rule:
+  1. **hybrid search** (`hybridTopChunks`, refactored out of the search endpoint: keyword +
+     vector, RRF, keyword fallback) picks the **top 5 chunks**, the database doing the work;
+  2. those chunks are split into sentences and the **top 10 by BM25** go to the checker, in
+     document order (`selectPassages`, `@lexguard/checker`): the passage shape the ContractNLI
+     eval measured. A heading number's full stop ("1. Definitions") does not end a sentence
+     (found by tests);
+  3. Neurons are reserved in the same atomic daily budget as extraction, then corrected;
+  4. the **verifier checks the claim against only the chunks that were loaded**
+     (`chunkedText`: a slice outside them can never equal evidence, so it fails closed). The
+     Worker never loads the whole document into a step (10 ms CPU, D24/D33);
+  5. section references are resolved against sections rebuilt from the chunks' stored headings
+     (the chunker's sections are not stored);
+  6. one `review_claims` row per rule: outcome (verified / rejected / unusable answer),
+     verdict, evidence as offsets only (text is the chunk's, as for clauses), rule quote,
+     the model's note, references, problems, Neurons. Every write is fenced by the ticket.
+  - A rule with no passage gets a silent claim without a model call.
+- **Migration 0008** (local only so far): review state columns on `documents` and
+  `review_claims` (tenant first in the key, cascade delete).
+- **Report from stored claims:** evidence text is read from the chunks it points into; the
+  report's text source is the loaded chunks (references and the document length are all it
+  reads), so `@lexguard/report` now takes the same `TextSource` as the verifier.
+- **Tests (Workers runtime, fake model, keyword search):** worker +11: the whole review of a
+  5-rule NDA scope (verified, downgraded, unusable answer, our `[n]` label stripped, a section
+  reference resolved, Neurons recorded), the daily budget stop, a newer job taking over before
+  a step and during a model call (no claim written), no scope, request validation, 404 / 409 /
+  503, the report as JSON and Markdown (evidence equal to the stored text, pages, references).
+  checker +8 (sentences, passages), verifier +1 (`chunkedText`). Mutation check: 17 breakages
+  of the Worker code; 3 first survived (the claim write's fencing, a missing scope, "not
+  indexed" vs "already running" both 409), all caught after new tests.
+- **The verifier's "rejected" outcome is defence in depth:** with evidence always taken from
+  loaded chunks it cannot occur in normal operation; the verifier itself is tested directly
+  (D50).
+- **Not done yet, needs Marwan's OK:** apply migration 0008 to the remote D1, deploy the Worker
+  (new Workflow `lexguard-review-document` is created on deploy), then a real review of a smoke
+  contract. The Worker bundle grows to 281 KB gzip (was 217 KB) with the rulebook data.

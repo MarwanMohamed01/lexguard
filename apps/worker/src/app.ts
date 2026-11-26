@@ -3,6 +3,7 @@
 import { authenticate } from "./auth";
 import { handleClauses, handleExtract, type StartExtraction } from "./clauses";
 import { countCreatedSince, getDocument } from "./documents";
+import { handleReport, handleReview, type StartReview } from "./review";
 import { handleSearch, type SearchServices } from "./search";
 import { handleUpload, type UploadDeps } from "./upload";
 
@@ -15,6 +16,8 @@ export type AppDeps = UploadDeps & {
   search?: SearchServices | undefined;
   /** Starts the extraction Workflow; without it, POST .../extract answers 503. */
   startExtraction?: StartExtraction | undefined;
+  /** Starts the review Workflow (M5, D52); without it, POST .../review answers 503. */
+  startReview?: StartReview | undefined;
 };
 
 /**
@@ -120,6 +123,19 @@ async function handleV1(request: Request, url: URL, env: Env, deps: AppDeps): Pr
     if (request.method !== "GET") return methodNotAllowed("GET");
     if (!UUID.test(id)) return notFound();
     return handleClauses(env.DB, tenantId, id, url);
+  }
+
+  const review = /^\/v1\/documents\/([^/]+)\/(review|report)$/.exec(url.pathname);
+  if (review?.[1] !== undefined) {
+    const id = review[1].toLowerCase();
+    if (review[2] === "review") {
+      if (request.method !== "POST") return methodNotAllowed("POST");
+      if (!UUID.test(id)) return notFound();
+      return handleReview(request, env.DB, tenantId, id, deps.startReview);
+    }
+    if (request.method !== "GET") return methodNotAllowed("GET");
+    if (!UUID.test(id)) return notFound();
+    return handleReport(env.DB, tenantId, id, url);
   }
 
   return notFound();

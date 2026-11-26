@@ -148,3 +148,39 @@ describe("verifyClaims", () => {
     expect(report.problemCounts).toEqual({ unknown_rule: 2, no_evidence: 1 });
   });
 });
+
+describe("chunkedText (verify against loaded chunks only, D52)", () => {
+  it("slices inside a loaded chunk, and fails closed anywhere else", async () => {
+    const { chunkedText } = await import("../src/index");
+    const full = "alpha beta gamma delta epsilon";
+    const source = chunkedText(full.length, [
+      { start: 0, text: full.slice(0, 11) }, // "alpha beta "
+      { start: 17, text: full.slice(17) }, // "delta epsilon"
+    ]);
+    expect(source.length).toBe(full.length);
+    expect(source.slice(6, 10)).toBe("beta");
+    expect(source.slice(17, 22)).toBe("delta");
+    // Across two chunks, or in text that was not loaded: never equal to real evidence.
+    expect(source.slice(6, 20)).not.toBe(full.slice(6, 20));
+    expect(source.slice(11, 16)).not.toBe(full.slice(11, 16));
+    // A claim on loaded text verifies; the same claim on unloaded text is rejected.
+    const claim: Claim = {
+      ruleId: "nda:11",
+      verdict: "agrees",
+      evidence: [{ start: 17, end: full.length, text: "delta epsilon" }],
+    };
+    const ok = verifyClaim(
+      { ...claim, evidence: [{ start: 0, end: 16, text: "alpha beta gamma" }] },
+      {
+        ...ctx,
+        text: chunkedText(full.length, [{ start: 0, text: full }]),
+      },
+    );
+    expect(ok.ok).toBe(true);
+    const partial = verifyClaim(
+      { ...claim, evidence: [{ start: 0, end: 16, text: "alpha beta gamma" }] },
+      { ...ctx, text: source },
+    );
+    expect(partial.ok).toBe(false);
+  });
+});

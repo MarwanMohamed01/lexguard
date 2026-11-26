@@ -142,6 +142,33 @@ export async function vectorWithRetry(search: () => Promise<number[]>): Promise<
   return null;
 }
 
+/**
+ * The top chunks for `query` the way hybrid search ranks them (keyword + vector, RRF), for
+ * callers inside the Worker (the review job, D52). Falls back to keywords alone when the
+ * vector side is missing or fails twice; `degraded` says so.
+ */
+export async function hybridTopChunks(
+  db: D1Database,
+  services: SearchServices | undefined,
+  tenantId: string,
+  documentId: string,
+  chunkCount: number,
+  query: string,
+  limit: number,
+): Promise<{ top: number[]; degraded: boolean }> {
+  const [keyword, vector] = await Promise.all([
+    keywordSearch(db, tenantId, documentId, query),
+    services === undefined
+      ? Promise.resolve(null)
+      : vectorWithRetry(() => vectorSearch(services, tenantId, documentId, chunkCount, query)),
+  ]);
+  const lists = [keyword, vector ?? []].filter((l) => l.length > 0);
+  const top = reciprocalRankFusion(lists.map((l) => l.map(String)))
+    .slice(0, limit)
+    .map((f) => Number(f.id));
+  return { top, degraded: vector === null };
+}
+
 interface ChunkRow {
   idx: number;
   start_offset: number;

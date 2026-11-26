@@ -37,6 +37,12 @@
       "binding": "EXTRACT_DOCUMENT",
       "class_name": "ExtractDocument",
     },
+    // Review job (src/reviewing.ts, M5, D52): started on request by POST .../review.
+    {
+      "name": "lexguard-review-document",
+      "binding": "REVIEW_DOCUMENT",
+      "class_name": "ReviewDocument",
+    },
   ],
   // Chunk vectors (bge-m3, 1,024 dimensions, cosine), one namespace per tenant, metadata
   // index on "doc". NOT created by deploy: created once with `wrangler vectorize create`

@@ -24,6 +24,32 @@ export type Verdict = (typeof VERDICTS)[number];
 export const MIN_EVIDENCE_WORDS = 3;
 const MAX_EVIDENCE = 8;
 
+/** What the verifier needs of the contract text; a plain string is one. */
+export interface TextSource {
+  readonly length: number;
+  slice(start: number, end: number): string;
+}
+
+/**
+ * The contract seen through some of its chunks (each exactly the stored text at its offsets,
+ * M2). A slice inside one loaded chunk is that chunk's text; any other slice is null, which
+ * never equals evidence text, so the claim fails closed.
+ */
+export function chunkedText(
+  length: number,
+  chunks: readonly { start: number; text: string }[],
+): TextSource {
+  return {
+    length,
+    slice(start, end) {
+      const chunk = chunks.find((c) => c.start <= start && end <= c.start + c.text.length);
+      return chunk === undefined
+        ? "\u0000not loaded"
+        : chunk.text.slice(start - chunk.start, end - chunk.start);
+    },
+  };
+}
+
 export interface Span {
   start: number;
   end: number;
@@ -67,8 +93,12 @@ export type Verification =
   { ok: true; claim: VerifiedClaim } | { ok: false; claim: Claim; problems: Problem[] };
 
 export interface VerifyContext {
-  /** The contract's stored text (D1), the same text all offsets point into. */
-  text: string;
+  /**
+   * The contract's stored text (D1), the same text all offsets point into. A string, or
+   * anything that can slice it: the Worker passes only the chunks it loaded (D52), and a
+   * slice it does not hold must come back different from any evidence (so it is rejected).
+   */
+  text: TextSource;
   /** Rulebooks by rule-ID prefix: "gdpr" -> the GDPR rulebook. */
   rulebooks: ReadonlyMap<string, Rulebook>;
   /** The chunker's sections of this text, for resolving references (may be empty). */

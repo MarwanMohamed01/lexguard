@@ -7,6 +7,7 @@ import { CONVERSION_OPTIONS } from "./upload";
 export { ChunkDocument } from "./chunking";
 export { IndexDocument } from "./indexing";
 export { ExtractDocument } from "./extraction";
+export { ReviewDocument } from "./reviewing";
 export { TenantAuth } from "./tenant-auth";
 
 export default {
@@ -23,6 +24,9 @@ export default {
       search: { embed: workersAiEmbedder(env.AI), vectors: vectorIndex(env) },
       startExtraction: async (params) => {
         await env.EXTRACT_DOCUMENT.create({ id: params.jobId, params });
+      },
+      startReview: async (params) => {
+        await env.REVIEW_DOCUMENT.create({ id: params.jobId, params });
       },
     });
   },

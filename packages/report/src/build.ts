@@ -12,7 +12,7 @@
 // Suggested wording (the redline) comes from the RULEBOOK, never from a model: pinned,
 // trusted text, marked as a template to adapt. No contract text reaches a writer (T1).
 import { getRule, ruleText, type Rulebook } from "@lexguard/rulebook";
-import type { Claim, Problem, Verdict, VerifiedClaim } from "@lexguard/verifier";
+import type { Claim, Problem, TextSource, Verdict, VerifiedClaim } from "@lexguard/verifier";
 
 export const REPORT_VERSION = "report/1";
 
@@ -22,8 +22,9 @@ export type Risk = "none" | "medium" | "high";
 
 export interface ReportInput {
   document: { id: string; title: string };
-  /** The stored contract text that every offset points into. */
-  text: string;
+  /** The stored contract text that every offset points into (a string, or the chunks the
+   * caller loaded: only its length and the slices of references are read). */
+  text: TextSource;
   /** Offsets where each PDF page starts (D21), to cite pages; empty for plain text. */
   pageStarts?: readonly number[];
   rulebooks: ReadonlyMap<string, Rulebook>;
