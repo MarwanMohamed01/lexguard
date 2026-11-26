@@ -1,0 +1,184 @@
+{
+  "split": "test",
+  "top5": {
+    "labels": {
+      "cases": 2091,
+      "accuracy": 0.8737,
+      "perClass": {
+        "Entailment": {
+          "tp": 777,
+          "fp": 0,
+          "fn": 191,
+          "precision": 1,
+          "recall": 0.8027,
+          "f1": 0.8905
+        },
+        "Contradiction": {
+          "tp": 147,
+          "fp": 0,
+          "fn": 73,
+          "precision": 1,
+          "recall": 0.6682,
+          "f1": 0.8011
+        },
+        "NotMentioned": {
+          "tp": 903,
+          "fp": 264,
+          "fn": 0,
+          "precision": 0.7738,
+          "recall": 1,
+          "f1": 0.8725
+        }
+      },
+      "macroF1": 0.8547,
+      "confusion": {
+        "Entailment": {
+          "Entailment": 777,
+          "Contradiction": 0,
+          "NotMentioned": 191
+        },
+        "Contradiction": {
+          "Entailment": 0,
+          "Contradiction": 147,
+          "NotMentioned": 73
+        },
+        "NotMentioned": {
+          "Entailment": 0,
+          "Contradiction": 0,
+          "NotMentioned": 903
+        }
+      }
+    },
+    "evidence": {
+      "tp": 1102,
+      "fp": 1,
+      "fn": 1302,
+      "precision": 0.9991,
+      "recall": 0.4584,
+      "f1": 0.6285,
+      "pairs": 1188,
+      "hit": 0.7778
+    }
+  },
+  "top10": {
+    "labels": {
+      "cases": 2091,
+      "accuracy": 0.9311,
+      "perClass": {
+        "Entailment": {
+          "tp": 862,
+          "fp": 0,
+          "fn": 106,
+          "precision": 1,
+          "recall": 0.8905,
+          "f1": 0.9421
+        },
+        "Contradiction": {
+          "tp": 182,
+          "fp": 0,
+          "fn": 38,
+          "precision": 1,
+          "recall": 0.8273,
+          "f1": 0.9055
+        },
+        "NotMentioned": {
+          "tp": 903,
+          "fp": 144,
+          "fn": 0,
+          "precision": 0.8625,
+          "recall": 1,
+          "f1": 0.9262
+        }
+      },
+      "macroF1": 0.9246,
+      "confusion": {
+        "Entailment": {
+          "Entailment": 862,
+          "Contradiction": 0,
+          "NotMentioned": 106
+        },
+        "Contradiction": {
+          "Entailment": 0,
+          "Contradiction": 182,
+          "NotMentioned": 38
+        },
+        "NotMentioned": {
+          "Entailment": 0,
+          "Contradiction": 0,
+          "NotMentioned": 903
+        }
+      }
+    },
+    "evidence": {
+      "tp": 1358,
+      "fp": 2,
+      "fn": 1046,
+      "precision": 0.9985,
+      "recall": 0.5649,
+      "f1": 0.7216,
+      "pairs": 1188,
+      "hit": 0.8788
+    }
+  },
+  "top20": {
+    "labels": {
+      "cases": 2091,
+      "accuracy": 0.977,
+      "perClass": {
+        "Entailment": {
+          "tp": 930,
+          "fp": 0,
+          "fn": 38,
+          "precision": 1,
+          "recall": 0.9607,
+          "f1": 0.98
+        },
+        "Contradiction": {
+          "tp": 210,
+          "fp": 0,
+          "fn": 10,
+          "precision": 1,
+          "recall": 0.9545,
+          "f1": 0.9767
+        },
+        "NotMentioned": {
+          "tp": 903,
+          "fp": 48,
+          "fn": 0,
+          "precision": 0.9495,
+          "recall": 1,
+          "f1": 0.9741
+        }
+      },
+      "macroF1": 0.9769,
+      "confusion": {
+        "Entailment": {
+          "Entailment": 930,
+          "Contradiction": 0,
+          "NotMentioned": 38
+        },
+        "Contradiction": {
+          "Entailment": 0,
+          "Contradiction": 210,
+          "NotMentioned": 10
+        },
+        "NotMentioned": {
+          "Entailment": 0,
+          "Contradiction": 0,
+          "NotMentioned": 903
+        }
+      }
+    },
+    "evidence": {
+      "tp": 1693,
+      "fp": 3,
+      "fn": 711,
+      "precision": 0.9982,
+      "recall": 0.7042,
+      "f1": 0.8259,
+      "pairs": 1188,
+      "hit": 0.9596
+    }
+  },
+  "barPerHypothesisMacroF1": 0.6168
+}

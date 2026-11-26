@@ -1561,3 +1561,59 @@ extract_error`; `clauses` (tenant-first key, document offsets, details JSON, **n
   `tools/list` answered OK (111 ms and 183 ms). The Inspector spoke the 2025-11-25 protocol
   (our stateless handler serves both eras, D46). A tool call (`get_rule`) is not in this
   recording.
+
+## D49. The checker: form, evidence rules, and its ceiling on ContractNLI (M5 step 5, 2026-11-26)
+
+- **What it does (`packages/checker`):** one call compares one rule (from the pinned
+  rulebook, trusted) with a few contract passages (untrusted) and fills a closed form:
+  `{"verdict": "agrees" | "conflicts" | "silent", "quotes": [...], "ruleQuote", "reason"}`.
+  It is a **quarantined reader** like the extractor (T1): no tools, closed form, passages
+  numbered `[1]...[n]` inside a nonce-wrapped `<document id=...>` block, the rule in its own
+  `<rule>` block; prompt version `check/1`. It reuses the extractor's `locateQuote` and the
+  guardrails' `parseModelOutput` (size cap, JSON, Zod).
+- **Evidence rules, all in code:**
+  - Each quote must be found in a passage (whitespace-tolerant, D38); what is kept is the
+    passage's own text at that position, never the model's words.
+  - **No evidence, no claim:** "agrees" or "conflicts" with no quote found is downgraded to
+    "silent" and counted (`downgraded`).
+  - **Quotes under 3 words are ignored** (`quotesTooShort`): found while scoring the oracle
+    below. ContractNLI marks sentence fragments such as "A " or "(a) Compu" as evidence, and a
+    fragment that short occurs in many passages, so it proves nothing.
+  - **Which passage a quote came from:** the passage that is exactly the quote, then one that
+    contains it verbatim, then a whitespace-tolerant match; the earliest on a tie.
+  - The rule quote is checked against the rule text and cited as the rule's own text; it is
+    optional, since the rule is already known by its ID.
+  - An answer outside the form is a failure, scored as no claim ("silent").
+- **Mapping to ContractNLI:** agrees = Entailment, conflicts = Contradiction, silent =
+  NotMentioned; the accepted quotes' passages are the predicted evidence spans. The rule text
+  is the NDA playbook's (`nda:N`), identical to ContractNLI's hypotheses (tested).
+- **What the checker reads:** the contract's top-k spans from M3's keyword search for the rule,
+  in document order, never the whole NDA.
+- **The ceiling, measured without any model (the "oracle"):** a fake model that answers the
+  expert's label and quotes the expert's evidence, run through the real checker code on all
+  2,091 test pairs. It can only be right where the search showed it some evidence:
+
+  | Passages read | Accuracy | Macro F1 | Contradiction F1 | Evidence P / R |
+  | ------------- | -------- | -------- | ---------------- | -------------- |
+  | top 5         | 0.874    | 0.855    | 0.801            | 0.999 / 0.458  |
+  | top 10        | 0.931    | 0.925    | 0.906            | 0.999 / 0.565  |
+  | top 20        | 0.977    | 0.977    | 0.977            | 0.998 / 0.704  |
+
+  The bar (most common label per rule, never reading the contract) is macro F1 0.617. So
+  between 0.617 and about 0.925 at k=10 is the checker's own job; above it, only better
+  retrieval helps. Evidence precision is not exactly 1 because the same 3+ words can stand in
+  two passages (repeated boilerplate). k stays 10 for now; the real runs decide whether 20 is
+  worth about twice the input tokens.
+
+- **Runner (`evals/contractnli/checker.task.ts`, `npm run check:contractnli -w
+@lexguard/evals`):** pinned subset of 20 test NDAs (340 pairs), answers cached per exact
+  prompt (the eval derives the nonce from the input), the Neuron ledger shared with the other
+  runs, Groq allowed because ContractNLI is public (D34). It reports the bar on the same pairs.
+  **No real model run yet:** the nightly task still uses most of the daily Neurons, and a Groq
+  run uses Marwan's Groq key (his to start).
+- **Tests:** checker 14 (fake models: honest, invented quote, injected instruction quoted,
+  broken JSON, oversized, malformed items, short quotes, passage choice, prompt refusals);
+  evals 6 new (case building, label and span mapping, oracle downgraded when blind, nonce, rule
+  texts equal the hypotheses, the oracle on all test pairs). Mutation check: 23 breakages over
+  the checker and the eval mapping; 3 first survived (two equivalent and removed as redundant
+  code, one real gap: the rule quote's own text, now tested).

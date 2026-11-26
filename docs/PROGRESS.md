@@ -42,7 +42,7 @@ https://github.com/MarwanMohamed01/lexguard (public).
 (F1 0.56 on 222 chunks vs keyword 0.20; final number when the nightly run ends).
 
 Done on 2026-11-26: end-of-M4 quiz (5/8, in LEARNING_LOG) and the M5 plan draft (below).
-M5 steps 1-4 done and the rulebook server deployed (D43-D47). Next: M5 step 5 (the checker).
+M5 steps 1-4 done and the rulebook server deployed (D43-D48); step 5 built, real runs pending (D49). Next: M5 step 5 (the checker).
 
 Originally planned for the new chat:
 
@@ -128,8 +128,11 @@ supervisor (budgets, stop conditions); no LLM decides what runs.
      (stale saved discovery state in the client; whitespace in the pasted key, now trimmed,
      `f7d3784a`). Still to record for the README GIF: a `get_rule` call.
    - The client pins the tool-schema hash (rug-pull check): M7.
-5. Checker (quarantined): clause + rule -> verdict, clause quote(s), rule quote, short reason;
-   fake model first, real model on ContractNLI when Neurons are free (after the nightly task).
+5. ⏳ Checker (D49): `packages/checker` built (quarantined reader, verdict agrees / conflicts /
+   silent, no evidence = no claim, quotes under 3 words ignored); ContractNLI runner with cache.
+   Ceiling with keyword top 10 passages (oracle, no model): macro F1 **0.925** (bar 0.617).
+   **Still to do:** real runs on the 340-pair subset (Groq, Marwan's key; gemma-4 when the
+   nightly task frees Neurons), then choose k (10 or 20) and record the score.
 6. Verifier (code): every quote must be found in the contract at its offsets and in the rule
    text; claims without a verified quote are dropped and counted. Section references
    ("Section 5.3", D40) resolved so the verifier can follow them.
@@ -327,6 +330,6 @@ PICK=3 node scripts/cpu-load.mjs <worker-url>        # one new upload + 20 searc
   indexing ~5 ms per step.
 - ContractNLI test split (2,091 pairs, D44): majority label macro F1 0.211, majority per
   hypothesis 0.617 (the checker's bar); keyword top 10 spans hold expert evidence for 89%.
-- Tests: 666 (worker 166, rulebook-mcp 58, a2a 34, chunker 68, extraction 51, guardrails 72,
-  retrieval 26, router 13, rulebook 24, trace 24, evals 130; the live-run, converted-PDF and hybrid-gate evals skip in
+- Tests: 686 (worker 166, rulebook-mcp 58, checker 14, a2a 34, chunker 68, extraction 51, guardrails 72,
+  retrieval 26, router 13, rulebook 24, trace 24, evals 136; the live-run, converted-PDF and hybrid-gate evals skip in
   CI).
