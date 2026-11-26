@@ -396,3 +396,92 @@ evals 74.
     results are labelled untrusted. The real defence is M7's quarantined reader.
   - To revisit before M4: D26 (padding), D27/D28 (zero-weight filter), D33 (JSON CPU), D25
     (512 tokens), T2.
+
+## Milestone 4 — Extraction swarm
+
+### What was built
+
+The system now READS a contract, live at https://lexguard.marwan-dev.workers.dev:
+
+**ready document → `POST .../extract` → extraction Workflow (one step per chunk, 4 at a time,
+daily Neuron budget) → extractor on each chunk → checked clauses in D1 → `GET .../clauses`
+(per chunk, or merged, with definitions)**
+
+| Piece                      | Job                                                                     |
+| -------------------------- | ----------------------------------------------------------------------- |
+| `packages/extraction`      | Prompt, Zod form, quote check, merge, defined-term matching             |
+| Migration 0007             | Extraction state, `clauses` (offsets, no quote), audit, Neuron budget   |
+| `ExtractDocument` Workflow | Load, chunk steps in parallel, reserve Neurons atomically, finish       |
+| `src/clauses.ts`           | Start extraction; return clauses, merged view, definitions              |
+| Chunker `findDefinitions`  | Also inline definitions `(the "Supplier")`; `definitionSpan` cites them |
+| Extraction eval            | CUAD labels per chunk, P/R/F1 per type, baselines, cached answers       |
+| Injection eval             | BIPIA's 75 public attacks planted in real chunks                        |
+| Nightly task               | Embedding, gemma eval and injection cases, unattended, self-disabling   |
+
+### Ideas worth remembering
+
+- **The extractor is a quarantined reader.** It reads untrusted text, has no tools, and can
+  only fill a closed form: 41 clause types, 5 risk flags, short capped details. Contract text
+  sits inside `<document id=NONCE>` tags, so a fake closing tag cannot be guessed.
+- **Code checks the model.** Every quote must be in the chunk (whitespace may differ), and
+  what is stored is the CONTRACT's text at that position, never the model's words. A clause
+  with an invented quote is dropped.
+- **The eval comes first, with baselines.** CUAD's lawyer labels per chunk. Guessing all
+  types: F1 0.026; keyword search top hit: 0.20. Groq gpt-oss-20b: 0.54; gemma-4 (production)
+  on 222 chunks: 0.56. A model must beat search to be worth its Neurons.
+- **Check privacy before sending text anywhere.** Gemini's free tier trains on prompts, so no
+  document text goes there; Groq does not say, so only public CUAD contracts go there.
+- **Free limits shape the design.** Queues allow about 3,300 messages a day, so the fan-out
+  is Workflow steps. A shared daily Neuron budget is reserved in one conditional UPDATE
+  before each call, so parallel steps cannot overspend.
+- **Merge on read.** A clause cut by a chunk border is two pieces; they are joined when the
+  clauses are read (same type, overlapping or only whitespace between), so the stored data
+  never changes.
+- **Inline definitions doubled what can be explained.** Only "X means" was found before (35%
+  of lawyer clauses used such a term); with `(the "Supplier")` it is 77%.
+
+### What the real runs found
+
+- **gemma-4 answered nothing at first:** "thinking" is on by default and the answer sits in
+  `choices[0].message.content`, not `response`. The production Worker had the same bug.
+- **9 of 13 rejected quotes differed only in whitespace** (a line break for a space). The
+  check now ignores whitespace but still cites the contract's own text: F1 0.45 → 0.54.
+- **My laptop was too slow** for a local model (1.5 tokens/s); a 3B model got 0 right. Free
+  hosted models on public data were the fast path.
+- **A Vitest `describe` body runs even when the suite is skipped.** Reading a local-only file
+  there broke CI; data is read in `beforeAll`.
+- **Injection: the quarantine held.** The model visibly obeyed 4 of 65 attacks (3 cipher or
+  Base64 answers that broke the JSON, 1 invented "Fact" clause about Mount Everest); none
+  reached the stored result. The cost is availability: F1 0.61 → 0.55 on attacked chunks.
+
+### Debugging and process lessons
+
+- Mutation checks again found gaps in every step (a definition looked up at the wrong place,
+  a short term beating a longer one, a resample averaged over the wrong count).
+- Writing files from PowerShell can change their encoding: `Get-Content`/`Set-Content` garbled
+  emoji in PROGRESS.md. Restore from git and use an editor or UTF-8 without BOM.
+- An unattended nightly task should resume from caches and stop itself when done.
+
+### Numbers
+
+- Baselines on 510 contracts: all types F1 0.026, frequency guess 0.021, keyword top-1 0.203.
+- Groq gpt-oss-20b, 68 chunks: F1 0.54 (P 0.57, R 0.52). gemma-4, 222 of 473 chunks: F1 0.56
+  (P 0.47, R 0.70), keyword 0.20 on the same chunks.
+- gemma-4: about 2,150 input and 150 output tokens per chunk, ~32 Neurons with clauses.
+- Definitions on 510 contracts: 15,291 found (8,323 inline), all cited.
+- Injection (BIPIA, Groq): 73 of 75 so far, 0 stored.
+- Live smoke: a 1-page contract extracted in 15.9 s, 4 clauses.
+- M3 closed in this milestone (D42): hybrid beats keyword by +0.022 MRR, 95% interval
+  [+0.015, +0.030] on 510 contracts; contextual header off.
+
+### Tests at the end of M4
+
+571 tests: worker 162, a2a 34, chunker 68, extraction 51, guardrails 72, retrieval 26, router
+13, trace 24, evals 121.
+
+### Quiz score
+
+- During M4: quote-check question answered A (right: B, code checks the quote against the
+  chunk). Definitions question and the Base64 (integrity vs availability) question not yet
+  answered.
+- End-of-M4 quiz: to do at the start of the next chat.

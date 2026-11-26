@@ -3,22 +3,22 @@
 Where the project stands and how to resume. Read together with `PROJECT.md` (the spec),
 `docs/DECISIONS.md` (deviations and their reasons) and `docs/LEARNING_LOG.md`.
 
-_Last updated: 2026-11-25._
+_Last updated: 2026-11-26._
 
 ## Status
 
-| Milestone                            | Status                                              |
-| ------------------------------------ | --------------------------------------------------- |
-| M0 Foundations                       | ✅ Done                                             |
-| M1 Core packages                     | ✅ Done (CI and full-history secret scan green)     |
-| M2 Ingestion & splitting             | ✅ Done (deployed, smoke test green)                |
-| M3 Index & retrieval                 | ✅ Done (deployed; full-corpus eval and gates, D42) |
-| **M4 Extraction swarm**              | ⏳ **In progress** (deployed; eval finishing)       |
-| M5 Research, verification, synthesis | Not started                                         |
-| M6 Routing & caching                 | Not started                                         |
-| M7 Guardrails & red team             | Not started                                         |
-| M8 A2A & observability               | Not started                                         |
-| M9 Evals in CI & write-up            | Not started                                         |
+| Milestone                                | Status                                              |
+| ---------------------------------------- | --------------------------------------------------- |
+| M0 Foundations                           | ✅ Done                                             |
+| M1 Core packages                         | ✅ Done (CI and full-history secret scan green)     |
+| M2 Ingestion & splitting                 | ✅ Done (deployed, smoke test green)                |
+| M3 Index & retrieval                     | ✅ Done (deployed; full-corpus eval and gates, D42) |
+| **M4 Extraction swarm**                  | ⏳ Nearly done (deployed; eval finishing nightly)   |
+| **M5 Research, verification, synthesis** | ⏳ **Next** (new chat)                              |
+| M6 Routing & caching                     | Not started                                         |
+| M7 Guardrails & red team                 | Not started                                         |
+| M8 A2A & observability                   | Not started                                         |
+| M9 Evals in CI & write-up                | Not started                                         |
 
 Deployed Worker: https://lexguard.marwan-dev.workers.dev, version `ce4c803b` (2026-11-25:
 M2 ingestion + M3 indexing and search + M4 extraction: upload, status, chunking, indexing
@@ -29,22 +29,51 @@ dims, cosine, metadata index `doc`), Workers AI, Workflows `lexguard-chunk-docum
 `lexguard-index-document` and `lexguard-extract-document`, secret `TENANT_KEYS`. Repo:
 https://github.com/MarwanMohamed01/lexguard (public).
 
-## Open items (carry into M4)
+## Resume here (next chat: start M5)
 
-- ✅ **Full-corpus retrieval eval (M3 step 2), closed 2026-11-26 (D42):** hybrid really
-  beats keyword (+0.022 MRR, 95% interval [+0.015, +0.030], 510 contracts); the contextual
-  header really hurts and stays off; CI gates set. Live = offline (D31).
-- **Nightly task** (D36): the scheduled task "Lexguard nightly embedding" runs
-  `scripts/nightly-embed.ps1` at 01:10 local (00:10 UTC); embedding is done, it still runs
-  the M4 extraction subset (gemma-4) and the last injection cases; log in
-  `evals/data/retrieval/nightly-embed.log`; it disables itself when all are done. The laptop
-  must stay logged in (sleep is fine) on those nights.
+**M5 is not blocked by anything still open in M4.** M5 builds on the deployed extraction
+(`GET /v1/documents/:id/clauses`: typed clauses, exact quotes, pages, definitions) and search
+(`POST .../search`). The production extractor model stays `@cf/google/gemma-4-26b-a4b-it`
+(F1 0.56 on 222 chunks vs keyword 0.20; final number when the nightly run ends).
+
+First in the new chat:
+
+1. The **end-of-M4 quiz** (multiple choice, about 8 questions; LEARNING_LOG has what M4
+   taught and the M3 misses). Record the score in LEARNING_LOG ("Quiz score" under M4).
+2. **Draft the M5 plan** (PROJECT.md: researcher swarm, rulebook MCP server, verifier,
+   report/redline output), explain M5 and each step simply with small examples, verify
+   free-tier limits in official docs first (MCP on Workers, Durable Objects / Agents SDK if
+   used, any web search for researchers), and design the M5 eval before building (D10: public
+   data only).
+
+**Neurons during M5:** until the nightly task disables itself (1-2 more nights), it uses up
+to 9,000 of the 10,000 free daily Neurons, so real Workers AI calls in M5 have about 1,000 a
+day. Build M5 with fake models and evals first; real runs after the task is done.
+
+## Open items (carry into M5)
+
+- **M4 finishing by itself (nightly task, D36):** the scheduled task "Lexguard nightly
+  embedding" runs `scripts/nightly-embed.ps1` at 01:10 local (00:10 UTC): the gemma-4
+  extraction subset (222 of 473 chunks done) and the last 2 of 75 injection cases (Groq). It
+  disables itself when everything is answered. The laptop must stay logged in (sleep is fine)
+  on those nights. Log: `evals/data/retrieval/nightly-embed.log`. Then:
+  - **M4 step 4 close:** score the full subset (`npm run extract:cuad -w @lexguard/evals`
+    with `PROVIDER=workers-ai LIMIT=0` re-scores from the cache), compare gemma-4 vs Groq vs
+    keyword, confirm the model, record in DECISIONS (D38 follow-up).
+  - **Injection:** re-score (`LIMIT=0 npm run injection:cuad -w @lexguard/evals`), update D41
+    with 75 of 75.
+- **M4 CPU check of an extraction run:** Marwan starts an extraction on the middle smoke
+  contract (4 pages) while `node scripts/tail-cpu.mjs --record tail-cpu.jsonl` records; needs
+  his key and about 200 Neurons.
+- ✅ **M3 closed 2026-11-26 (D42):** hybrid really beats keyword (+0.022 MRR, 95% interval
+  [+0.015, +0.030], 510 contracts); contextual header off; CI gates set.
 - **Rotate the API key** (it appeared in a terminal shared with the assistant on 2026-11-25):
   `node apps/worker/scripts/new-tenant-key.mjs marwan --set`.
-- Not built yet: deleting a document (its vectors and FTS rows; retention, D25); an index
-  stuck in `indexing` whose job never ran (D32); a per-tenant daily search cap (T15, D30).
-- Threat model open question 3 (T12): data-use terms of each free model provider, to answer in
-  M4 step 1 before any document text goes to one.
+- Not built yet: deleting a document (its vectors, FTS rows and clauses; retention, D25); an
+  index or extraction stuck in `indexing` / `extracting` whose job never ran (D32); a
+  per-tenant daily search and extraction cap (T15, D30); section cross-references ("as set
+  out in Section 5.3", D40, the M5 verifier needs them); flagging instruction-like lines in
+  chunks (D41, M7).
 
 ## M4 plan (draft, explained to Marwan on 2026-11-25; explain each step again before starting)
 
