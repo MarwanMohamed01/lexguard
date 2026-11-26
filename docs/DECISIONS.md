@@ -1223,3 +1223,50 @@ extract_error`; `clauses` (tenant-first key, document offsets, details JSON, **n
   broken form), 1 data check (75 attacks, 15 categories). Mutation check: 10 of 10 caught.
 - **Open:** the same run on the production model (gemma-4 on Workers AI) once its clean subset
   answers exist (step 4, nightly).
+
+## D42. M3 closed: hybrid search stays, contextual header stays off, CI gates (2026-11-26)
+
+- **Full corpus embedded** (night of 2026-11-26): all 17,026 CUAD chunks in both variants
+  plus the 41 queries, on Workers AI bge-m3 (the production model), over five nights within the
+  9,000-Neuron daily cap (D26). The question D26 left open could now be answered on 510
+  contracts / 6,702 questions instead of 30 / 415.
+- **Paired comparison, not two averages (`evals/shared/paired.ts`):** both methods answer the
+  same question; the per-question difference is studied (wins, losses, ties, mean). Its 95%
+  interval comes from a **cluster bootstrap by contract** (2,000 resamples, seeded):
+  questions about one contract are not independent, so whole contracts are resampled.
+  Resampling single questions would give a narrower, over-confident interval (unit-tested:
+  the same gain concentrated in one contract gives a wider interval that touches 0).
+- **Results on CUAD text (510 contracts, 6,702 questions), MRR@10:**
+
+  | Question                 | Baseline | Candidate | Mean diff | Wins / losses | 95% interval     |
+  | ------------------------ | -------- | --------- | --------- | ------------- | ---------------- |
+  | Hybrid vs keyword        | 0.5677   | 0.5901    | +0.0224   | 1,769 / 1,135 | [+0.015, +0.030] |
+  | Header vs plain (hybrid) | 0.5901   | 0.5814    | -0.0086   | 826 / 1,050   | [-0.012, -0.005] |
+  | Header vs plain (vector) | 0.5220   | 0.5156    | -0.0065   | 1,154 / 1,429 | [-0.012, -0.001] |
+  | Porter vs no stemming    | 0.5461   | 0.5677    | +0.0216   | 1,269 / 1,368 | [+0.015, +0.028] |
+
+  hit@5 agrees: hybrid +0.027 [+0.018, +0.036]; header -0.007 [-0.012, -0.002].
+  - On the 30 converted PDFs alone, hybrid vs keyword was +0.022 with an interval of
+    [-0.011, +0.054]: the same gain, but too few contracts to tell it from luck. That is why
+    the decision waited for the full corpus.
+  - Porter wins on fewer questions than it loses (1,269 vs 1,368) yet raises the mean: when it
+    helps, it moves the answer up a lot; when it hurts, a little.
+
+- **Decisions:**
+  - **Hybrid stays** (already in production, D30): really better than keyword, by a small but
+    consistent amount (about 2 more right answers in the top 5 per 100 questions).
+  - **Contextual header stays off** (production indexes `bge-m3/plain/1`): it really hurts on
+    these queries. `contextualHeader` stays in `@lexguard/retrieval`, unused; it may help other
+    kinds of query (M5), which would need its own measurement.
+- **CI gates (`evals/retrieval/retrieval.test.ts`):**
+  - In CI (CUAD text, no embeddings): production keyword search MRR@10 >= 0.56 and hit@5 >=
+    0.71 (measured 0.5677 / 0.7204), and porter's interval above 0.
+  - Locally, with the embedding cache: hybrid MRR@10 >= 0.58 and hit@5 >= 0.74 (measured
+    0.5901 / 0.7471), hybrid vs keyword interval above 0 on both; header interval not above 0.
+    Skipped in CI, where no vectors exist.
+  - The eval is deterministic, so the floors are tight: a drop is a regression, not noise.
+- **Tests:** 10 unit tests of the paired comparison; 3 gate tests. Mutation check: 8 breakages
+  of `paired.ts`, 3 survived the first tests (a resample averaged over all questions instead
+  of its own; a 50% interval instead of 95%; a weakened random generator); all caught after
+  new tests (unequal contract sizes, interval width, the published mulberry32 value). Breaking
+  hybrid search (returning keyword results only) fails the gate.

@@ -7,18 +7,18 @@ _Last updated: 2026-11-25._
 
 ## Status
 
-| Milestone                            | Status                                          |
-| ------------------------------------ | ----------------------------------------------- |
-| M0 Foundations                       | ✅ Done                                         |
-| M1 Core packages                     | ✅ Done (CI and full-history secret scan green) |
-| M2 Ingestion & splitting             | ✅ Done (deployed, smoke test green)            |
-| M3 Index & retrieval                 | ✅ Done (deployed; full-corpus eval finishing)  |
-| **M4 Extraction swarm**              | ⏳ **Next**                                     |
-| M5 Research, verification, synthesis | Not started                                     |
-| M6 Routing & caching                 | Not started                                     |
-| M7 Guardrails & red team             | Not started                                     |
-| M8 A2A & observability               | Not started                                     |
-| M9 Evals in CI & write-up            | Not started                                     |
+| Milestone                            | Status                                              |
+| ------------------------------------ | --------------------------------------------------- |
+| M0 Foundations                       | ✅ Done                                             |
+| M1 Core packages                     | ✅ Done (CI and full-history secret scan green)     |
+| M2 Ingestion & splitting             | ✅ Done (deployed, smoke test green)                |
+| M3 Index & retrieval                 | ✅ Done (deployed; full-corpus eval and gates, D42) |
+| **M4 Extraction swarm**              | ⏳ **In progress** (deployed; eval finishing)       |
+| M5 Research, verification, synthesis | Not started                                         |
+| M6 Routing & caching                 | Not started                                         |
+| M7 Guardrails & red team             | Not started                                         |
+| M8 A2A & observability               | Not started                                         |
+| M9 Evals in CI & write-up            | Not started                                         |
 
 Deployed Worker: https://lexguard.marwan-dev.workers.dev, version `ce4c803b` (2026-11-25:
 M2 ingestion + M3 indexing and search + M4 extraction: upload, status, chunking, indexing
@@ -31,11 +31,14 @@ https://github.com/MarwanMohamed01/lexguard (public).
 
 ## Open items (carry into M4)
 
-- **Full-corpus retrieval eval (M3 step 2):** every text embedded (night of 2026-11-26). **Automated** (D36): the scheduled task "Lexguard nightly embedding" runs
-  `scripts/nightly-embed.ps1` at 01:10 local (00:10 UTC); log in
-  `evals/data/retrieval/nightly-embed.log`; it disables itself when done. Then decide hybrid vs keyword and the contextual
-  header with a per-case paired comparison, and set the CI gate (D26). Live = offline (D31),
-  so the offline result stands for production.
+- ✅ **Full-corpus retrieval eval (M3 step 2), closed 2026-11-26 (D42):** hybrid really
+  beats keyword (+0.022 MRR, 95% interval [+0.015, +0.030], 510 contracts); the contextual
+  header really hurts and stays off; CI gates set. Live = offline (D31).
+- **Nightly task** (D36): the scheduled task "Lexguard nightly embedding" runs
+  `scripts/nightly-embed.ps1` at 01:10 local (00:10 UTC); embedding is done, it still runs
+  the M4 extraction subset (gemma-4) and the last injection cases; log in
+  `evals/data/retrieval/nightly-embed.log`; it disables itself when all are done. The laptop
+  must stay logged in (sleep is fine) on those nights.
 - **Rotate the API key** (it appeared in a terminal shared with the assistant on 2026-11-25):
   `node apps/worker/scripts/new-tenant-key.mjs marwan --set`.
 - Not built yet: deleting a document (its vectors and FTS rows; retention, D25); an index
@@ -132,12 +135,11 @@ fusion), each hit with exact offsets and page, measured against keyword-only and
 
 1. ✅ Limits checked; embedding model chosen and probed: `@cf/baai/bge-m3`, 1,024 dimensions;
    Vectorize space (~4,880 vectors) is the tightest limit (D25).
-2. ⏳ Retrieval eval first: CUAD's clause-category questions as queries, the chunk holding the
+2. ✅ Retrieval eval first: CUAD's clause-category questions as queries, the chunk holding the
    lawyer-labelled span as the answer; recall@k, MRR, nDCG; keyword / vector / hybrid (D26).
-   Built; keyword measured on all 510 contracts, vector and hybrid on the 30 converted PDFs.
-   **Open:** embed the rest of the corpus on Workers AI (9,000 Neurons a day, about 3 more
-   days: start the probe Worker, then `npm run embed:cuad -w @lexguard/evals`), then decide
-   hybrid / header with a paired comparison and set the CI gate.
+   Full corpus (510 contracts, 6,702 questions) embedded; paired comparison clustered by
+   contract: hybrid +0.022 MRR [+0.015, +0.030] over keyword, header -0.009 [-0.012,
+   -0.005]; hybrid stays, header off; CI gates (D42).
 3. ✅ `packages/retrieval`: contextual header, RRF, safe FTS5 query builder (`ftsQuery`,
    `scopedFtsQuery`, `reciprocalRankFusion`, `contextualHeader`). Fuzzed against real FTS5
    (never fails, never leaves tenant + document scope), two bugs fixed, 0 of 16 mutations
@@ -229,5 +231,6 @@ PICK=3 node scripts/cpu-load.mjs <worker-url>        # one new upload + 20 searc
   CUAD contracts: MRR 0.568 with stemming.
 - Production CPU (D33): search 3-5 ms, status 0 ms, upload 15 ms (655 KB, known since D24),
   indexing ~5 ms per step.
-- Tests: 558 (worker 162, a2a 34, chunker 68, extraction 51, guardrails 72, retrieval 26,
-  router 13, trace 24, evals 108; the live-run and converted-PDF evals skip in CI).
+- Tests: 571 (worker 162, a2a 34, chunker 68, extraction 51, guardrails 72, retrieval 26,
+  router 13, trace 24, evals 121; the live-run, converted-PDF and hybrid-gate evals skip in
+  CI).

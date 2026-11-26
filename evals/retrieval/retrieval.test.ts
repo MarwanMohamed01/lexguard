@@ -4,6 +4,7 @@ import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { beforeAll, describe, expect, it } from "vitest";
 import { cuadAvailable } from "../cuad/load";
+import { pairedComparison, type PairedResult } from "../shared/paired";
 import { meanScores, scoreRanking, type RankScores } from "../shared/ranking";
 import {
   casesFor,
@@ -276,8 +277,25 @@ interface CorpusReport {
   cases: number;
   unlocatedSpans?: number;
   methods: MethodReport[];
+  /** Per-question comparisons of two methods (D42), clustered by contract. */
+  comparisons: { question: string; mrr10: PairedResult; hit5: PairedResult }[];
   skipped: string[];
 }
+
+// The production methods (D30, D42) and the questions the paired comparison answers.
+const KEYWORD = "keyword (FTS5 porter unicode61)";
+const HYBRID_PLAIN = "hybrid RRF (workers-ai-bge-m3, plain + FTS5 porter unicode61)";
+const HYBRID_HEADER = "hybrid RRF (workers-ai-bge-m3, header + FTS5 porter unicode61)";
+const COMPARISONS = [
+  { question: "porter stemming vs none", baseline: "keyword (FTS5 unicode61)", candidate: KEYWORD },
+  { question: "hybrid vs keyword", baseline: KEYWORD, candidate: HYBRID_PLAIN },
+  { question: "header vs plain (hybrid)", baseline: HYBRID_PLAIN, candidate: HYBRID_HEADER },
+  {
+    question: "header vs plain (vector)",
+    baseline: "vector (workers-ai-bge-m3, plain)",
+    candidate: "vector (workers-ai-bge-m3, header)",
+  },
+] as const;
 
 function evaluate(corpus: Corpus, queries: Map<string, string>): CorpusReport {
   const report: CorpusReport = {
@@ -286,8 +304,10 @@ function evaluate(corpus: Corpus, queries: Map<string, string>): CorpusReport {
     chunks: corpus.docs.reduce((n, d) => n + d.chunks.length, 0),
     cases: corpus.cases.length,
     methods: [],
+    comparisons: [],
     skipped: [],
   };
+  const perCase = new Map<string, RankScores[]>();
   const query = (type: string) => {
     const q = queries.get(type);
     if (q === undefined) throw new Error(`no question for ${type}`);
@@ -298,6 +318,10 @@ function evaluate(corpus: Corpus, queries: Map<string, string>): CorpusReport {
       type: c.clauseType,
       s: scoreRanking(rank(c), c.relevant),
     }));
+    perCase.set(
+      method,
+      scored.map((x) => x.s),
+    );
     const byType = new Map<string, RankScores[]>();
     for (const { type, s } of scored) byType.set(type, [...(byType.get(type) ?? []), s]);
     const methodReport: MethodReport = {
@@ -372,6 +396,26 @@ function evaluate(corpus: Corpus, queries: Map<string, string>): CorpusReport {
       }
     }
   }
+
+  const groups = corpus.cases.map((c) => c.doc);
+  for (const { question, baseline, candidate } of COMPARISONS) {
+    const a = perCase.get(baseline);
+    const b = perCase.get(candidate);
+    if (a === undefined || b === undefined) continue;
+    report.comparisons.push({
+      question,
+      mrr10: pairedComparison(
+        a.map((s) => s.mrr10),
+        b.map((s) => s.mrr10),
+        groups,
+      ),
+      hit5: pairedComparison(
+        a.map((s) => s.hit5),
+        b.map((s) => s.hit5),
+        groups,
+      ),
+    });
+  }
   return report;
 }
 
@@ -400,5 +444,33 @@ describe.skipIf(!cuadAvailable())("CUAD retrieval", () => {
     const random = methods.find((m) => m.method === "random")?.all.mrr10 ?? 1;
     const keyword = methods.find((m) => m.method.startsWith("keyword"))?.all.mrr10 ?? 0;
     expect(keyword).toBeGreaterThan(random);
+  });
+
+  // Gates (D42). Measured on CUAD text: keyword MRR@10 0.5677, hit@5 0.7204; hybrid 0.5901,
+  // 0.7471. The eval is deterministic, so a drop below these floors is a real regression.
+  const method = (name: string) => reports[0]?.methods.find((m) => m.method === name);
+  const comparison = (question: string) =>
+    reports[0]?.comparisons.find((c) => c.question === question);
+
+  it("gate: production keyword search keeps its quality (runs in CI)", () => {
+    expect(method(KEYWORD)?.all.mrr10).toBeGreaterThanOrEqual(0.56);
+    expect(method(KEYWORD)?.all.hit5).toBeGreaterThanOrEqual(0.71);
+    expect(comparison("porter stemming vs none")?.mrr10.ci95[0]).toBeGreaterThan(0);
+  });
+
+  // Needs the embedding cache (local only): skipped in CI, like the vector rows above.
+  it("gate: hybrid search keeps its quality and stays really better than keyword", (ctx) => {
+    const hybrid = method(HYBRID_PLAIN);
+    if (hybrid === undefined) ctx.skip();
+    expect(hybrid?.all.mrr10).toBeGreaterThanOrEqual(0.58);
+    expect(hybrid?.all.hit5).toBeGreaterThanOrEqual(0.74);
+    expect(comparison("hybrid vs keyword")?.mrr10.ci95[0]).toBeGreaterThan(0);
+    expect(comparison("hybrid vs keyword")?.hit5.ci95[0]).toBeGreaterThan(0);
+  });
+
+  it("the contextual header stays off: it does not help (D42)", (ctx) => {
+    const header = comparison("header vs plain (hybrid)");
+    if (header === undefined) ctx.skip();
+    expect(header?.mrr10.ci95[1]).toBeLessThanOrEqual(0);
   });
 });
