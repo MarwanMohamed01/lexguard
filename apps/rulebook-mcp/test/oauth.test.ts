@@ -149,10 +149,10 @@ describe("discovery (how a client finds out where to sign in)", () => {
       token_endpoint: `${TEST_ORIGIN}/oauth/token`,
       code_challenge_methods_supported: ["S256"],
     });
-    // Dynamic registration is off (D47): no endpoint advertised, none served.
-    expect(server.registration_endpoint).toBeUndefined();
-    // Clients identify themselves by a metadata document URL instead (CIMD).
+    // Both ways for a client to identify: a metadata document URL (CIMD) for hosted clients,
+    // guarded self-registration for desktop clients (D48).
     expect(server.client_id_metadata_document_supported).toBe(true);
+    expect(server.registration_endpoint).toBe(`${TEST_ORIGIN}/oauth/register`);
   });
 });
 
@@ -380,6 +380,78 @@ describe("using a token at /mcp", () => {
     const client = await mcpClient(withToken(await signIn()));
     const { tools } = await client.listTools();
     expect(tools).toHaveLength(3);
+  });
+});
+
+describe("self-registration for desktop clients (D48)", () => {
+  const register = (metadata: Record<string, unknown>) =>
+    app("/oauth/register", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(metadata),
+    });
+  const inspector = {
+    client_name: "MCP Inspector",
+    redirect_uris: ["http://localhost:6274/oauth/callback"],
+    grant_types: ["authorization_code", "refresh_token"],
+    response_types: ["code"],
+    token_endpoint_auth_method: "none",
+  };
+
+  // These tests share the burst limit (5 a minute in tests too), so they run in this order
+  // and the limit test comes last.
+  it("lets an Inspector-like client register and reach the consent page", async () => {
+    const response = await register(inspector);
+    expect(response.status).toBe(201);
+    const client = await response.json<{ client_id: string }>();
+    expect(client.client_id).not.toBe("");
+    // The record expires in KV after about a day, so abandoned ones do not pile up. (A public
+    // client has no secret, so the reply's client_secret_expires_at is 0, meaning "no secret".)
+    const { keys } = await env.OAUTH_KV.list({ prefix: `client:${client.client_id}` });
+    const expiresIn = (keys[0]?.expiration ?? 0) - Date.now() / 1000;
+    expect(expiresIn).toBeGreaterThan(86_400 - 120);
+    expect(expiresIn).toBeLessThanOrEqual(86_400 + 5);
+
+    const { challenge } = await pkce();
+    const query = new URLSearchParams({
+      response_type: "code",
+      client_id: client.client_id,
+      redirect_uri: "http://localhost:6274/oauth/callback",
+      scope: SCOPE,
+      state: "s",
+      code_challenge: challenge,
+      code_challenge_method: "S256",
+      resource: RESOURCE,
+    });
+    const page = await app(`/authorize?${query.toString()}`);
+    const html = await page.text();
+    expect(page.status).toBe(200);
+    expect(html).toContain("MCP Inspector");
+    expect(html).toContain("This app registered itself; its name is not verified.");
+    expect(html).toContain("This sends access to an app on your computer.");
+  });
+
+  it("refuses a client that wants tokens sent to a remote address", async () => {
+    const response = await register({
+      ...inspector,
+      redirect_uris: ["https://attacker.example/cb"],
+    });
+    expect(response.status).toBe(400);
+    expect(await response.json<{ error: string }>()).toMatchObject({
+      error: "invalid_redirect_uri",
+    });
+  });
+
+  it("slows down a burst of registrations (429 with Retry-After)", async () => {
+    const statuses: number[] = [];
+    let limited: Response | undefined;
+    for (let i = 0; i < 12 && limited === undefined; i++) {
+      const response = await register(inspector);
+      statuses.push(response.status);
+      if (response.status === 429) limited = response;
+    }
+    expect(statuses, statuses.join(",")).toContain(429);
+    expect(limited?.headers.get("Retry-After")).toBe("60");
   });
 });
 

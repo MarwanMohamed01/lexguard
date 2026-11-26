@@ -29,7 +29,7 @@ and extraction Workflows, `POST /v1/documents/:id/search`, `POST .../extract`,
 dims, cosine, metadata index `doc`), Workers AI, Workflows `lexguard-chunk-document`,
 `lexguard-index-document` and `lexguard-extract-document`, secret `TENANT_KEYS`.
 
-Rulebook MCP server: https://lexguard-rulebook.marwan-dev.workers.dev/mcp, version `4511c133`
+Rulebook MCP server: https://lexguard-rulebook.marwan-dev.workers.dev/mcp, version `9fbb4cfd`
 (2026-11-26, D46/D47): OAuth 2.1, KV `OAUTH_KV` (`b2317d0c...`), service binding to
 `lexguard#TenantAuth`, private entrypoint `RulebookInternal`. Repo:
 https://github.com/MarwanMohamed01/lexguard (public).
@@ -120,8 +120,10 @@ supervisor (budgets, stop conditions); no LLM decides what runs.
      `lexguard-rulebook` `4511c133`; 8 live checks from outside passed (401 + discovery, tenant
      header ignored, made-up token 401, metadata with CIMD on and no registration, unknown
      client rendered not redirected, `TenantAuth` 404 publicly).
-   - Next: Marwan demos with a real MCP client (sign-in needs his key); if the client supports
-     only dynamic registration, decide on it with a limit (D47).
+   - ✅ 4c (D48): the first demo showed MCP Inspector needs dynamic registration; turned on with
+     guards (localhost redirect URIs only, 1-day expiry, 5 a minute); redeployed `lexguard-rulebook`
+     `9fbb4cfd`; live checks passed. Residual: a script can use up a day of KV writes (M7 cap).
+   - Next: Marwan repeats the demo with MCP Inspector (sign-in needs his key).
    - The client pins the tool-schema hash (rug-pull check): M7.
 5. Checker (quarantined): clause + rule -> verdict, clause quote(s), rule quote, short reason;
    fake model first, real model on ContractNLI when Neurons are free (after the nightly task).
@@ -322,6 +324,6 @@ PICK=3 node scripts/cpu-load.mjs <worker-url>        # one new upload + 20 searc
   indexing ~5 ms per step.
 - ContractNLI test split (2,091 pairs, D44): majority label macro F1 0.211, majority per
   hypothesis 0.617 (the checker's bar); keyword top 10 spans hold expert evidence for 89%.
-- Tests: 638 (worker 166, rulebook-mcp 30, a2a 34, chunker 68, extraction 51, guardrails 72,
+- Tests: 662 (worker 166, rulebook-mcp 54, a2a 34, chunker 68, extraction 51, guardrails 72,
   retrieval 26, router 13, rulebook 24, trace 24, evals 130; the live-run, converted-PDF and hybrid-gate evals skip in
   CI).

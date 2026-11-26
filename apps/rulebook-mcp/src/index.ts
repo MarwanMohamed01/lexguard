@@ -18,9 +18,11 @@ import {
 } from "@cloudflare/workers-oauth-provider";
 import { WorkerEntrypoint } from "cloudflare:workers";
 import { consentPage, messagePage } from "./consent";
+import { registrationPolicy } from "./registration";
 import { rulebookHandler } from "./server";
 
 export const SCOPE = "rules:read";
+export const REGISTER_PATH = "/oauth/register";
 
 /** What a grant remembers about who approved it (encrypted by the library). */
 export interface GrantProps {
@@ -137,10 +139,14 @@ export function oauthOptions(env: Env): OAuthProviderOptions<Env> {
     defaultHandler: site,
     authorizeEndpoint: "/authorize",
     tokenEndpoint: "/oauth/token",
-    // Clients identify themselves by a metadata document URL (CIMD, MCP 2026-07-28). Dynamic
-    // registration stays off: each registration is a KV write (1,000 a day free) that anyone
-    // could trigger (A5, D47).
+    // Hosted clients identify by a metadata document URL (CIMD, MCP 2026-07-28). Desktop
+    // clients such as MCP Inspector can only register themselves (DCR), so registration is
+    // on but guarded (D48): localhost redirect URIs only, records expire after a day, and
+    // bursts are rate-limited in front of the provider (see the default export).
     clientIdMetadataDocumentEnabled: true,
+    clientRegistrationEndpoint: REGISTER_PATH,
+    clientRegistrationCallback: registrationPolicy,
+    clientRegistrationTTL: 86_400, // KV deletes abandoned registrations after 1 day
     scopesSupported: [SCOPE],
     requiredScopes: [SCOPE],
     resourceMetadata: { resource: `${origin}/mcp`, authorization_servers: [origin] },
@@ -152,11 +158,22 @@ export function oauthOptions(env: Env): OAuthProviderOptions<Env> {
 let provider: { origin: string; instance: OAuthProvider<Env> } | null = null;
 
 export default {
-  fetch(request, env, ctx): Promise<Response> {
+  async fetch(request, env, ctx): Promise<Response> {
+    // Burst limit on self-registration (D48). Approximate and per Cloudflare location, so it
+    // slows a script down but cannot cap the day's total (that needs an atomic counter, M7).
+    if (request.method === "POST" && new URL(request.url).pathname === REGISTER_PATH) {
+      const { success } = await env.REGISTER_LIMIT.limit({ key: "register" });
+      if (!success) {
+        return Response.json(
+          { error: "temporarily_unavailable", error_description: "Too many registrations." },
+          { status: 429, headers: { "Retry-After": "60" } },
+        );
+      }
+    }
     if (provider?.origin !== env.PUBLIC_ORIGIN) {
       provider = { origin: env.PUBLIC_ORIGIN, instance: new OAuthProvider(oauthOptions(env)) };
     }
-    return provider.instance.fetch(request, env, ctx);
+    return await provider.instance.fetch(request, env, ctx);
   },
 } satisfies ExportedHandler<Env>;
 

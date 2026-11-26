@@ -1506,3 +1506,35 @@ extract_error`; `clauses` (tenant-first key, document offsets, details JSON, **n
   token 401; resource and authorization-server metadata correct (CIMD on, no registration
   endpoint, PKCE S256); `/authorize` for an unknown client rendered as a 400 page, not
   redirected; the main Worker's `/tenantForKey` 404 from the public URL.
+
+## D48. Guarded self-registration for desktop MCP clients (M5 step 4c, 2026-11-26)
+
+- **Why:** the first live demo failed: MCP Inspector 2.16 signs in only through dynamic client
+  registration (RFC 7591), which D47 had turned off. Marwan chose to turn it on with guards
+  (over keeping it off or pre-registering the Inspector by hand).
+- **Guards (`apps/rulebook-mcp/src/registration.ts` and the default export):**
+  - **Local apps only:** every redirect URI must be `http(s)` on `localhost`, `127.0.0.1` or
+    `[::1]`, with no user info and no fragment, at most 200 characters, 1 to 5 of them; the
+    client name at most 100 characters. Hosted clients keep using a Client ID Metadata
+    Document. A refused client gets `400 invalid_redirect_uri` before anything is stored.
+  - **Records expire after 1 day** (`clientRegistrationTTL`, a KV expiration), so abandoned
+    registrations do not pile up.
+  - **Burst limit:** 5 registrations a minute (Workers Rate Limiting binding, checked before
+    the provider), else `429` with `Retry-After: 60`.
+- **What the limit cannot do (said plainly):** the binding is approximate and counted per
+  Cloudflare location, and even 1 a minute is 1,440 a day, above the 1,000 free KV writes. So
+  a determined script can still use up a day's KV writes. The damage is bounded: outside MCP
+  logins fail until 00:00 UTC; the pipeline's private door uses no KV; no data is exposed. A
+  true daily cap needs an atomic counter (like the M4 Neuron budget in D1); left for M7 (T15).
+- **Pricing of the rate-limit binding: not stated** in the official pricing, limits and binding
+  pages (GA since 2025-09-19, no price, no plan restriction mentioned). The account has no
+  card, so nothing can be billed; the Free-plan deploy accepted the binding (version
+  `9fbb4cfd`, "5 requests/60s").
+- **Tests:** rulebook-mcp 54 (24 new): the policy (allowed and refused URIs: look-alike
+  hosts, `127.0.0.2`, user info, fragment, `javascript:`, too long, too many), an
+  Inspector-like client registering and reaching the consent page (marked "not verified" and
+  "app on your computer"), the KV record expiring in about a day, a remote address refused,
+  and a burst getting `429`. Mutation check: 17 breakages; 2 first survived (user name alone,
+  password alone, because the test URL had both), 0 after new tests.
+- **Live (2026-11-26):** registration endpoint advertised next to CIMD; a remote redirect URI
+  refused with 400; a localhost one accepted (201, a public client); `/mcp` still 401.
