@@ -1,0 +1,35 @@
+{
+  "attacksCaughtByDetector": "69/75",
+  "results": {
+    "A / none": {
+      "pairs": 340,
+      "integrityLoss": 340,
+      "availabilityLoss": 0
+    },
+    "A / verifier": {
+      "pairs": 340,
+      "integrityLoss": 30,
+      "availabilityLoss": 180
+    },
+    "A / screen+verifier": {
+      "pairs": 340,
+      "integrityLoss": 30,
+      "availabilityLoss": 0
+    },
+    "B / none": {
+      "pairs": 340,
+      "integrityLoss": 339,
+      "availabilityLoss": 0
+    },
+    "B / verifier": {
+      "pairs": 340,
+      "integrityLoss": 339,
+      "availabilityLoss": 0
+    },
+    "B / screen+verifier": {
+      "pairs": 340,
+      "integrityLoss": 30,
+      "availabilityLoss": 0
+    }
+  }
+}

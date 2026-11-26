@@ -195,14 +195,19 @@ describe("renderMarkdown", () => {
   });
 
   it("escapes contract text and model notes so nothing in them can act", () => {
-    const hostile = verified({
+    // Built directly, not through the verifier: since D53 the verifier already refuses this
+    // evidence (a javascript: link reads as an instruction), but the report must stay safe on
+    // its own, whatever it is given (defence in depth).
+    const hostile: VerifiedClaim = {
       ruleId: "nda:11",
       verdict: "agrees",
       evidence: [
         span("<img src=x onerror=alert(1)> [click here](javascript:alert(2)) # Fake heading"),
       ],
       reason: "</p><script>alert(3)</script>",
-    });
+      references: [],
+    };
+    expect(verifyClaim(hostile, { text: TEXT, rulebooks, sections }).ok).toBe(false);
     const md = renderMarkdown(
       buildReport(input({ verified: [hostile], scope: [{ ruleId: "nda:11" }] })),
     );

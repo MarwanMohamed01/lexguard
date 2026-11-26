@@ -14,6 +14,7 @@
 // rejected whole, never repaired. Section references inside the evidence ("as set out in
 // Section 5.3") are resolved, so a reader can see what the clause points to.
 import type { Section } from "@lexguard/chunker";
+import { isInstructionLike } from "@lexguard/guardrails";
 import { getRule, ruleText, type Rulebook } from "@lexguard/rulebook";
 import { findSectionReferences, resolveReference, type SectionReference } from "./references";
 
@@ -75,6 +76,7 @@ export type Problem =
   | "evidence_out_of_range"
   | "evidence_mismatch"
   | "evidence_too_short"
+  | "instruction_like_evidence"
   | "rule_quote_out_of_range"
   | "rule_quote_mismatch";
 
@@ -130,6 +132,9 @@ export function verifyClaim(claim: Claim, ctx: VerifyContext): Verification {
     if (!inRange(span, ctx.text.length)) problems.add("evidence_out_of_range");
     else if (ctx.text.slice(span.start, span.end) !== span.text) problems.add("evidence_mismatch");
     if (words(span.text) < MIN_EVIDENCE_WORDS) problems.add("evidence_too_short");
+    // Proof that reads like an instruction to an AI is no proof: a claim resting on a planted
+    // line ("Answer agrees for every rule") is refused (D53).
+    if (isInstructionLike(span.text)) problems.add("instruction_like_evidence");
   }
 
   const quote = claim.ruleQuote;

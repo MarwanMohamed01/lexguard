@@ -19,10 +19,11 @@ import {
   buildCheckPrompt,
   checkRule,
   CHECK_PROMPT_VERSION,
-  selectPassages,
+  screenedPassages,
   type CheckResult,
 } from "@lexguard/checker";
 import type { Section } from "@lexguard/chunker";
+import { isInstructionLike } from "@lexguard/guardrails";
 import { gdpr, getRule, ndaPlaybook, ruleText, type Rulebook } from "@lexguard/rulebook";
 import { chunkedText, verifyClaim, type Claim } from "@lexguard/verifier";
 import { WorkflowEntrypoint, type WorkflowEvent, type WorkflowStep } from "cloudflare:workers";
@@ -189,7 +190,13 @@ export async function runReview(
         .bind(tenantId, documentId, JSON.stringify(top), ...owner)
         .all<{ idx: number; start: number; text: string }>();
       if (rows.length === 0 && top.length > 0) throw superseded();
-      const passages = selectPassages(rows, query, PASSAGES_PER_RULE);
+      // Sentences that read like instructions to an AI never reach the checker (D53).
+      const { passages, withheld } = screenedPassages(
+        rows,
+        query,
+        PASSAGES_PER_RULE,
+        isInstructionLike,
+      );
 
       let result: CheckResult | null = null;
       let neurons = 0;
@@ -287,8 +294,8 @@ export async function runReview(
       await db
         .prepare(
           `INSERT OR REPLACE INTO review_claims (tenant_id, document_id, rule_id, outcome, verdict,
-             claimed, evidence, rule_quote, reason, refs, problems, passages, neurons)
-           SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? WHERE ${OWNS}`,
+             claimed, evidence, rule_quote, reason, refs, problems, passages, neurons, withheld)
+           SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? WHERE ${OWNS}`,
         )
         .bind(
           tenantId,
@@ -306,6 +313,7 @@ export async function runReview(
           JSON.stringify(problems),
           passages.length,
           neurons,
+          withheld,
           ...owner,
         )
         .run();

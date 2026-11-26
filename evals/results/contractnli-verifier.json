@@ -10,11 +10,11 @@
     "resolvedReferences": 56
   },
   "groq": {
-    "claims": 159,
-    "verified": 159,
-    "nonSilent": 90,
-    "tampered": 587,
-    "tamperRejected": 587,
+    "claims": 165,
+    "verified": 165,
+    "nonSilent": 93,
+    "tampered": 608,
+    "tamperRejected": 608,
     "withReferences": 3,
     "references": 9,
     "resolvedReferences": 7

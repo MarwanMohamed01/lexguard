@@ -27,3 +27,4 @@ export {
   type ParseOptions,
   type ParseResult,
 } from "./validate";
+export { instructionSignals, isInstructionLike, type InstructionSignal } from "./instructions";

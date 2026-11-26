@@ -10,4 +10,10 @@ export {
   type Evidence,
   type Verdict,
 } from "./check";
-export { MAX_PASSAGE_CHARS, selectPassages, splitSentences, type Passage } from "./passages";
+export {
+  MAX_PASSAGE_CHARS,
+  screenedPassages,
+  selectPassages,
+  splitSentences,
+  type Passage,
+} from "./passages";

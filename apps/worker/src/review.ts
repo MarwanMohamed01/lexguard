@@ -155,6 +155,7 @@ interface ClaimRow {
   refs: string;
   problems: string;
   neurons: number;
+  withheld: number;
 }
 
 export async function handleReport(
@@ -195,7 +196,8 @@ export async function handleReport(
     .parse(JSON.parse(doc.scope));
   const { results: rows } = await db
     .prepare(
-      `SELECT rule_id, outcome, verdict, evidence, rule_quote, reason, refs, problems, neurons
+      `SELECT rule_id, outcome, verdict, evidence, rule_quote, reason, refs, problems, neurons,
+         withheld
        FROM review_claims WHERE tenant_id = ? AND document_id = ?`,
     )
     .bind(tenantId, id)
@@ -223,8 +225,10 @@ export async function handleReport(
   const rejected: { claim: Claim; problems: Problem[] }[] = [];
   let failedAnswers = 0;
   let neurons = 0;
+  let withheld = 0;
   for (const r of rows) {
     neurons += r.neurons;
+    withheld += r.withheld;
     if (r.outcome !== "verified" && r.outcome !== "rejected") {
       failedAnswers++;
       continue;
@@ -275,5 +279,5 @@ export async function handleReport(
       headers: { "Content-Type": "text/markdown; charset=utf-8" },
     });
   }
-  return Response.json({ report, review: { failedAnswers, neurons } });
+  return Response.json({ report, review: { failedAnswers, neurons, withheldPassages: withheld } });
 }

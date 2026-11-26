@@ -43,7 +43,7 @@ https://github.com/MarwanMohamed01/lexguard (public).
 (F1 0.56 on 222 chunks vs keyword 0.20; final number when the nightly run ends).
 
 Done on 2026-11-26: end-of-M4 quiz (5/8, in LEARNING_LOG) and the M5 plan draft (below).
-M5 steps 1-4, 6, 7 done, rulebook server deployed (D43-D51); step 5 real runs pending (D49); step 8 deployed and smoke-tested (D52). Next: M5 step 5 (the checker).
+M5 steps 1-4, 6, 7 done, rulebook server deployed (D43-D51); step 5 real runs pending (D49); step 8 deployed and smoke-tested (D52); step 9 done locally (D53). Next: M5 step 5 (the checker).
 
 Originally planned for the new chat:
 
@@ -151,8 +151,10 @@ supervisor (budgets, stop conditions); no LLM decides what runs.
    fake model (11 tests, 0 of 17 mutations survive). ✅ Deployed 2026-11-26: 0008 applied
    remotely, Worker `bcca83bf`. Smoke test (Marwan): all 35 checks passed; review of 4 NDA rules on
    the smallest contract in 11.3 s, 26.7 Neurons, all 4 correctly "missing" (D52).
-9. Security tests (BIPIA on the checker, MCP token scope, poisoned rule text), real run,
-   deploy (Marwan's OK), learning log, quiz.
+9. ✅ Security (D53): worst case with a model that always obeys planted attacks: 340/340 flipped
+   verdicts without defences, **30/340** with the screen + verifier rule; screen 92% recall, 0.26%
+   / 0.09% false alarms on held-out data; rulebook bytes pinned in CI; threat model T1, T19, T22;
+   learning log. **To do:** apply migration 0009 remotely + deploy (Marwan's OK), the quiz.
 
 ## M4 plan (draft, explained to Marwan on 2026-11-25; explain each step again before starting)
 
@@ -341,6 +343,6 @@ PICK=3 node scripts/cpu-load.mjs <worker-url>        # one new upload + 20 searc
   indexing ~5 ms per step.
 - ContractNLI test split (2,091 pairs, D44): majority label macro F1 0.211, majority per
   hypothesis 0.617 (the checker's bar); keyword top 10 spans hold expert evidence for 89%.
-- Tests: 750 (worker 177, rulebook-mcp 58, checker 24, verifier 24, report 14, a2a 34, chunker 68, extraction 51, guardrails 72,
-  retrieval 26, router 13, rulebook 24, trace 24, evals 141; the live-run, converted-PDF and hybrid-gate evals skip in
+- Tests: 776 (worker 178, rulebook-mcp 58, checker 26, verifier 25, report 14, a2a 34, chunker 68, extraction 51, guardrails 88,
+  retrieval 26, router 13, rulebook 24, trace 24, evals 147; the live-run, converted-PDF and hybrid-gate evals skip in
   CI).

@@ -496,3 +496,91 @@ daily Neuron budget) → extractor on each chunk → checked clauses in D1 → `
   - **The injection attacks cost availability, not integrity.** Nothing false was stored (0 of
     65); broken JSON answers just lost real clauses on attacked chunks (F1 0.61 -> 0.55).
   - To revisit early in M5: D39 (merge), D38 (thinking), D41 (integrity vs availability).
+
+## Milestone 5 — Research, verification, synthesis
+
+### What was built
+
+Lexguard now **judges** a contract against rules and writes a cited report, live at
+https://lexguard.marwan-dev.workers.dev:
+
+**`POST .../review` (rules + my side's policy) -> review Workflow (4 rules per step: hybrid
+search -> top 10 sentences -> screen -> checker -> verifier) -> `GET .../report` (JSON or
+Markdown)**, plus a rulebook MCP server with OAuth at https://lexguard-rulebook.marwan-dev.workers.dev/mcp.
+
+| Piece                    | Job                                                                            |
+| ------------------------ | ------------------------------------------------------------------------------ |
+| `packages/rulebook`      | GDPR (786 rules from the Official Journal) + 17 NDA rules, citable IDs         |
+| `apps/rulebook-mcp`      | MCP tools get/list/search rules; OAuth for outside apps, private door inside   |
+| `packages/checker`       | Quarantined reader: rule + passages -> agrees / conflicts / silent + quotes    |
+| `packages/verifier`      | Code re-checks every claim against the stored contract; resolves "Section 5.3" |
+| `packages/report`        | One finding per rule, rulebook-template redlines, escaped Markdown             |
+| `packages/guardrails`    | + a screen for text that reads like an instruction to an AI                    |
+| Review Workflow + 0008/9 | The pipeline in the Worker, fenced, budgeted                                   |
+| ContractNLI eval         | 607 NDAs with expert labels: the checker's answer key                          |
+
+### Ideas worth remembering
+
+- **Measure the ceiling before the model.** A fake "oracle" that answers like the expert but
+  sees only our top-10 passages scores macro F1 0.925. The bar (each rule's usual answer,
+  never reading) is 0.617. So the checker's job is the gap between them, and above 0.925 only
+  better search helps. You can tell "the model is weak" from "the model never saw the proof".
+- **No evidence, no claim.** "agrees" or "conflicts" without a quote found in the contract
+  becomes "silent"; the report says "not addressed", never a guess. The first live review
+  answered "not addressed" for 4 rules, and it was right: the contract never mentions them.
+- **Look at WHY answers are rejected.** The first Groq score was below the bar (0.552). The
+  model was fine: it copied our own `[2]` passage labels into its quotes. Stripping our label in
+  code raised it to 0.694 without changing the model or the prompt.
+- **Scores from different collections don't compare.** BM25 over the GDPR and over the NDA
+  rules separately gave "confidential" very different weights; one combined collection fixed
+  it. Same lesson as bm25 vs cosine in M3.
+- **Free limits shape the design, again.** 3,000 Workflow steps a day -> 4 rules per step;
+  10 ms CPU per step -> the database finds the chunks, and the verifier and report read only
+  those chunks, never the whole contract.
+- **OAuth has no "machine login" here.** Outside apps sign in through a consent page (my API key,
+  checked by the main Worker over a private line); our own pipeline uses a private service
+  binding instead of a stored token. Edge OAuth, service identity inside.
+- **Quote checks cannot catch a lie about meaning.** If a fooled model flips the verdict but
+  quotes a real sentence, every check passes. Only keeping the attack away from the model
+  helps: screening took a worst-case 339/340 down to 30/340.
+
+### What the live runs found
+
+- **MCP Inspector needed dynamic client registration**, which I had switched off; turned on
+  for apps on this computer only (localhost), 1-day expiry, a burst limit.
+- **The Inspector reused old saved metadata** (from before registration was on) without asking
+  again; a fresh URL (`?fresh=1`) fixed it. A client-side cache can make a fixed server look
+  broken.
+- **My pasted API key had 2 invisible extra characters** (48 stars for a 46-character key);
+  the consent page now trims.
+- **Escapes typed into a tool came out as invisible characters** (a no-break space in a
+  regex); the hidden-character check now also refuses characters that look like a space.
+
+### Debugging and process lessons
+
+- Mutation checks found weak tests in every step: an "order" check that matched the summary
+  table instead of the findings, a fencing test that never reached the write it was meant to
+  guard, an "external reference" test that passed only because the section number did not
+  exist.
+- Tune on one set, measure on another: the screen caught 75/75 on its training attacks and
+  69/75 on held-out ones. The held-out number is the real one.
+- Shell edits keep eating backslashes in regexes; use the editor for patterns.
+
+### Numbers
+
+- ContractNLI (2,091 test pairs): bar macro F1 0.617; oracle ceiling at top-10 passages 0.925.
+  Groq gpt-oss-20b, first 148 pairs: 0.694 (run still going).
+- Section references on 510 CUAD contracts: 88.2% of internal ones resolve.
+- Verifier: 2,091/2,091 oracle claims verify; 5,223/5,223 tampered copies rejected.
+- Screen (held-out): 92% of attacks, 0.26% / 0.09% false alarms.
+- Live review: 4 rules in 11.3 s, 26.7 Neurons.
+
+### Tests at the end of M5
+
+776 tests: worker 178, rulebook-mcp 58, rulebook 24, checker 26, verifier 25, report 14,
+guardrails 88, a2a 34, chunker 68, extraction 51, retrieval 26, router 13, trace 24, evals 147.
+
+### Quiz score
+
+- During M5: 7 check questions asked, not answered yet (folded into the end-of-M5 quiz).
+- End-of-M5 quiz: see below.

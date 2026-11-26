@@ -1775,3 +1775,55 @@ herein..."`), copied despite the prompt. **Fix in code, not the prompt:** a lead
   right: checked against the contract's CUAD text, it never mentions confidentiality,
   disclosure, employees, survival, termination, return or destruction. A review that finds
   something to quote on the live system is still to be seen (a larger contract, or an NDA).
+
+## D53. M5 security: planted instructions, the screen, rulebook integrity (M5 step 9, 2026-11-26)
+
+- **The gap, measured first (worst case, no model):** the checker's verdict is the model's
+  judgment. A fake model that fully obeys a planted BIPIA attack, run through the real checker
+  and verifier on the 340 pairs of the 20 pinned ContractNLI NDAs
+  (`evals/contractnli/injection-checker.test.ts`):
+
+  | Attacker style                         | No defence | Verifier rule only | Screen + verifier    |
+  | -------------------------------------- | ---------- | ------------------ | -------------------- |
+  | A: flip the verdict, quote the attack  | 340 / 340  | 30, but 180 lost   | **30 / 340, 0 lost** |
+  | B: flip the verdict, quote a real line | 339 / 340  | 339 / 340          | **30 / 340, 0 lost** |
+
+  (Integrity loss = a verified claim carrying the attacker's flipped verdict; "lost" = honest
+  claims rejected, availability.) Quote checks cannot see a lie about meaning (style B): only
+  keeping the attack away from the model helps. What remains, 30 of 340 (8.8%), is exactly the
+  attacks the screen misses. A real model obeys far less often (M4: 6% visibly, D41).
+
+- **The screen (`instructionSignals`, `@lexguard/guardrails`):** six generic signals of text
+  addressed to an AI: override ("ignore the previous instructions"), AI meta words, "your
+  response/message", a sentence opening with a request verb (Write, Translate, Provide...,
+  only in normal case, so ALL-CAPS headings such as "LIST OF ..." are not commands), a direct
+  question, code or links.
+  - **Tuned on train, measured on held-out data (the M1 lesson):** tuned on BIPIA's 75 train
+    attacks (a second pinned file, 0 in common with the test attacks) and ContractNLI's train
+    evidence: 75/75 caught, 0 of 5,885 flagged. **Measured** (`evals/redteam/instructions.test.ts`):
+    BIPIA test attacks **69 / 75 (92%)**; false alarms on every sentence of the 123 ContractNLI
+    test NDAs **22 / 8,449 (0.26%)** and on CUAD's lawyer-labelled clauses **12 / 13,823
+    (0.09%)**. Not re-tuned on these results.
+  - **Misses:** request verbs not in the list ("Analyze", "Determine", "Help me"); a word list
+    never covers every way to ask. **False alarms:** signature lines ("Print Name:") and list
+    items continuing "shall not:" ("suggest to, induce or persuade any customer ..."), which
+    can be real evidence: a future version should read the previous sentence, measured on
+    fresh data.
+- **Two layers in the pipeline:** (1) the review withholds flagged sentences from the checker
+  (`screenedPassages`; flagged sentences are blanked before ranking, so up to 10 clean passages
+  still go to the checker) and stores how many it withheld (`review_claims.withheld`, migration
+  **0009**, local only so far; the report endpoint returns `withheldPassages`); (2) the verifier
+  rejects evidence that reads like an instruction (`instruction_like_evidence`). Measured cost
+  of (2) on the 2,091 oracle claims: none rejected.
+- **Found while wiring it:** the report test's hostile passage (`[click](javascript:...)`) is
+  now refused by the verifier before it can reach a report; the report test builds the claim
+  directly, so the report's own escaping (D51) stays tested on its own (defence in depth).
+- **Rulebook integrity (T19, `evals/redteam/rulebook-integrity.test.ts`):** the bytes of
+  `gdpr.json` and `nda.json` are pinned by SHA-256 in CI, so a one-word edit to a rule ("shall
+  not" -> "may") fails the build unless the test changes in the same reviewed commit.
+- **Not done (needs models or later milestones):** a real-model run of planted attacks against
+  the checker (how often gpt-oss-20b / gemma-4 actually obey); the M7 red team (a model judge,
+  hidden-text PDFs, MCP schema pinning).
+- **Tests:** guardrails +16 (detector), checker +2 (screen), verifier +1, worker +1 (an on-topic
+  planted line withheld, never seen by an obedient model, counted in the report), evals +3.
+  Mutation check of the detector: 7 breakages, all caught.

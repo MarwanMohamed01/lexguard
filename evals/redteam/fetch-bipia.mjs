@@ -17,6 +17,13 @@ const FILES = [
     sha256: "75750e7b4e8b34e8f9d88d89b357aeaaf02bd07f9e493ccd37eda74a0cd7c7f8",
   },
   {
+    // Disjoint from the test attacks (0 in common): used to tune the M5 detector, which is
+    // then measured on the test attacks only (D53).
+    path: "benchmark/text_attack_train.json",
+    name: "text_attack_train.json",
+    sha256: "63f95d3e67eac4178cdabdbdaf192cd05f2b6ed0702b578f1d30d556e5155670",
+  },
+  {
     path: "LICENSE",
     name: "LICENSE",
     sha256: "57cf81c45e0929899bc18051cf90134f00e55963ddecc7b37cfc5ea1494b1e8b",

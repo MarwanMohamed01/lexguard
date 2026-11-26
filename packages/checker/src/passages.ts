@@ -88,3 +88,34 @@ export function selectPassages(
   const picked = (matching.length > 0 ? matching.slice(0, k) : scored.slice(0, k)).map((x) => x.i);
   return picked.sort((a, b) => a - b).flatMap((i) => (docs[i] === undefined ? [] : [docs[i].s]));
 }
+
+/**
+ * `selectPassages` with a screen in front (D53): sentences the screen flags (text that reads
+ * like an instruction to an AI) are never handed to the checker. `withheld` counts the flagged
+ * sentences that would otherwise have been among the top k, so the review can report them.
+ */
+export function screenedPassages(
+  chunks: readonly { start: number; text: string }[],
+  query: string,
+  k: number,
+  flagged: (text: string) => boolean,
+): { passages: Passage[]; withheld: number } {
+  const unscreened = selectPassages(chunks, query, k);
+  const withheld = unscreened.filter((p) => flagged(p.text)).length;
+  if (withheld === 0) return { passages: unscreened, withheld: 0 };
+  // Rank again with the flagged sentences replaced by blanks of the same length, so offsets
+  // stay exact and a flagged sentence can never be chosen.
+  const blanked = chunks.map((c) => ({
+    start: c.start,
+    text: splitSentences(c.text, c.start).reduce(
+      (text, s) =>
+        flagged(s.text)
+          ? text.slice(0, s.start - c.start) +
+            " ".repeat(s.end - s.start) +
+            text.slice(s.end - c.start)
+          : text,
+      c.text,
+    ),
+  }));
+  return { passages: selectPassages(blanked, query, k), withheld };
+}
