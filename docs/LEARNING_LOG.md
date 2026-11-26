@@ -484,4 +484,15 @@ daily Neuron budget) → extractor on each chunk → checked clauses in D1 → `
 - During M4: quote-check question answered A (right: B, code checks the quote against the
   chunk). Definitions question and the Base64 (integrity vs availability) question not yet
   answered.
-- End-of-M4 quiz: to do at the start of the next chat.
+- End of M4 (2026-11-26): 5/8. Right: whitespace-tolerant quote check that stores the
+  contract's own text, Workflow steps instead of Queues (about 3,300 messages a day), the
+  atomic Neuron reservation, 35% -> 77% with inline definitions, no contract text to Gemini
+  free or Groq. Missed:
+  - **Merge on read** is not about Neurons (merging is plain code and costs none). It keeps the
+    stored per-chunk clauses unchanged as evidence, so the merge rules can be improved later
+    without re-extracting.
+  - **gemma-4's empty answers** came from thinking being on by default and the answer sitting
+    in `choices[0].message.content`, not `response`; the budget was not empty.
+  - **The injection attacks cost availability, not integrity.** Nothing false was stored (0 of
+    65); broken JSON answers just lost real clauses on attacked chunks (F1 0.61 -> 0.55).
+  - To revisit early in M5: D39 (merge), D38 (thinking), D41 (integrity vs availability).

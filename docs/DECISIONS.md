@@ -1270,3 +1270,59 @@ extract_error`; `clauses` (tenant-first key, document offsets, details JSON, **n
   of its own; a 50% interval instead of 95%; a weakened random generator); all caught after
   new tests (unequal contract sizes, interval width, the published mulberry32 value). Breaking
   hybrid search (returning keyword results only) fails the gate.
+
+## D43. Limits, licences and building blocks for M5 (M5 step 1, 2026-11-26)
+
+- **Checked in the official docs today:** Cloudflare Agents MCP pages (overview, transport,
+  authorization, `createMcpHandler`, `McpAgent`), Durable Objects, KV, Workers, Workflows
+  (limits and pricing, the pricing page read directly), Workers AI pricing, service bindings;
+  the ContractNLI site, the EUR-Lex legal notice, the `workers-oauth-provider` README.
+- **Remote MCP server on Workers:**
+  - `createMcpHandler` (package `agents`, path `agents/mcp/server`, with
+    `@modelcontextprotocol/server` 2.x at the exact version the installed `agents` asks for)
+    is **stateless**: a fresh server per request, **no Durable Object**. `McpAgent` (Durable
+    Object based) is **deprecated and feature-frozen**. Decision: `createMcpHandler`; a
+    read-only rulebook needs no per-session state.
+  - Transport: **Streamable HTTP** only (SSE deprecated), default route `/mcp`.
+  - Auth: the handler does not check tokens itself. The documented way is OAuth 2.1 with
+    `@cloudflare/workers-oauth-provider` (MIT, as shown on GitHub): an authorization server
+    that stores grants and tokens in a KV namespace bound as `OAUTH_KV`, and the MCP server as
+    a resource server reached through a service binding. A custom bearer check is also shown.
+    The choice (full OAuth vs a scoped token we check ourselves) is made in step 4; full OAuth
+    needs a new KV namespace (Marwan's OK).
+  - **Not stated:** anything about the Free plan on the MCP pages. Covered by the general
+    Worker limits below.
+- **Free-plan limits that shape M5:**
+  - **Workflows: 3,000 steps a day** (billing for steps and storage applies since
+    2026-08-10), 1 GB-month of storage, state kept 3 days, 1,024 steps per instance, 100
+    concurrent instances, 10 ms CPU per step, 1 MiB per step result. "Step count does not
+    include rollback handlers or retries." **New since D34**, which missed the daily step
+    count. Today's documents use about one step per chunk for extraction plus about 20 for
+    indexing: an average CUAD contract (~33 chunks) is ~60 steps, so ~50 contracts a day by
+    steps, still above the Neuron limit (~16, D34). **M5 must group its checks** (several
+    clause/rule pairs per step), not one step per pair. **Not stated:** what happens on Free
+    when the daily step count is used up.
+  - Subrequests: 50 external and 1,000 to Cloudflare services per invocation. The pricing page
+    says "Steps within a Workflow are not invocations"; **not stated** whether each step gets
+    its own subrequest budget (D34's open question stays open; the M5 real run counts calls
+    per instance). Each service binding call counts as a subrequest; at most 32 Worker
+    invocations per request.
+  - KV: 100,000 reads, **1,000 writes** a day, 1 GB. Enough for OAuth grants and tokens of a
+    few clients; not for per-request writes.
+  - Durable Objects (if ever used): SQLite backend only on Free, 100,000 requests and 13,000
+    GB-s a day, 5 million rows read and 100,000 written a day, 5 GB total. Not needed now.
+  - Workers: 100,000 requests a day, 10 ms CPU per request. Workers AI: 10,000 Neurons a day.
+- **Data licences:**
+  - **ContractNLI:** CC BY 4.0 (attribution required), 607 NDAs, 17 fixed hypotheses, labels
+    Entailment / Contradiction / NotMentioned, evidence spans (sentences or list items) for the
+    first two. JSON in `contract-nli.zip` from the project site, behind click-through terms
+    naming Hitachi America as provider. Split sizes are read from the zip in step 2.
+  - **EUR-Lex:** "Unless otherwise specified, you can re-use the legal documents published in
+    EUR-Lex for commercial or non-commercial purposes" (Decision 2011/833/EU); editorial
+    content and consolidated texts are CC BY 4.0 (acknowledge the source, indicate changes);
+    metadata CC0. So the GDPR text can be stored in the repo with its source and SHA-256.
+    **Not checked:** rules for automated access (the webservice needs registration); the text
+    is downloaded once and pinned, never fetched at run time.
+- **Consequences for the plan:** no Durable Objects and no web access at run time (the
+  rulebook is pinned data served by our own MCP server, so T5's web risk does not open in M5);
+  checks grouped per step; the step count joins Neurons in the review's budget.

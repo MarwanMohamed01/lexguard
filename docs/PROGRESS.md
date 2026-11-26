@@ -36,7 +36,10 @@ https://github.com/MarwanMohamed01/lexguard (public).
 (`POST .../search`). The production extractor model stays `@cf/google/gemma-4-26b-a4b-it`
 (F1 0.56 on 222 chunks vs keyword 0.20; final number when the nightly run ends).
 
-First in the new chat:
+Done on 2026-11-26: end-of-M4 quiz (5/8, in LEARNING_LOG) and the M5 plan draft (below).
+M5 step 1 done (D43). Next: M5 step 2 (ContractNLI eval first).
+
+Originally planned for the new chat:
 
 1. The **end-of-M4 quiz** (multiple choice, about 8 questions; LEARNING_LOG has what M4
    taught and the M3 misses). Record the score in LEARNING_LOG ("Quiz score" under M4).
@@ -56,7 +59,9 @@ day. Build M5 with fake models and evals first; real runs after the task is done
   embedding" runs `scripts/nightly-embed.ps1` at 01:10 local (00:10 UTC): the gemma-4
   extraction subset (222 of 473 chunks done) and the last 2 of 75 injection cases (Groq). It
   disables itself when everything is answered. The laptop must stay logged in (sleep is fine)
-  on those nights. Log: `evals/data/retrieval/nightly-embed.log`. Then:
+  on those nights. Log: `evals/data/retrieval/nightly-embed.log`. Night of 2026-11-26: gemma-4
+  answered 220 chunks (222 of 473 cached, about 2 more nights); the 2 remaining injection
+  cases failed with Groq 429 after 8 retries (the task retries them next night). Then:
   - **M4 step 4 close:** score the full subset (`npm run extract:cuad -w @lexguard/evals`
     with `PROVIDER=workers-ai LIMIT=0` re-scores from the cache), compare gemma-4 vs Groq vs
     keyword, confirm the model, record in DECISIONS (D38 follow-up).
@@ -74,6 +79,42 @@ day. Build M5 with fake models and evals first; real runs after the task is done
   per-tenant daily search and extraction cap (T15, D30); section cross-references ("as set
   out in Section 5.3", D40, the M5 verifier needs them); flagging instruction-like lines in
   chunks (D41, M7).
+
+## M5 plan (draft, explained to Marwan on 2026-11-26; explain each step again before starting)
+
+Goal: for each extracted clause, find the rules that apply, decide whether the clause meets,
+breaks or ignores each rule, keep only claims whose quotes code can find in the contract and in
+the rule text, and write a cited report with suggested edits (redline).
+
+Design idea (dual-model, T1/T2): the agent that reads contract text (the **checker**) has no
+tools and fills a closed form; choosing which rules to fetch is done by code from the clause
+TYPE (typed data, not contract text) through the rulebook MCP server. The Workflow is the
+supervisor (budgets, stop conditions); no LLM decides what runs.
+
+1. ✅ Limits and licences (D43): stateless `createMcpHandler`, no Durable Object (`McpAgent`
+   is deprecated); OAuth needs a KV namespace (1,000 writes a day); **Workflows 3,000 steps a
+   day on Free** (new), so checks are grouped per step; ContractNLI CC BY 4.0; EUR-Lex texts
+   reusable, pinned once, no web access at run time.
+2. Eval first (D10, public data only): candidate **ContractNLI** (607 NDAs, 17 rule-like
+   hypotheses, labels entailed / contradicted / not mentioned, evidence spans). Pinned subset,
+   SHA-256, scorer (label accuracy and macro F1, evidence-span precision / recall), baselines
+   (majority label, keyword top span). Licence checked first.
+3. Rulebook data: the official GDPR text (Art. 28 processor terms first) and ContractNLI's 17
+   hypotheses as a public NDA playbook, split into articles / paragraphs with exact offsets
+   and stable IDs (`gdpr:28(3)(a)`), hashed.
+4. Rulebook MCP server on Workers: read-only tools `get_rule(id)` and `search_rules(query)`,
+   scoped token, Zod arguments; the client pins the tool-schema hash (rug-pull check).
+5. Checker (quarantined): clause + rule -> verdict, clause quote(s), rule quote, short reason;
+   fake model first, real model on ContractNLI when Neurons are free (after the nightly task).
+6. Verifier (code): every quote must be found in the contract at its offsets and in the rule
+   text; claims without a verified quote are dropped and counted. Section references
+   ("Section 5.3", D40) resolved so the verifier can follow them.
+7. Synthesizer: report (JSON + Markdown) built only from verified claims; redline as
+   offsets + suggested text, marked as an AI suggestion.
+8. Review Workflow and endpoints (`POST .../review`, `GET .../report`), migration 0008,
+   Neuron budget; tests, mutation checks.
+9. Security tests (BIPIA on the checker, MCP token scope, poisoned rule text), real run,
+   deploy (Marwan's OK), learning log, quiz.
 
 ## M4 plan (draft, explained to Marwan on 2026-11-25; explain each step again before starting)
 
