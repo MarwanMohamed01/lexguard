@@ -43,7 +43,7 @@ https://github.com/MarwanMohamed01/lexguard (public).
 (F1 0.56 on 222 chunks vs keyword 0.20; final number when the nightly run ends).
 
 Done on 2026-11-26: end-of-M4 quiz (5/8, in LEARNING_LOG) and the M5 plan draft (below).
-M5 steps 1-4, 6, 7 done, rulebook server deployed (D43-D51); step 5 real runs pending (D49); step 8 built locally, deploy pending (D52). Next: M5 step 5 (the checker).
+M5 steps 1-4, 6, 7 done, rulebook server deployed (D43-D51); step 5 real runs pending (D49); step 8 deployed and smoke-tested (D52). Next: M5 step 5 (the checker).
 
 Originally planned for the new chat:
 
@@ -145,11 +145,12 @@ supervisor (budgets, stop conditions); no LLM decides what runs.
    require/forbid per rule, redlines from the rulebook's own wording (no model), escaped
    Markdown; reports for 20 NDAs pass every invariant; 14 tests, 0 of 17 mutations survive.
    Open: scope and policy per rule come with the review request (step 8; depends on the side).
-8. ⏳ Review pipeline (D52): `POST .../review` (scope + policy per rule), `ReviewDocument`
+8. ✅ Review pipeline (D52): `POST .../review` (scope + policy per rule), `ReviewDocument`
    Workflow (4 rules per step; hybrid search -> top 10 sentences -> checker -> verifier on the
    loaded chunks), `GET .../report` (JSON / Markdown), migration 0008; tested locally with a
    fake model (11 tests, 0 of 17 mutations survive). ✅ Deployed 2026-11-26: 0008 applied
-   remotely, Worker `bcca83bf`. **To do:** Marwan runs the smoke test (review stage added).
+   remotely, Worker `bcca83bf`. Smoke test (Marwan): all 35 checks passed; review of 4 NDA rules on
+   the smallest contract in 11.3 s, 26.7 Neurons, all 4 correctly "missing" (D52).
 9. Security tests (BIPIA on the checker, MCP token scope, poisoned rule text), real run,
    deploy (Marwan's OK), learning log, quiz.
 

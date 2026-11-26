@@ -1768,3 +1768,10 @@ herein..."`), copied despite the prompt. **Fix in code, not the prompt:** a lead
   rulebook MCP server still 401 without a token. The smoke test (`scripts/smoke.mjs`) gained a
   review stage on the smallest contract (4 NDA rules, about 60 Neurons); Marwan runs it with his
   key.
+- **First real review (2026-11-26, Marwan's smoke run, all 35 checks passed):** 4 NDA rules on
+  the smallest contract (a 1-page maintenance agreement): an unknown rule 400, started 202, a
+  second request 409, report 200 after **11.3 s** with one finding per rule, Markdown 200, no key
+  401; **26.7 Neurons** in total, no unusable answer. All 4 rules came out "missing", which is
+  right: checked against the contract's CUAD text, it never mentions confidentiality,
+  disclosure, employees, survival, termination, return or destruction. A review that finds
+  something to quote on the live system is still to be seen (a larger contract, or an NDA).
