@@ -53,11 +53,18 @@ jobs:
           path: evals/data/contractnli
           key: eval-data-contractnli-3d2a4d47da022de1f1d740b8eea16930e55c21a1
 
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: evals/data/redteam/bipia
+          key: eval-data-bipia-a004b69ec0dd446e0afd461d98cb5e96e120a5d0-train-test
+
       - run: npm run fetch:gretel -w @lexguard/evals
       # 40 MB; needed for the clause-integrity gate (evals/cuad/chunking.test.ts).
       - run: npm run fetch:cuad -w @lexguard/evals
       # 65 MB zip, 11 MB kept; the M5 checker eval's data (evals/contractnli).
       - run: npm run fetch:contractnli -w @lexguard/evals
+      # BIPIA attacks (train + test, about 30 KB): the M5 screen gates and worst-case test (D53).
+      - run: npm run fetch:bipia -w @lexguard/evals
 
       - run: npm run check
 
