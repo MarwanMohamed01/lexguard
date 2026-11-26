@@ -220,3 +220,53 @@ describe("findQuote (which passage a quote came from)", () => {
     expect(findQuote(["same text", "same text"], "same")?.passage).toBe(0);
   });
 });
+
+describe("quotes that copy our [n] passage label (D49)", () => {
+  it("strips the label, finds the words, and counts it", async () => {
+    const result = await check({
+      verdict: "agrees",
+      quotes: [
+        "[2] The Recipient shall not decompile, disassemble or reverse engineer the Materials.",
+      ],
+    });
+    if (!result.ok) throw new Error("expected ok");
+    expect(result).toMatchObject({ verdict: "agrees", labelsStripped: 1, quotesNotFound: 0 });
+    expect(result.evidence[0]?.passage).toBe(1);
+    expect(result.evidence[0]?.text).not.toContain("[2]"); // the passage's text, not the label
+  });
+
+  it("uses the label as a hint, but falls back when the words are elsewhere", async () => {
+    // The same words in passages 1 and 3 (index 0 and 2): the label picks [3].
+    const twice = [
+      "Recipient shall keep it secret.",
+      "Other text here.",
+      "Recipient shall keep it secret.",
+    ];
+    const hinted = await check(
+      { verdict: "agrees", quotes: ["[3] Recipient shall keep it secret."] },
+      twice,
+    );
+    if (!hinted.ok) throw new Error("expected ok");
+    expect(hinted.evidence[0]?.passage).toBe(2);
+    // A wrong label: the words are not in [1], so the best passage anywhere is used.
+    const wrong = await check({ verdict: "agrees", quotes: ["[1] or reverse engineer"] });
+    if (!wrong.ok) throw new Error("expected ok");
+    expect(wrong.evidence[0]?.passage).toBe(1);
+    // A label past the last passage is just ignored as a hint.
+    const past = await check({ verdict: "agrees", quotes: ["[9] or reverse engineer"] });
+    if (!past.ok) throw new Error("expected ok");
+    expect(past.evidence[0]?.passage).toBe(1);
+  });
+
+  it("does not let the label count as words, or strip a label that is not at the start", async () => {
+    const bare = await check({ verdict: "agrees", quotes: ["[2] reverse engineer"] });
+    expect(bare).toMatchObject({ ok: true, verdict: "silent", quotesTooShort: 1 });
+    const inside = await check({ verdict: "agrees", quotes: ["shall not [2] decompile"] });
+    expect(inside).toMatchObject({
+      ok: true,
+      verdict: "silent",
+      labelsStripped: 0,
+      quotesNotFound: 1,
+    });
+  });
+});

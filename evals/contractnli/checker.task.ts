@@ -7,7 +7,8 @@
 //   NEURON_CAP=<Workers AI, default 9,000, shared ledger with the other runs (D26)>.
 // ContractNLI is public (CC BY 4.0), so Groq may read it (D34). Groq reads GROQ_API_KEY from
 // evals/.env (git-ignored), loaded into this process only, never printed.
-// Scores only pairs that have an answer, and says how many those are.
+// Scores only pairs that have an answer, and says how many those are. LIMIT=0 scores the
+// cache without calling any model (and without loading the key), e.g. while a run is going.
 import { checkRule, CHECK_PROMPT_VERSION, buildCheckPrompt } from "@lexguard/checker";
 import { getRule, ndaPlaybook, ruleText } from "@lexguard/rulebook";
 import { existsSync, writeFileSync } from "node:fs";
@@ -36,14 +37,19 @@ it(
     const topK = Number(process.env.TOPK ?? TOP_K);
     const limit = Number(process.env.LIMIT ?? Infinity);
     const envFile = new URL("../.env", import.meta.url);
-    if (existsSync(envFile)) process.loadEnvFile(envFile);
+    // LIMIT=0 only scores cached answers: no model call, so the key file is not even loaded.
+    const scoreOnly = limit === 0;
+    if (!scoreOnly && existsSync(envFile)) process.loadEnvFile(envFile);
     const provider = process.env.PROVIDER ?? "groq";
     const model: ChatModel =
       provider === "workers-ai"
         ? workersAiChat(process.env.MODEL ?? "@cf/google/gemma-4-26b-a4b-it")
         : provider === "ollama"
           ? ollamaChat(process.env.MODEL ?? "llama3.1:8b")
-          : groqChat(process.env.MODEL ?? "openai/gpt-oss-20b");
+          : groqChat(
+              process.env.MODEL ?? "openai/gpt-oss-20b",
+              scoreOnly ? "unused-when-scoring-only" : undefined,
+            );
     const ledger =
       provider === "workers-ai" ? new NeuronLedger(Number(process.env.NEURON_CAP ?? 9_000)) : null;
     const cache = new AnswerCache(model.name, CHECK_PROMPT_VERSION, CACHE_DIR);
@@ -104,6 +110,7 @@ it(
       downgraded: 0,
       quotesNotFound: 0,
       quotesTooShort: 0,
+      labelsStripped: 0,
       ruleQuoteFound: 0,
       inputTokens: 0,
       outputTokens: 0,
@@ -123,6 +130,7 @@ it(
         if (result.downgraded) totals.downgraded++;
         totals.quotesNotFound += result.quotesNotFound;
         totals.quotesTooShort += result.quotesTooShort;
+        totals.labelsStripped += result.labelsStripped;
         if (result.ruleQuote !== null) totals.ruleQuoteFound++;
       }
       scored.push({ gold: x.c.gold, predicted: toPrediction(x.c, result) });

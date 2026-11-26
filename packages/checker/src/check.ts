@@ -67,6 +67,8 @@ export type CheckResult =
       quotesNotFound: number;
       /** Quotes under MIN_QUOTE_WORDS words, ignored. */
       quotesTooShort: number;
+      /** Quotes that began with our own [n] passage label, removed before matching. */
+      labelsStripped: number;
     }
   | { ok: false; promptVersion: string; reason: ParseFailureReason; message: string };
 
@@ -84,7 +86,12 @@ export interface CheckOptions {
 export function findQuote(
   passages: readonly string[],
   quote: string,
+  hint?: number,
 ): { passage: number; found: { start: number; end: number } } | undefined {
+  // The passage the model named comes first, if the words are really there.
+  const named = hint === undefined ? undefined : passages[hint];
+  const there = named === undefined ? null : locateQuote(named, quote);
+  if (hint !== undefined && there !== null) return { passage: hint, found: there };
   let best: { passage: number; found: { start: number; end: number }; rank: number } | undefined;
   passages.forEach((text, passage) => {
     const found = locateQuote(text, quote);
@@ -116,13 +123,21 @@ export async function checkRule(
   const evidence: Evidence[] = [];
   let quotesNotFound = 0;
   let quotesTooShort = 0;
+  let labelsStripped = 0;
   if (form.verdict !== "silent") {
-    for (const quote of form.quotes) {
+    for (const raw of form.quotes) {
+      // Models often copy our own passage label: "[2] As used herein..." (55 of 58 unfound
+      // quotes in the first ContractNLI run, D49). The label is ours, not the contract's: strip
+      // it and use it as a hint. The words after it must still be found in a passage.
+      const label = /^\[(\d{1,2})\]\s+/u.exec(raw);
+      const quote = label === null ? raw : raw.slice(label[0].length);
+      const hint = label === null ? undefined : Number(label[1]) - 1;
+      if (label !== null) labelsStripped++;
       if (quote.split(/\s+/u).filter((w) => w.length > 0).length < MIN_QUOTE_WORDS) {
         quotesTooShort++;
         continue;
       }
-      const hit = findQuote(passages, quote);
+      const hit = findQuote(passages, quote, hint);
       if (hit === undefined) {
         quotesNotFound++;
         continue;
@@ -159,5 +174,6 @@ export async function checkRule(
     reason: form.reason,
     quotesNotFound,
     quotesTooShort,
+    labelsStripped,
   };
 }

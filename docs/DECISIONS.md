@@ -1617,3 +1617,21 @@ extract_error`; `clauses` (tenant-first key, document offsets, details JSON, **n
   texts equal the hypotheses, the oracle on all test pairs). Mutation check: 23 breakages over
   the checker and the eval mapping; 3 first survived (two equivalent and removed as redundant
   code, one real gap: the rule quote's own text, now tested).
+- **First real run, partial (Groq gpt-oss-20b, 148 of 340 pairs, 2026-11-26):**
+  - **Speed:** median 7.7 s per call, but 72 s on average: most of the time is spent waiting
+    out the free tier's rate limits (the longest wait 481 s); about 960 input and 170 output
+    tokens per pair. The run resumes from its cache, so it can stop and continue another day.
+  - **First score, below the bar:** macro F1 0.552 vs 0.586 for the per-rule bar on the same
+    pairs. 36 of 148 verdicts were downgraded to "silent" because 58 quotes were not found.
+  - **Cause:** 55 of those 58 quotes began with our own passage label (`"[2] As used
+herein..."`), copied despite the prompt. **Fix in code, not the prompt:** a leading `[n]`
+    label is stripped and used as a hint for which passage the quote came from; the words after
+    it must still be found (a label alone, or a label inside a quote, is not stripped into
+    evidence; tested). The prompt is unchanged, so the cached answers stay valid and were
+    re-scored for free.
+  - **Re-scored, same 148 answers:** downgraded 36 -> 1, quotes not found 58 -> 4, accuracy
+    0.622 -> **0.770**, macro F1 0.552 -> **0.694** (bar 0.586, oracle ceiling at top 10 about
+    0.925 on the full test split), Contradiction F1 0.483 (bar 0.437), evidence precision 0.664
+    / recall 0.382. Final numbers when all 340 pairs are answered.
+  - `LIMIT=0` now scores the cache without calling a model and without loading the key file,
+    so a run in progress can be scored by anyone.

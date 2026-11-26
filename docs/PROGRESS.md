@@ -131,8 +131,11 @@ supervisor (budgets, stop conditions); no LLM decides what runs.
 5. ⏳ Checker (D49): `packages/checker` built (quarantined reader, verdict agrees / conflicts /
    silent, no evidence = no claim, quotes under 3 words ignored); ContractNLI runner with cache.
    Ceiling with keyword top 10 passages (oracle, no model): macro F1 **0.925** (bar 0.617).
-   **Still to do:** real runs on the 340-pair subset (Groq, Marwan's key; gemma-4 when the
-   nightly task frees Neurons), then choose k (10 or 20) and record the score.
+   First Groq run (148 of 340 pairs): models copied our `[n]` passage labels into quotes;
+   stripped in code, re-scored: macro F1 **0.694** vs bar 0.586 (D49). **Still to do:** finish
+   the 340 pairs (Marwan's Groq run resumes from the cache; re-score with `LIMIT=0` after it
+   ends, since a run started before the fix scores with the old code), gemma-4 when the nightly
+   task frees Neurons, then choose k (10 or 20).
 6. Verifier (code): every quote must be found in the contract at its offsets and in the rule
    text; claims without a verified quote are dropped and counted. Section references
    ("Section 5.3", D40) resolved so the verifier can follow them.
@@ -330,6 +333,6 @@ PICK=3 node scripts/cpu-load.mjs <worker-url>        # one new upload + 20 searc
   indexing ~5 ms per step.
 - ContractNLI test split (2,091 pairs, D44): majority label macro F1 0.211, majority per
   hypothesis 0.617 (the checker's bar); keyword top 10 spans hold expert evidence for 89%.
-- Tests: 686 (worker 166, rulebook-mcp 58, checker 14, a2a 34, chunker 68, extraction 51, guardrails 72,
+- Tests: 689 (worker 166, rulebook-mcp 58, checker 17, a2a 34, chunker 68, extraction 51, guardrails 72,
   retrieval 26, router 13, rulebook 24, trace 24, evals 136; the live-run, converted-PDF and hybrid-gate evals skip in
   CI).
