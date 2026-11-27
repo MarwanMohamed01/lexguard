@@ -1099,6 +1099,23 @@ extract_error`; `clauses` (tenant-first key, document offsets, details JSON, **n
 - **CI failure found after the push:** `evals/retrieval/live.test.ts` read a local-only file
   in a `describe` body; Vitest runs describe bodies even for skipped suites. Fixed by reading
   in `beforeAll`, checked by running the evals with the local-only data hidden.
+- **Full subset done (nightly task, night of 2026-11-27): gemma-4 is the extraction model.**
+  All 473 chunks of the 10-contract subset answered on Workers AI gemma-4 (thinking off), over
+  three nights (`results/cuad-extraction-workers-ai-_cf_google_gemma-4-26b-a4b-it-json-t0-10.json`):
+
+  | 473 chunks, 10 contracts              | Precision | Recall | F1 (micro) | Macro F1 |
+  | ------------------------------------- | --------- | ------ | ---------- | -------- |
+  | gemma-4-26b-a4b-it                    | 0.43      | 0.66   | **0.52**   | 0.53     |
+  | M3 keyword search, top chunk per type | 0.13      | 0.25   | 0.17       | 0.15     |
+
+  2 answers not JSON (one cut off at the output cap), 23 quotes not found in the chunk
+  (dropped by the check), 29 relocated across whitespace; 4.2 s and about 2,200 input + 126
+  output tokens per chunk. It beats the bar (keyword top-1, 0.203 on 510 contracts, 0.17 on
+  these chunks) by about three times. gpt-oss-20b's 0.54 is on only the first 68 chunks, so the
+  two are not compared head to head; gemma-4 stays the choice anyway because document text may
+  not go to Groq (D34). **Weak point: precision** (194 wrong clause types against 147 right):
+  the model finds most clauses but labels extra ones. Not tuned now: the verifier and report
+  (M5) only use what is quoted, and M6's routing may send unsure chunks to a stronger model.
 
 ## D39. The reduce step: document-level clauses (M4 step 6, 2026-11-25)
 
@@ -1222,7 +1239,10 @@ extract_error`; `clauses` (tenant-first key, document offsets, details JSON, **n
   (planting, echo, verdict for an obeyed detail, an invented quote, a quoted planted line, a
   broken form), 1 data check (75 attacks, 15 categories). Mutation check: 10 of 10 caught.
 - **Open:** the same run on the production model (gemma-4 on Workers AI) once its clean subset
-  answers exist (step 4, nightly).
+  answers exist (step 4, nightly). Its clean answers exist since 2026-11-27 (D38).
+- **Status 2026-11-27:** 73 of 75 cases, still 0 reached the stored result. The last 2 failed
+  again with Groq 429: Marwan's ContractNLI checker run used the same 200,000 tokens/day the
+  night before. The nightly task stays on and retries them.
 
 ## D42. M3 closed: hybrid search stays, contextual header stays off, CI gates (2026-11-26)
 
@@ -1635,6 +1655,14 @@ herein..."`), copied despite the prompt. **Fix in code, not the prompt:** a lead
     / recall 0.382. Final numbers when all 340 pairs are answered.
   - `LIMIT=0` now scores the cache without calling a model and without loading the key file,
     so a run in progress can be scored by anyone.
+- **Second scoring, 192 of 340 pairs (2026-11-27, with the label fix from the start):** the run
+  stopped at Groq's 200,000 tokens/day. Accuracy **0.750**, macro F1 **0.648** vs 0.586 for the
+  per-rule bar on the same 192 pairs (still above; the 0.694 on the first 148 was partly the
+  luck of an easier start). Per class: Entailment 0.82, Not mentioned 0.76, **Contradiction
+  0.37** (the weak class; few examples, and the model often reads a contradiction as "not
+  mentioned"). Evidence precision 0.66 / recall 0.36; quotes not found 4, labels stripped 73.
+  The remaining 148 pairs: Marwan resumes the same command after the nightly injection run has
+  had its Groq share (both use one daily budget).
 
 ## D50. The verifier and section cross-references (M5 step 6, 2026-11-26)
 

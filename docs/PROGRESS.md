@@ -43,15 +43,10 @@ blocked by the M5 leftovers below; they are runs that finish on their own plus s
 
 First in the new chat:
 
-1. **Check the overnight runs and close what they finished** (a few minutes each):
-   - Nightly task (log: `evals/data/retrieval/nightly-embed.log`): if the gemma-4 extraction
-     subset (473 chunks) and the 75 injection cases are complete, close **M4 step 4** (re-score
-     with `PROVIDER=workers-ai LIMIT=0 npm run extract:cuad -w @lexguard/evals`, compare
-     gemma-4 vs Groq vs keyword, confirm the model) and update **D41** (`LIMIT=0 npm run
-injection:cuad -w @lexguard/evals`).
-   - Marwan's Groq checker run (cache: `evals/data/contractnli/answers/`, 172 of 340 on
-     2026-11-26): re-score with `LIMIT=0 npm run check:contractnli -w @lexguard/evals` (no key
-     needed, D49) and record the final macro F1 vs the bar 0.617 and the oracle 0.925.
+1. ✅ **Overnight runs checked (2026-11-27):** M4 step 4 closed (gemma-4 F1 0.52 vs keyword
+   0.17 on all 473 chunks, D38); Groq checker re-scored on 192 of 340 pairs (macro F1 0.648 vs
+   bar 0.586 on the same pairs, D49). Still open: the last 2 injection cases (D41, nightly) and
+   the other 148 checker pairs (Marwan, after the nightly run).
 2. **Start M6 (routing & caching)**: explain M6 simply with small examples, draft the plan, verify
    free-tier limits in the official docs first (AI Gateway caching, Workers AI models and
    prices), design the M6 eval before building (D10: public data only). Build with fake models
@@ -60,25 +55,21 @@ injection:cuad -w @lexguard/evals`).
 
 ## Open items (carry into M6)
 
-- **M5 leftovers (D49, D53, D52):** the gemma-4 checker run on the 340 ContractNLI pairs once the
-  nightly task frees the Neurons (~4,000-5,000 Neurons, through the probe Worker, ask Marwan
-  first); a real-model run of planted attacks against the checker; a live review that quotes
+- **M5 leftovers (D49, D53, D52):** the gemma-4 checker run on the 340 ContractNLI pairs
+  (Neurons free since 2026-11-27: the nightly task no longer uses Workers AI; ~4,000-5,000
+  Neurons, probe Worker, ask Marwan first); a real-model run of planted attacks against the checker; a live review that quotes
   something (Marwan, smoke test on a larger contract); the screen's false alarms on list items
   after "shall not:" (read the previous sentence, measure on fresh data).
 - **Marwan:** `git push` (24+ local commits); rotate the API key (open since M3).
 
 - **M4 finishing by itself (nightly task, D36):** the scheduled task "Lexguard nightly
-  embedding" runs `scripts/nightly-embed.ps1` at 01:10 local (00:10 UTC): the gemma-4
-  extraction subset (222 of 473 chunks done) and the last 2 of 75 injection cases (Groq). It
-  disables itself when everything is answered. The laptop must stay logged in (sleep is fine)
-  on those nights. Log: `evals/data/retrieval/nightly-embed.log`. Night of 2026-11-26: gemma-4
-  answered 220 chunks (222 of 473 cached, about 2 more nights); the 2 remaining injection
-  cases failed with Groq 429 after 8 retries (the task retries them next night). Then:
-  - **M4 step 4 close:** score the full subset (`npm run extract:cuad -w @lexguard/evals`
-    with `PROVIDER=workers-ai LIMIT=0` re-scores from the cache), compare gemma-4 vs Groq vs
-    keyword, confirm the model, record in DECISIONS (D38 follow-up).
-  - **Injection:** re-score (`LIMIT=0 npm run injection:cuad -w @lexguard/evals`), update D41
-    with 75 of 75.
+  embedding" (`scripts/nightly-embed.ps1`, 01:10 local) still runs: embedding and the gemma-4
+  extraction subset are complete (night of 2026-11-27), only the last 2 of 75 injection cases
+  (Groq) remain; they failed again with 429 because Marwan's checker run used the same Groq
+  daily budget. The task disables itself when they are answered. Then re-score
+  (`LIMIT=0 npm run injection:cuad -w @lexguard/evals`) and update D41 with 75 of 75. Run the
+  rest of the Groq checker (`PROVIDER=groq npm run check:contractnli -w @lexguard/evals`) only
+  after that night's run.
 - **M4 CPU check of an extraction run:** Marwan starts an extraction on the middle smoke
   contract (4 pages) while `node scripts/tail-cpu.mjs --record tail-cpu.jsonl` records; needs
   his key and about 200 Neurons.
@@ -181,7 +172,7 @@ only, document text marked as data, T1/T2); every quote is checked by code again
 3. ✅ The extractor (D36): `packages/extraction`, Zod form with closed type and risk lists,
    nonce-wrapped untrusted text, optional PII redaction with restore, verbatim-quote check
    with exact offsets; 18 tests with a fake model, 0 of 20 mutations survive.
-4. ⏳ Measure on the pinned 10-contract subset (473 chunks), answers cached (D38). Laptop too
+4. ✅ Measure on the pinned 10-contract subset (473 chunks), answers cached (D38). Laptop too
    slow; Groq gpt-oss-20b early signal on 68 chunks: F1 0.54 vs keyword 0.20 (whitespace-
    tolerant quotes, contract text cited). **Full subset on Workers AI gemma-4 (thinking off),
    run automatically by the nightly task after the embedding, about 3 nights**; then compare,
@@ -203,6 +194,8 @@ only, document text marked as data, T1/T2); every quote is checked by code again
    - ✅ Real run (2026-11-26, Marwan ran `scripts/smoke.mjs`): all 28 checks passed;
      extraction of the smallest contract (1 page) on gemma-4 took 15.9 s, 4 clauses (Document
      Name, Renewal Term, Effective Date, Parties), exact quotes, merged view, no restart.
+   - ✅ Step 4 closed 2026-11-27 (D38): gemma-4 on all 473 chunks, precision 0.43, recall 0.66,
+     F1 0.52 vs keyword 0.17; gemma-4 is the extraction model.
    - Nightly results so far: M3 corpus fully embedded; gemma-4 222 of 473 subset chunks, F1
      0.56 vs keyword 0.20 on the same chunks; injection 73 of 75, still 0 stored.
    - Next: CPU check of an extraction run, learning log, quiz.

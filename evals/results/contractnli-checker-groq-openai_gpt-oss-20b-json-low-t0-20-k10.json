@@ -1,0 +1,154 @@
+{
+  "model": "groq-openai/gpt-oss-20b-json-low-t0",
+  "promptVersion": "check/1",
+  "subset": {
+    "ndas": 20,
+    "pairs": 340,
+    "answered": 192,
+    "ids": [
+      606,
+      83,
+      5,
+      433,
+      129,
+      22,
+      564,
+      412,
+      289,
+      25,
+      521,
+      584,
+      165,
+      400,
+      43,
+      389,
+      8,
+      395,
+      585,
+      1
+    ],
+    "topK": 10
+  },
+  "failed": 0,
+  "downgraded": 1,
+  "quotesNotFound": 4,
+  "quotesTooShort": 0,
+  "labelsStripped": 73,
+  "ruleQuoteFound": 191,
+  "inputTokens": 187519,
+  "outputTokens": 33363,
+  "ms": 32136365,
+  "secondsPerPair": 167.37690104166668,
+  "tokensPerPair": {
+    "input": 976.6614583333334,
+    "output": 173.765625
+  },
+  "checker": {
+    "labels": {
+      "cases": 192,
+      "accuracy": 0.75,
+      "perClass": {
+        "Entailment": {
+          "tp": 79,
+          "fp": 13,
+          "fn": 22,
+          "precision": 0.8586956521739131,
+          "recall": 0.7821782178217822,
+          "f1": 0.8186528497409327
+        },
+        "Contradiction": {
+          "tp": 7,
+          "fp": 12,
+          "fn": 12,
+          "precision": 0.3684210526315789,
+          "recall": 0.3684210526315789,
+          "f1": 0.3684210526315789
+        },
+        "NotMentioned": {
+          "tp": 58,
+          "fp": 23,
+          "fn": 14,
+          "precision": 0.7160493827160493,
+          "recall": 0.8055555555555556,
+          "f1": 0.758169934640523
+        }
+      },
+      "macroF1": 0.6484146123376782,
+      "confusion": {
+        "Entailment": {
+          "Entailment": 79,
+          "Contradiction": 6,
+          "NotMentioned": 16
+        },
+        "Contradiction": {
+          "Entailment": 5,
+          "Contradiction": 7,
+          "NotMentioned": 7
+        },
+        "NotMentioned": {
+          "Entailment": 8,
+          "Contradiction": 6,
+          "NotMentioned": 58
+        }
+      }
+    },
+    "evidence": {
+      "tp": 93,
+      "fp": 47,
+      "fn": 162,
+      "precision": 0.6642857142857143,
+      "recall": 0.36470588235294116,
+      "f1": 0.4708860759493671,
+      "pairs": 120,
+      "hit": 0.7083333333333334
+    }
+  },
+  "barPerHypothesisSamePairs": {
+    "cases": 192,
+    "accuracy": 0.6510416666666666,
+    "perClass": {
+      "Entailment": {
+        "tp": 75,
+        "fp": 27,
+        "fn": 26,
+        "precision": 0.7352941176470589,
+        "recall": 0.7425742574257426,
+        "f1": 0.7389162561576355
+      },
+      "Contradiction": {
+        "tp": 9,
+        "fp": 14,
+        "fn": 10,
+        "precision": 0.391304347826087,
+        "recall": 0.47368421052631576,
+        "f1": 0.42857142857142855
+      },
+      "NotMentioned": {
+        "tp": 41,
+        "fp": 26,
+        "fn": 31,
+        "precision": 0.6119402985074627,
+        "recall": 0.5694444444444444,
+        "f1": 0.5899280575539567
+      }
+    },
+    "macroF1": 0.5858052474276736,
+    "confusion": {
+      "Entailment": {
+        "Entailment": 75,
+        "Contradiction": 5,
+        "NotMentioned": 21
+      },
+      "Contradiction": {
+        "Entailment": 5,
+        "Contradiction": 9,
+        "NotMentioned": 5
+      },
+      "NotMentioned": {
+        "Entailment": 22,
+        "Contradiction": 9,
+        "NotMentioned": 41
+      }
+    }
+  }
+}
