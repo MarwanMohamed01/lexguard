@@ -4,7 +4,7 @@
   "subset": {
     "ndas": 20,
     "pairs": 340,
-    "answered": 192,
+    "answered": 200,
     "ids": [
       606,
       83,
@@ -29,32 +29,32 @@
     ],
     "topK": 10
   },
-  "failed": 0,
+  "failed": 1,
   "downgraded": 1,
   "quotesNotFound": 4,
   "quotesTooShort": 0,
   "labelsStripped": 73,
-  "ruleQuoteFound": 191,
-  "inputTokens": 187519,
-  "outputTokens": 33363,
-  "ms": 32136365,
-  "secondsPerPair": 167.37690104166668,
+  "ruleQuoteFound": 198,
+  "inputTokens": 196958,
+  "outputTokens": 34885,
+  "ms": 37530496,
+  "secondsPerPair": 187.65248,
   "tokensPerPair": {
-    "input": 976.6614583333334,
-    "output": 173.765625
+    "input": 984.79,
+    "output": 174.425
   },
   "checker": {
     "labels": {
-      "cases": 192,
-      "accuracy": 0.75,
+      "cases": 200,
+      "accuracy": 0.76,
       "perClass": {
         "Entailment": {
-          "tp": 79,
+          "tp": 84,
           "fp": 13,
           "fn": 22,
-          "precision": 0.8586956521739131,
-          "recall": 0.7821782178217822,
-          "f1": 0.8186528497409327
+          "precision": 0.865979381443299,
+          "recall": 0.7924528301886793,
+          "f1": 0.8275862068965517
         },
         "Contradiction": {
           "tp": 7,
@@ -65,18 +65,18 @@
           "f1": 0.3684210526315789
         },
         "NotMentioned": {
-          "tp": 58,
+          "tp": 61,
           "fp": 23,
           "fn": 14,
-          "precision": 0.7160493827160493,
-          "recall": 0.8055555555555556,
-          "f1": 0.758169934640523
+          "precision": 0.7261904761904762,
+          "recall": 0.8133333333333334,
+          "f1": 0.7672955974842767
         }
       },
-      "macroF1": 0.6484146123376782,
+      "macroF1": 0.6544342856708024,
       "confusion": {
         "Entailment": {
-          "Entailment": 79,
+          "Entailment": 84,
           "Contradiction": 6,
           "NotMentioned": 16
         },
@@ -88,32 +88,32 @@
         "NotMentioned": {
           "Entailment": 8,
           "Contradiction": 6,
-          "NotMentioned": 58
+          "NotMentioned": 61
         }
       }
     },
     "evidence": {
-      "tp": 93,
-      "fp": 47,
-      "fn": 162,
-      "precision": 0.6642857142857143,
-      "recall": 0.36470588235294116,
-      "f1": 0.4708860759493671,
-      "pairs": 120,
-      "hit": 0.7083333333333334
+      "tp": 99,
+      "fp": 48,
+      "fn": 166,
+      "precision": 0.673469387755102,
+      "recall": 0.37358490566037733,
+      "f1": 0.4805825242718446,
+      "pairs": 125,
+      "hit": 0.72
     }
   },
   "barPerHypothesisSamePairs": {
-    "cases": 192,
-    "accuracy": 0.6510416666666666,
+    "cases": 200,
+    "accuracy": 0.655,
     "perClass": {
       "Entailment": {
-        "tp": 75,
-        "fp": 27,
-        "fn": 26,
-        "precision": 0.7352941176470589,
-        "recall": 0.7425742574257426,
-        "f1": 0.7389162561576355
+        "tp": 79,
+        "fp": 28,
+        "fn": 27,
+        "precision": 0.7383177570093458,
+        "recall": 0.7452830188679245,
+        "f1": 0.7417840375586855
       },
       "Contradiction": {
         "tp": 9,
@@ -124,20 +124,20 @@
         "f1": 0.42857142857142855
       },
       "NotMentioned": {
-        "tp": 41,
-        "fp": 26,
-        "fn": 31,
-        "precision": 0.6119402985074627,
-        "recall": 0.5694444444444444,
-        "f1": 0.5899280575539567
+        "tp": 43,
+        "fp": 27,
+        "fn": 32,
+        "precision": 0.6142857142857143,
+        "recall": 0.5733333333333334,
+        "f1": 0.5931034482758621
       }
     },
-    "macroF1": 0.5858052474276736,
+    "macroF1": 0.5878196381353255,
     "confusion": {
       "Entailment": {
-        "Entailment": 75,
+        "Entailment": 79,
         "Contradiction": 5,
-        "NotMentioned": 21
+        "NotMentioned": 22
       },
       "Contradiction": {
         "Entailment": 5,
@@ -145,9 +145,9 @@
         "NotMentioned": 5
       },
       "NotMentioned": {
-        "Entailment": 22,
+        "Entailment": 23,
         "Contradiction": 9,
-        "NotMentioned": 41
+        "NotMentioned": 43
       }
     }
   }

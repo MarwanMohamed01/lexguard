@@ -1663,6 +1663,12 @@ herein..."`), copied despite the prompt. **Fix in code, not the prompt:** a lead
   mentioned"). Evidence precision 0.66 / recall 0.36; quotes not found 4, labels stripped 73.
   The remaining 148 pairs: Marwan resumes the same command after the nightly injection run has
   had its Groq share (both use one daily budget).
+- **Overnight 2026-11-27: 200 of 340.** Left running all night, the run added only 8 answers
+  before stopping at 03:02 with 429 after 8 retries: Groq's 200,000 tokens/day had been used
+  up and comes back only gradually. One of the 8 was a refused, invalid JSON answer
+  (`failed` 1). Scores barely moved: accuracy 0.760, macro F1 **0.654** vs bar 0.588 on the
+  same 200 pairs; Contradiction still 0.37. Lesson: about 150-190 pairs a day is Groq's
+  ceiling for this prompt, so the other 140 need about one more full day of budget.
 
 ## D50. The verifier and section cross-references (M5 step 6, 2026-11-26)
 

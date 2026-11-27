@@ -44,9 +44,9 @@ blocked by the M5 leftovers below; they are runs that finish on their own plus s
 First in the new chat:
 
 1. ✅ **Overnight runs checked (2026-11-27):** M4 step 4 closed (gemma-4 F1 0.52 vs keyword
-   0.17 on all 473 chunks, D38); Groq checker re-scored on 192 of 340 pairs (macro F1 0.648 vs
-   bar 0.586 on the same pairs, D49). Still open: the last 2 injection cases (D41, nightly) and
-   the other 148 checker pairs (Marwan, after the nightly run).
+   0.17 on all 473 chunks, D38); Groq checker re-scored on 200 of 340 pairs (macro F1 0.654 vs
+   bar 0.588 on the same pairs, D49). Still open: the last 2 injection cases (D41, nightly) and
+   the other 140 checker pairs (Marwan, after the nightly run).
 2. **Start M6 (routing & caching)**: explain M6 simply with small examples, draft the plan, verify
    free-tier limits in the official docs first (AI Gateway caching, Workers AI models and
    prices), design the M6 eval before building (D10: public data only). Build with fake models
