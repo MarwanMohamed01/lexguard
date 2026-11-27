@@ -1669,6 +1669,27 @@ herein..."`), copied despite the prompt. **Fix in code, not the prompt:** a lead
   (`failed` 1). Scores barely moved: accuracy 0.760, macro F1 **0.654** vs bar 0.588 on the
   same 200 pairs; Contradiction still 0.37. Lesson: about 150-190 pairs a day is Groq's
   ceiling for this prompt, so the other 140 need about one more full day of budget.
+- **gemma-4 on Workers AI, 289 of 340 pairs (2026-11-27, thinking off, same prompt
+  `check/1`):** stopped by the Neuron ledger at the 9,000 cap (the nightly extraction had used
+  5,799 of that UTC day); the last 51 pairs run after 00:00 UTC. About 11 Neurons, 3.3 s and
+  ~945 input + 90 output tokens per pair. **Head to head on the first 200 pairs** (the cache
+  keys, which hash the full prompt, are identical for both models, so the questions are the
+  same):
+
+  | Same 200 pairs     | Accuracy | Macro F1  | Contradiction F1 | Evidence P / R  | Quotes not found |
+  | ------------------ | -------- | --------- | ---------------- | --------------- | ---------------- |
+  | gemma-4-26b-a4b-it | 0.785    | **0.692** | 0.44             | **0.94** / 0.41 | 0                |
+  | gpt-oss-20b (Groq) | 0.760    | 0.654     | 0.37             | 0.67 / 0.37     | 4                |
+  | Per-rule bar       | -        | 0.588     | -                | -               | -                |
+
+  On all 289: accuracy 0.792, macro F1 **0.712** (bar 0.579 on those pairs), Contradiction
+  0.48, evidence precision 0.94. gemma-4 is ahead on every measure, by a margin that 200
+  pairs cannot call certain (no paired interval computed yet), and it is also the only one of
+  the two allowed to read real customers' documents (D34) and the one production runs. Its
+  quotes are almost always the right ones (0.94): when it cites, the citation holds. The weak
+  class stays Contradiction: 16 "not mentioned" pairs read as contradictions. **For M6:**
+  gemma-4 is a good default "cheap" checker; a stronger model is worth paying for mainly on
+  pairs where the verdict is a contradiction.
 
 ## D50. The verifier and section cross-references (M5 step 6, 2026-11-26)
 

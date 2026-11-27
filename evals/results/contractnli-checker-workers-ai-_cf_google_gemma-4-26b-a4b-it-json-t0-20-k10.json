@@ -1,0 +1,154 @@
+{
+  "model": "workers-ai-@cf/google/gemma-4-26b-a4b-it-json-t0",
+  "promptVersion": "check/1",
+  "subset": {
+    "ndas": 20,
+    "pairs": 340,
+    "answered": 289,
+    "ids": [
+      606,
+      83,
+      5,
+      433,
+      129,
+      22,
+      564,
+      412,
+      289,
+      25,
+      521,
+      584,
+      165,
+      400,
+      43,
+      389,
+      8,
+      395,
+      585,
+      1
+    ],
+    "topK": 10
+  },
+  "failed": 0,
+  "downgraded": 1,
+  "quotesNotFound": 0,
+  "quotesTooShort": 0,
+  "labelsStripped": 4,
+  "ruleQuoteFound": 289,
+  "inputTokens": 272691,
+  "outputTokens": 25542,
+  "ms": 918712,
+  "secondsPerPair": 3.1789342560553635,
+  "tokensPerPair": {
+    "input": 943.5674740484429,
+    "output": 88.38062283737024
+  },
+  "checker": {
+    "labels": {
+      "cases": 289,
+      "accuracy": 0.7923875432525952,
+      "perClass": {
+        "Entailment": {
+          "tp": 118,
+          "fp": 15,
+          "fn": 25,
+          "precision": 0.8872180451127819,
+          "recall": 0.8251748251748252,
+          "f1": 0.8550724637681159
+        },
+        "Contradiction": {
+          "tp": 15,
+          "fp": 23,
+          "fn": 10,
+          "precision": 0.39473684210526316,
+          "recall": 0.6,
+          "f1": 0.47619047619047616
+        },
+        "NotMentioned": {
+          "tp": 96,
+          "fp": 22,
+          "fn": 25,
+          "precision": 0.8135593220338984,
+          "recall": 0.7933884297520661,
+          "f1": 0.8033472803347281
+        }
+      },
+      "macroF1": 0.7115367400977733,
+      "confusion": {
+        "Entailment": {
+          "Entailment": 118,
+          "Contradiction": 7,
+          "NotMentioned": 18
+        },
+        "Contradiction": {
+          "Entailment": 6,
+          "Contradiction": 15,
+          "NotMentioned": 4
+        },
+        "NotMentioned": {
+          "Entailment": 9,
+          "Contradiction": 16,
+          "NotMentioned": 96
+        }
+      }
+    },
+    "evidence": {
+      "tp": 144,
+      "fp": 9,
+      "fn": 192,
+      "precision": 0.9411764705882353,
+      "recall": 0.42857142857142855,
+      "f1": 0.5889570552147239,
+      "pairs": 168,
+      "hit": 0.8214285714285714
+    }
+  },
+  "barPerHypothesisSamePairs": {
+    "cases": 289,
+    "accuracy": 0.6470588235294118,
+    "perClass": {
+      "Entailment": {
+        "tp": 108,
+        "fp": 45,
+        "fn": 35,
+        "precision": 0.7058823529411765,
+        "recall": 0.7552447552447552,
+        "f1": 0.7297297297297297
+      },
+      "Contradiction": {
+        "tp": 12,
+        "fp": 22,
+        "fn": 13,
+        "precision": 0.35294117647058826,
+        "recall": 0.48,
+        "f1": 0.4067796610169491
+      },
+      "NotMentioned": {
+        "tp": 67,
+        "fp": 35,
+        "fn": 54,
+        "precision": 0.6568627450980392,
+        "recall": 0.5537190082644629,
+        "f1": 0.6008968609865472
+      }
+    },
+    "macroF1": 0.5791354172444086,
+    "confusion": {
+      "Entailment": {
+        "Entailment": 108,
+        "Contradiction": 7,
+        "NotMentioned": 28
+      },
+      "Contradiction": {
+        "Entailment": 6,
+        "Contradiction": 12,
+        "NotMentioned": 7
+      },
+      "NotMentioned": {
+        "Entailment": 39,
+        "Contradiction": 15,
+        "NotMentioned": 67
+      }
+    }
+  }
+}

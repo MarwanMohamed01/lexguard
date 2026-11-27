@@ -45,19 +45,22 @@ First in the new chat:
 
 1. ✅ **Overnight runs checked (2026-11-27):** M4 step 4 closed (gemma-4 F1 0.52 vs keyword
    0.17 on all 473 chunks, D38); Groq checker re-scored on 200 of 340 pairs (macro F1 0.654 vs
-   bar 0.588 on the same pairs, D49). Still open: the last 2 injection cases (D41, nightly) and
-   the other 140 checker pairs (Marwan, after the nightly run).
+   bar 0.588 on the same pairs, D49); gemma-4 checker 289 of 340 (on the same 200 pairs
+   macro F1 0.692 vs Groq 0.654, evidence precision 0.94; D49). Still open: the last 2
+   injection cases (D41, nightly) and the last 51 gemma-4 checker pairs (after 00:00 UTC: start the probe Worker, then
+   `PROVIDER=workers-ai npm run check:contractnli -w @lexguard/evals`); Groq's other 140 pairs
+   are optional now.
 2. **Start M6 (routing & caching)**: explain M6 simply with small examples, draft the plan, verify
    free-tier limits in the official docs first (AI Gateway caching, Workers AI models and
    prices), design the M6 eval before building (D10: public data only). Build with fake models
-   first; leave the choice of the cheap and strong model open until the gemma-4 checker numbers
-   exist (M5 leftover below).
+   first; gemma-4 is the measured default checker (D49); a stronger model mainly for
+   contradiction verdicts.
 
 ## Open items (carry into M6)
 
-- **M5 leftovers (D49, D53, D52):** the gemma-4 checker run on the 340 ContractNLI pairs
-  (Neurons free since 2026-11-27: the nightly task no longer uses Workers AI; ~4,000-5,000
-  Neurons, probe Worker, ask Marwan first); a real-model run of planted attacks against the checker; a live review that quotes
+- **M5 leftovers (D49, D53, D52):** the last 51 of 340 gemma-4 checker pairs
+  (289 done 2026-11-27, stopped at the daily Neuron cap); a real-model run of planted attacks
+  against the checker; a live review that quotes
   something (Marwan, smoke test on a larger contract); the screen's false alarms on list items
   after "shall not:" (read the previous sentence, measure on fresh data).
 - **Marwan:** `git push` (24+ local commits); rotate the API key (open since M3).
